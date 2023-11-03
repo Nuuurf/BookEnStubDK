@@ -1,0 +1,22 @@
+CREATE TABLE Customer (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Firstname VARCHAR(50) NOT NULL,
+    Lastname VARCHAR(50) NOT NULL,
+    Email VARCHAR(50) NOT NULL UNIQUE,
+    Phone VARCHAR(12) NOT NULL
+);
+
+CREATE TABLE Booking (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    TimeStart DATETIME NOT NULL,
+    TimeEnd DATETIME NOT NULL,
+    Notes VARCHAR(400),
+    CustomerID INT,
+	StubId INT,
+	FOREIGN KEY (StubID) REFERENCES Stub(Id),
+    FOREIGN KEY (CustomerID) REFERENCES Customer(Id)
+);
+
+CREATE TABLE Stub (
+    Id INT PRIMARY KEY,
+);
