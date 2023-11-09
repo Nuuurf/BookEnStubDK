@@ -11,10 +11,10 @@ CREATE TABLE Booking (
     TimeStart DATETIME NOT NULL,
     TimeEnd DATETIME NOT NULL,
     Notes VARCHAR(400),
-    CustomerID INT,
+    CustomerId INT,
 	StubId INT,
 	FOREIGN KEY (StubID) REFERENCES Stub(Id),
-    FOREIGN KEY (CustomerID) REFERENCES Customer(Id)
+    FOREIGN KEY (CustomerId) REFERENCES Customer(Id)
 );
 
 CREATE TABLE Stub (
