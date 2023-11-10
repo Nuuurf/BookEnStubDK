@@ -17,14 +17,13 @@ namespace RestfulApi.DAL {
         /// <param name="booking"> the booking object that needs to be persisted</param>
         /// <returns>A boolean indicading where the action was successful or not</returns>
         public bool CreateBooking(Booking booking) {
-            string script = "Insert into bookings TimeStart, TimeEnd, Notes values (@StartTime, @EndTime, @Notes)";
+            string script = "Insert into booking (TimeStart, TimeEnd, Notes) values (@TimeStart, @TimeEnd, @Notes)";
 
             bool success = false;
 
-            using(SqlConnection connection = _connectionString) {
-                connection.Open();
+            using(SqlConnection con = DBConnection.Instance.GetOpenConnection()) {
 
-                connection.Execute(script, booking);
+                con.Execute(script, booking);
 
                 success = true;
             }
@@ -34,7 +33,19 @@ namespace RestfulApi.DAL {
 
         // Not implemented
         public List<Booking> GetBookingsInTimeslot(DateTime start, DateTime end) {
-            throw new NotImplementedException();
+            string script = "SELECT id, TimeStart, TimeEnd, Notes FROM Booking WHERE TimeStart >= @TimeStart AND TimeEnd <= @TimeEnd";
+
+            List<Booking> bookings;
+
+            using(SqlConnection con = DBConnection.Instance.GetOpenConnection()) {
+                bookings = con.Query<Booking>(script, new { TimeStart = start, TimeEnd = end }).ToList();
+
+                //SqlCommand cmd = con.CreateCommand(script);
+
+
+            }
+
+            return bookings;
         }
     }
 }

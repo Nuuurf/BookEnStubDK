@@ -2,8 +2,8 @@
 {
     public class AvailableBookingsForTimeframe
     {
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public DateTime TimeStart { get; set; }
+        public DateTime TimeEnd { get; set; }
         public int Available { get; set; }
     }
 }

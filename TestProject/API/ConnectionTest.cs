@@ -12,8 +12,6 @@ namespace TestProject.API {
         [Test]
         public void CanConnectionBeEtablished_ShouldBeOpen() {
             Assert.That(DBConnection.Instance.TryConnection()[0], Is.EqualTo(ConnectionState.Open));
-
-            TestContext.WriteLine(DBConnection.Instance.TryConnection()[0].ToString());
         }
 
     }

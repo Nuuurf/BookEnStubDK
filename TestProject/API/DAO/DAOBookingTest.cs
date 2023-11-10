@@ -3,33 +3,40 @@ using NUnit.Framework;
 using System;
 using System.Diagnostics;
 using RestfulApi.DAL;
+using System.Data.SqlClient;
+using Dapper;
 
 namespace TestProject.API.DAO {
     public class DAOBookingTest {
 
         private static Booking booking1 = new Booking {
-            StartTime = DateTime.Now,
-            EndTime = DateTime.Now.AddHours(1),
+            TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
+            TimeEnd = new DateTime(2023, 11, 12, 10, 0, 0),
             Notes = "Some generic notes",
-            CustomerID = 1,
-            StubID = 1,
+            //CustomerID = 1,
+            //StubID = 1,
         };
 
         private static Booking booking2 = new Booking {
-            StartTime = DateTime.Now,
-            EndTime = DateTime.Now.AddHours(1),
+            TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
+            TimeEnd = new DateTime(2023, 11, 12, 10, 0, 0),
             Notes = "Some generic notes",
-            CustomerID = 2,
-            StubID = 1,
+            //CustomerID = 2,
+            //StubID = 1,
         };
 
         private static Booking booking3 = new Booking {
-            StartTime = DateTime.Now.AddDays(1),
-            EndTime = DateTime.Now.AddDays(1).AddHours(1),
+            TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
+            TimeEnd = new DateTime(2023, 11, 12, 10, 0, 0),
             Notes = "Some generic notes",
-            CustomerID = 3,
-            StubID = 2,
+            //CustomerID = 3,
+            //StubID = 2,
         };
+
+        //change fourth integer for hour change
+        private static DateTime[] DateRange1 = new DateTime[] { new DateTime(2022, 11, 10, 9, 0, 0), new DateTime(2024, 11, 10, 12, 0, 0) };
+        private static DateTime[] DateRange2 = new DateTime[] { new DateTime(2022, 11, 10, 10, 0, 0), new DateTime(2024, 11, 10, 11, 0, 0) };
+        private static DateTime[] DateRange3 = new DateTime[] { new DateTime(2022, 11, 10, 11, 0, 0), new DateTime(2024, 11, 10, 12, 0, 0) };
 
         //private string dBConnectionString = "Connection";
 
@@ -44,9 +51,40 @@ namespace TestProject.API.DAO {
             }
         }
 
+        public static IEnumerable<DateTime[]> TestDates {
+            get {
+                yield return DateRange1;
+                yield return DateRange2;
+                yield return DateRange3;
+            }
+        }
+
+
 
         [SetUp]
         public void Setup() {
+
+            //List<Booking> bookings = (List<Booking>)TestBookings;
+
+            for(int i = 0; i < TestBookings.Count(); i++) {
+                string script = "Insert into booking (TimeStart, TimeEnd, Notes) values (@TimeStart, @TimeEnd, @Notes)";
+
+                using (SqlConnection con = DBConnection.Instance.GetOpenConnection()) {
+
+                    con.Execute(script, TestBookings);
+                    
+                }
+            }
+            
+        }
+
+        [TearDown]
+        public void TearThatAssholeDown() {
+            using(SqlConnection con = DBConnection.Instance.GetOpenConnection()) {
+                string script = "Delete from booking where notes = 'some generic notes'";
+
+                con.Execute(script);
+            }
         }
 
         [Test]
@@ -57,6 +95,61 @@ namespace TestProject.API.DAO {
         [Test]
         public void CreateBooking_ShouldReturnTrueIfValidInterval([ValueSource(nameof(TestBookings))] Booking inBooking) {
             Assert.True(_dbBooking.CreateBooking(inBooking));
+        }
+
+        //[Test]
+        //public void GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates) {
+        //    //Arange
+        //    //Get the values from the dates comming in
+        //    //long utc1 = inDates[0].ToFileTimeUtc();
+        //    //long utc2 = inDates[1].ToFileTimeUtc();
+        //    List<Booking> bookings;
+        //    //long[,] startAndEndTimes = new long[100,2];
+        //    List<DateTime[]> startAndEndTimes = new List<DateTime[]>();
+
+        //    //Act
+        //    bookings = _dbBooking.GetBookingsInTimeslot(inDates[0], inDates[1]);
+        //    startAndEndTimes = new List<DateTime[]>();
+
+        //    for(int i = 0; i < bookings.Count(); i++) {
+        //        //startAndEndTimes[i,0] = bookings[i].StartTime.ToFileTimeUtc();
+        //        //startAndEndTimes[i,1] = bookings[i].StartTime.ToFileTimeUtc();
+        //        TestContext.WriteLine(" index " + i + " bookings size " + bookings.Count());
+        //        startAndEndTimes[i] = new DateTime[] { bookings[i].TimeStart, bookings[i].TimeEnd };
+        //    }
+
+        //    //Assert
+        //    for(int i = 0; i < startAndEndTimes.Count(); i++) {
+        //        Assert.Greater(startAndEndTimes[i][0], inDates[0]);
+        //        Assert.Less(startAndEndTimes[i][1], inDates[1]);
+        //    }
+        //}
+
+        [Test]
+        public void GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates) {
+            // Arrange
+            var start = inDates[0];
+            var end = inDates[1];
+            const int expectedBookingCount = 3; // Set your expected count here
+
+            TestContext.WriteLine($"Testing timeslot: Start - {start}, End - {end}");
+
+            // Act
+            var bookings = _dbBooking.GetBookingsInTimeslot(start, end);
+
+            // Additional Information
+            TestContext.WriteLine($"Number of bookings returned: {bookings.Count}");
+            TestContext.WriteLine($"Expected number of bookings: {expectedBookingCount}");
+
+            // Assert
+            foreach (var booking in bookings) {
+                TestContext.WriteLine($"Booking ID: {booking.Id}, Start Time: {booking.TimeStart}, End Time: {booking.TimeEnd}");
+                Assert.GreaterOrEqual(booking.TimeStart, start, $"Booking ID {booking.Id} start time should be within the timeslot");
+                Assert.LessOrEqual(booking.TimeEnd, end, $"Booking ID {booking.Id} end time should be within the timeslot");
+            }
+
+            // Check if the number of bookings matches the expected count
+            Assert.AreEqual(expectedBookingCount, bookings.Count, "The number of bookings returned does not match the expected count");
         }
     }
 }
