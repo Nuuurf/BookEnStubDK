@@ -12,13 +12,13 @@ namespace RestfulApi.DAL
 
         private DBConnection()
         {
-            string dataSource = "";
-            string initialCatalog = "";
-            string userID = "";
-            int port = 0;
-            string password = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set.");
+            string dataSource = "hildur.ucn.dk";
+            string initialCatalog = "DMA-CSD-S225_10461242";
+            string userID = "DMA-CSD-S225_10461242";
 
-            connectionString = $"Data Source={dataSource},{port};Initial Catalog={initialCatalog};User ID={userID};Password={password};";
+            string password = "Password1!"; //Environment.GetEnvironmentVariable("DB_PASSWORD") ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set.");
+
+            connectionString = $"Data Source={dataSource};Initial Catalog={initialCatalog};User ID={userID};Password={password};";
 
         }
 
