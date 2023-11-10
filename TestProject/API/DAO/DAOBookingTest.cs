@@ -10,8 +10,8 @@ namespace TestProject.API.DAO {
     public class DAOBookingTest {
 
         private static Booking booking1 = new Booking {
-            TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
-            TimeEnd = new DateTime(2023, 11, 12, 10, 0, 0),
+            TimeStart = new DateTime(2023, 11, 10, 9, 0, 0),
+            TimeEnd = new DateTime(2023, 11, 10, 10, 0, 0),
             Notes = "Some generic notes",
             //CustomerID = 1,
             //StubID = 1,
@@ -19,24 +19,24 @@ namespace TestProject.API.DAO {
 
         private static Booking booking2 = new Booking {
             TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
-            TimeEnd = new DateTime(2023, 11, 12, 10, 0, 0),
+            TimeEnd = new DateTime(2023, 11, 10, 11, 0, 0),
             Notes = "Some generic notes",
             //CustomerID = 2,
             //StubID = 1,
         };
 
         private static Booking booking3 = new Booking {
-            TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
-            TimeEnd = new DateTime(2023, 11, 12, 10, 0, 0),
+            TimeStart = new DateTime(2023, 11, 10, 11, 0, 0),
+            TimeEnd = new DateTime(2023, 11, 10, 12, 0, 0),
             Notes = "Some generic notes",
             //CustomerID = 3,
             //StubID = 2,
         };
 
         //change fourth integer for hour change
-        private static DateTime[] DateRange1 = new DateTime[] { new DateTime(2022, 11, 10, 9, 0, 0), new DateTime(2024, 11, 10, 12, 0, 0) };
-        private static DateTime[] DateRange2 = new DateTime[] { new DateTime(2022, 11, 10, 10, 0, 0), new DateTime(2024, 11, 10, 11, 0, 0) };
-        private static DateTime[] DateRange3 = new DateTime[] { new DateTime(2022, 11, 10, 11, 0, 0), new DateTime(2024, 11, 10, 12, 0, 0) };
+        private static DateTime[] DateRange1 = new DateTime[] { new DateTime(2023, 11, 10, 9, 0, 0), new DateTime(2023, 11, 10, 10, 0, 0) };
+        private static DateTime[] DateRange2 = new DateTime[] { new DateTime(2023, 11, 10, 10, 0, 0), new DateTime(2023, 11, 10, 11, 0, 0) };
+        private static DateTime[] DateRange3 = new DateTime[] { new DateTime(2023, 11, 10, 11, 0, 0), new DateTime(2023, 11, 10, 12, 0, 0) };
 
         //private string dBConnectionString = "Connection";
 
@@ -59,8 +59,6 @@ namespace TestProject.API.DAO {
             }
         }
 
-
-
         [SetUp]
         public void Setup() {
 
@@ -79,7 +77,7 @@ namespace TestProject.API.DAO {
         }
 
         [TearDown]
-        public void TearThatAssholeDown() {
+        public void TearDown() {
             using(SqlConnection con = DBConnection.Instance.GetOpenConnection()) {
                 string script = "Delete from booking where notes = 'some generic notes'";
 
@@ -88,42 +86,9 @@ namespace TestProject.API.DAO {
         }
 
         [Test]
-        public void Test1() {
-            Assert.Pass();
-        }
-
-        [Test]
         public void CreateBooking_ShouldReturnTrueIfValidInterval([ValueSource(nameof(TestBookings))] Booking inBooking) {
             Assert.True(_dbBooking.CreateBooking(inBooking));
         }
-
-        //[Test]
-        //public void GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates) {
-        //    //Arange
-        //    //Get the values from the dates comming in
-        //    //long utc1 = inDates[0].ToFileTimeUtc();
-        //    //long utc2 = inDates[1].ToFileTimeUtc();
-        //    List<Booking> bookings;
-        //    //long[,] startAndEndTimes = new long[100,2];
-        //    List<DateTime[]> startAndEndTimes = new List<DateTime[]>();
-
-        //    //Act
-        //    bookings = _dbBooking.GetBookingsInTimeslot(inDates[0], inDates[1]);
-        //    startAndEndTimes = new List<DateTime[]>();
-
-        //    for(int i = 0; i < bookings.Count(); i++) {
-        //        //startAndEndTimes[i,0] = bookings[i].StartTime.ToFileTimeUtc();
-        //        //startAndEndTimes[i,1] = bookings[i].StartTime.ToFileTimeUtc();
-        //        TestContext.WriteLine(" index " + i + " bookings size " + bookings.Count());
-        //        startAndEndTimes[i] = new DateTime[] { bookings[i].TimeStart, bookings[i].TimeEnd };
-        //    }
-
-        //    //Assert
-        //    for(int i = 0; i < startAndEndTimes.Count(); i++) {
-        //        Assert.Greater(startAndEndTimes[i][0], inDates[0]);
-        //        Assert.Less(startAndEndTimes[i][1], inDates[1]);
-        //    }
-        //}
 
         [Test]
         public void GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates) {
