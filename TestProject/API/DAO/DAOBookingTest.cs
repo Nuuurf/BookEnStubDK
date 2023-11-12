@@ -64,21 +64,21 @@ namespace TestProject.API.DAO {
 
             //List<Booking> bookings = (List<Booking>)TestBookings;
 
-            for(int i = 0; i < TestBookings.Count(); i++) {
+            for (int i = 0; i < TestBookings.Count(); i++) {
                 string script = "Insert into booking (TimeStart, TimeEnd, Notes) values (@TimeStart, @TimeEnd, @Notes)";
 
                 using (SqlConnection con = DBConnection.Instance.GetOpenConnection()) {
 
                     con.Execute(script, TestBookings);
-                    
+
                 }
             }
-            
+
         }
 
         [TearDown]
         public void TearDown() {
-            using(SqlConnection con = DBConnection.Instance.GetOpenConnection()) {
+            using (SqlConnection con = DBConnection.Instance.GetOpenConnection()) {
                 string script = "Delete from booking where notes = 'some generic notes'";
 
                 con.Execute(script);
@@ -92,6 +92,10 @@ namespace TestProject.API.DAO {
 
         [Test]
         public void GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates) {
+            //####################################
+            //####This test should not be used####
+            //####################################
+
             // Arrange
             var start = inDates[0];
             var end = inDates[1];
@@ -116,5 +120,36 @@ namespace TestProject.API.DAO {
             // Check if the number of bookings matches the expected count
             Assert.AreEqual(expectedBookingCount, bookings.Count, "The number of bookings returned does not match the expected count");
         }
+
+        [Test]
+        public void BookingsInTimeslots_PassedShouldMatchFetched([ValueSource(nameof(TestDates))] DateTime[] inDates) {
+            //Arrange
+            var start = inDates[0];
+            var end = inDates[1];
+
+            var bookings = _dbBooking.GetBookingsInTimeslot(start, end);
+
+            int fetched = bookings.Count;
+            int passed = 0;
+            int forIndex = 0;
+            string forIndexInformation = "";
+            
+            //Act
+            foreach (var booking in bookings) {
+                forIndexInformation += $"{forIndex} - booking - start: {booking.TimeStart} - end: {booking.TimeEnd} \n";
+                forIndex++;
+                if (booking.TimeStart >= start && booking.TimeEnd <= end) {
+                    passed++;
+                } 
+            }
+
+            //Assert
+            TestContext.WriteLine(forIndexInformation);
+            TestContext.WriteLine($"Testing timeslot: Start - {start}, End - {end}");
+            TestContext.WriteLine($"Number of test which should pass: {fetched} - Actually passed {passed}");
+
+            Assert.AreEqual(fetched, passed);
+        }
+
     }
 }
