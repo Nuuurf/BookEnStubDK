@@ -39,7 +39,6 @@ namespace TestProject.API.Controller
         [Test]
         public void GetBookingsInTimeSlot_ReturnsOK_WithBooking()
         {
-
             //Arrange
             var mockDBBokking = new Mock<IDBBooking>();
             DateTime currentTime = DateTime.Now;
