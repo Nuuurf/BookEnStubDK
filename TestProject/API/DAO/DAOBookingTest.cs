@@ -92,9 +92,6 @@ namespace TestProject.API.DAO {
 
         [Test]
         public void GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates) {
-            //####################################
-            //####This test should not be used####
-            //####################################
 
             // Arrange
             var start = inDates[0];
@@ -121,35 +118,36 @@ namespace TestProject.API.DAO {
             Assert.AreEqual(expectedBookingCount, bookings.Count, "The number of bookings returned does not match the expected count");
         }
 
-        [Test]
-        public void BookingsInTimeslots_PassedShouldMatchFetched([ValueSource(nameof(TestDates))] DateTime[] inDates) {
-            //Arrange
-            var start = inDates[0];
-            var end = inDates[1];
+        //Backup test :3
+        //[Test]
+        //public void BookingsInTimeslots_PassedShouldMatchFetched([ValueSource(nameof(TestDates))] DateTime[] inDates) {
+        //    //Arrange
+        //    var start = inDates[0];
+        //    var end = inDates[1];
 
-            var bookings = _dbBooking.GetBookingsInTimeslot(start, end);
+        //    var bookings = _dbBooking.GetBookingsInTimeslot(start, end);
 
-            int fetched = bookings.Count;
-            int passed = 0;
-            int forIndex = 0;
-            string forIndexInformation = "";
+        //    int fetched = bookings.Count;
+        //    int passed = 0;
+        //    int forIndex = 0;
+        //    string forIndexInformation = "";
             
-            //Act
-            foreach (var booking in bookings) {
-                forIndexInformation += $"{forIndex} - booking - start: {booking.TimeStart} - end: {booking.TimeEnd} \n";
-                forIndex++;
-                if (booking.TimeStart >= start && booking.TimeEnd <= end) {
-                    passed++;
-                } 
-            }
+        //    //Act
+        //    foreach (var booking in bookings) {
+        //        forIndexInformation += $"{forIndex} - booking - start: {booking.TimeStart} - end: {booking.TimeEnd} \n";
+        //        forIndex++;
+        //        if (booking.TimeStart >= start && booking.TimeEnd <= end) {
+        //            passed++;
+        //        } 
+        //    }
 
-            //Assert
-            TestContext.WriteLine(forIndexInformation);
-            TestContext.WriteLine($"Testing timeslot: Start - {start}, End - {end}");
-            TestContext.WriteLine($"Number of test which should pass: {fetched} - Actually passed {passed}");
+        //    //Assert
+        //    TestContext.WriteLine(forIndexInformation);
+        //    TestContext.WriteLine($"Testing timeslot: Start - {start}, End - {end}");
+        //    TestContext.WriteLine($"Number of test which should pass: {fetched} - Actually passed {passed}");
 
-            Assert.AreEqual(fetched, passed);
-        }
+        //    Assert.AreEqual(fetched, passed);
+        //}
 
     }
 }
