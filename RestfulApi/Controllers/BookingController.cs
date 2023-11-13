@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RestfulApi.BusinessLogic;
 using RestfulApi.DAL;
 using RestfulApi.Models;
 using System.Data.SqlClient;
@@ -16,36 +17,35 @@ namespace RestfulApi.Controllers {
             _DBBooking = dbBooking;
         }
 
-        /*
-                // URL: api/booking
-                [HttpPut]
-                public IActionResult UpdateBooking([FromBody] Booking updatedBooking) {
-                    try {
-                        bool success = _DBBooking.UpdateBooking(updatedBooking);
-                        if (success == false) {
-                            return NotFound("Booking not updated");
-                        }
-                        return Ok(success);
-                    } catch (Exception ex) {
-                        return StatusCode(500, $"Internal Server Error: {ex.Message}");
-                    }
+/*
+        // URL: api/booking
+        [HttpPut]
+        public IActionResult UpdateBooking([FromBody] Booking updatedBooking) {
+            try {
+                bool success = _DBBooking.UpdateBooking(updatedBooking);
+                if (success == false) {
+                    return NotFound("Booking not updated");
+                }
+                return Ok(success);
+            } catch (Exception ex) {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        // URL: api/booking
+        [HttpGet("id")]
+        public IActionResult GetSingleBooking(int id) {
+            try {
+                Booking booking = _DBBooking.GetSingleBooking(id);
+                if (booking == null) {
+                    return NotFound("No booking found.");
                 }
 
-
-                // URL: api/booking
-                [HttpGet("id")]
-                public IActionResult GetSingleBooking(int id) {
-                    try {
-                        Booking booking = _DBBooking.GetSingleBooking(id);
-                        if (booking == null) {
-                            return NotFound("No booking found.");
-                        }
-
-                        return Ok(booking);
-                    } catch (Exception ex) {
-                        return StatusCode(500, $"Internal Server Error: {ex.Message}");
-                    }
-                }*/
+                return Ok(booking);
+            } catch (Exception ex) {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }*/
 
         // URL: api/booking
         [HttpGet]
@@ -64,16 +64,28 @@ namespace RestfulApi.Controllers {
 
         // URL: api/booking
         [HttpPost]
-        public IActionResult CreateBooking(Booking booking) {
-            try {
-                bool bookingSuccess = _DBBooking.CreateBooking(booking);
-                if (bookingSuccess == false) {
-                    return BadRequest("Booking not created.");
-                }
+        public IActionResult CreateBooking([FromBody] Booking? booking = null) {
+            if(booking != null) {
+                try {
+                    BookingDataControl bdc = new BookingDataControl();
 
-                return Ok(bookingSuccess);
-            } catch (Exception ex) {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                    bool success = bdc.CreateBooking(booking);
+
+                    if (success) {
+                        return Ok(success);
+                    }
+                    else {
+                        //No stubs are available, status might have changed from last opdate of UI
+                        //Added translations for the lulz
+                        return UnprocessableEntity("DA: Alle stubbe for denne tidsperiode er optaget \n EN: All stubs for this period are unavailable");
+                    }
+                }
+                catch (Exception ex) {
+                    return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                }
+            }
+            else {
+                return BadRequest("No JSON object has been transmitted with request");
             }
         }
 /*
