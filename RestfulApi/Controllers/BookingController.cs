@@ -67,7 +67,7 @@ namespace RestfulApi.Controllers {
             try {
                 bool bookingSuccess = _DBBooking.CreateBooking(booking);
                 if (bookingSuccess == false) {
-                    return NotFound("Booking not created");
+                    return BadRequest("Booking not created.");
                 }
 
                 return Ok(bookingSuccess);
