@@ -76,7 +76,7 @@ namespace RestfulApi.DAL {
         /// <returns>A boolean indicading where the action was successful or not</returns>
         public bool CreateBooking(Booking booking)
         {
-            string script = "Insert into booking (TimeStart, TimeEnd, Notes) values (@TimeStart, @TimeEnd, @Notes)";
+            string script = "Insert into booking (TimeStart, TimeEnd, Notes, StubId) values (@TimeStart, @TimeEnd, @Notes, @StubId)";
 
             bool success = false;
 
@@ -91,7 +91,7 @@ namespace RestfulApi.DAL {
         // Not implemented
         public List<Booking> GetBookingsInTimeslot(DateTime start, DateTime end)
         {
-            string script = "SELECT id, TimeStart, TimeEnd, Notes FROM Booking WHERE TimeStart < @TimeEnd AND TimeEnd > @TimeStart";
+            string script = "SELECT id, TimeStart, TimeEnd, Notes, StubId FROM Booking WHERE TimeStart < @TimeEnd AND TimeEnd > @TimeStart";
 
             List<Booking> bookings;
 
