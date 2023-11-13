@@ -44,7 +44,7 @@ namespace TestProject.API.Control {
         }
 
         [Test]
-        public void CreateBooking_ShouldBeFalse() {
+        public void CreateBooking_ShouldThrowArgumentException() {
             //Arrange
             BookingDataControl bdc = new BookingDataControl();
 
@@ -56,14 +56,11 @@ namespace TestProject.API.Control {
                 TimeEnd = DateTime.Now.AddHours(-1),
             };
 
-            bool createReturn = false;
             //Act
-            createReturn = bdc.CreateBooking(booking);
+            TestDelegate act = () => bdc.CreateBooking(booking);
 
             //Assert
-            Assert.IsFalse(createReturn);
-
-
+            Assert.Throws<ArgumentException>(act);
         }
 
     }
