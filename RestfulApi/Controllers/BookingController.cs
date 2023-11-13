@@ -9,13 +9,13 @@ namespace RestfulApi.Controllers {
     [Route("[controller]")]
     public class BookingController : ControllerBase {
 
-        private readonly DBBooking _DBBooking;
+        private readonly IDBBooking _DBBooking;
 
-
-        public BookingController() {
-            _DBBooking = new DBBooking();
+        public BookingController(IDBBooking dbBooking)
+        {
+            _DBBooking = dbBooking;
         }
-
+/*
         // URL: api/booking
         [HttpPut]
         public IActionResult UpdateBooking([FromBody] Booking updatedBooking) {
@@ -44,7 +44,7 @@ namespace RestfulApi.Controllers {
             } catch (Exception ex) {
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
-        }
+        }*/
 
         // URL: api/booking
         [HttpGet]
@@ -75,7 +75,7 @@ namespace RestfulApi.Controllers {
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
-
+/*
         // URL: api/booking
         [HttpDelete("{id}")]
         public IActionResult DeleteBooking(int id) {
@@ -89,6 +89,6 @@ namespace RestfulApi.Controllers {
             } catch (Exception ex) {
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
-        }
+        }*/
     }
 }
