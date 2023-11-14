@@ -2,6 +2,8 @@
 using System.Data.SqlClient;
 using Dapper;
 using Microsoft.VisualBasic;
+using System.Data;
+using System.Linq.Expressions;
 
 namespace RestfulApi.DAL {
     public class DBBooking : IDBBooking
@@ -89,20 +91,29 @@ namespace RestfulApi.DAL {
                 return success;
             }
         // Not implemented
-        public List<Booking> GetBookingsInTimeslot(DateTime start, DateTime end)
+        public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end)
         {
             string script = "SELECT id, TimeStart, TimeEnd, Notes, StubId FROM Booking WHERE TimeStart < @TimeEnd AND TimeEnd > @TimeStart";
 
-            List<Booking> bookings;
-
             using (SqlConnection con = conn.GetOpenConnection())
             {
-                bookings = con.Query<Booking>(script, new { TimeStart = start, TimeEnd = end }).ToList();
-
+               var bookings = await con.QueryAsync<Booking>(script, new { TimeStart = start, TimeEnd = end });
+                return bookings.ToList();
             }
+        }
 
-            return bookings;
+        public async Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(DateTime date)
+        {
+            string script = "dbo.GetAvailableBookingsForDate";
+            
+            using (SqlConnection con = conn.GetOpenConnection())
+            {
+                var parameter = new { date = date.Date };
+
+                var result = await con.QueryAsync<AvailableBookingsForTimeframe>(script, parameter, commandType: CommandType.StoredProcedure);
+
+                return result.ToList();
+            }
         }
     }
-
 }

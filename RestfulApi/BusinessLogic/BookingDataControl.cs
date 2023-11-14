@@ -1,4 +1,5 @@
-﻿using RestfulApi;
+﻿using Castle.Components.DictionaryAdapter.Xml;
+using RestfulApi;
 using RestfulApi.DAL;
 using RestfulApi.Models;
 
@@ -7,16 +8,16 @@ namespace RestfulApi.BusinessLogic {
 
         private DBBooking _dBBooking;
 
-        public BookingDataControl() {
+        public BookingDataControl(DBBooking dbBooking) {
             //Needs to change with injection
-            _dBBooking = new DBBooking();
+            _dBBooking = dbBooking;
         }
 
-        public bool CreateBooking(Booking booking) {
+        public async Task<bool> CreateBooking(Booking booking) {
             bool success = false;
             bool possibleDates = false;
 
-            List<Booking> bookings = _dBBooking.GetBookingsInTimeslot(booking.TimeStart, booking.TimeEnd);
+            List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(booking.TimeStart, booking.TimeEnd);
 
             //Change to non hardcoded value when stored procedure has implemented a way of getting this value from database.
             int maxStubs = 8;
@@ -58,6 +59,32 @@ namespace RestfulApi.BusinessLogic {
             }
 
             return success;
+        }
+
+        public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(DateTime date)
+        {
+            DateTime currentDate = DateTime.Now.Date;
+
+            if(date != null && date < currentDate)
+            {
+                return null;
+            }
+            
+            List<AvailableBookingsForTimeframe> availableBookings = await _dBBooking.GetAvaiableBookingsForGivenDate(date);
+            
+            return availableBookings;
+        }
+
+        public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end)
+        {
+            if(start != null && end != null && start > end)
+            {
+                return null;
+            }
+
+            List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(start, end);
+
+            return bookings;
         }
 
         private int FindLowestAvailableNumber(int[] array) {
