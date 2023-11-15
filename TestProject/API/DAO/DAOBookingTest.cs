@@ -13,14 +13,16 @@ namespace TestProject.API.DAO {
             TimeStart = new DateTime(2023, 11, 10, 9, 0, 0),
             TimeEnd = new DateTime(2023, 11, 10, 10, 0, 0),
             Notes = "Some generic notes",
+            StubId = 1
             //CustomerID = 1,
             //StubID = 1,
         };
 
-        private static Booking booking2 = new Booking {
-            TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
-            TimeEnd = new DateTime(2023, 11, 10, 11, 0, 0),
-            Notes = "Some generic notes",
+    private static Booking booking2 = new Booking {
+        TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
+        TimeEnd = new DateTime(2023, 11, 10, 11, 0, 0),
+        Notes = "Some generic notes",
+        StubId = 2
             //CustomerID = 2,
             //StubID = 1,
         };
@@ -29,6 +31,7 @@ namespace TestProject.API.DAO {
             TimeStart = new DateTime(2023, 11, 10, 11, 0, 0),
             TimeEnd = new DateTime(2023, 11, 10, 12, 0, 0),
             Notes = "Some generic notes",
+            StubId = 3
             //CustomerID = 3,
             //StubID = 2,
         };
@@ -40,7 +43,7 @@ namespace TestProject.API.DAO {
 
         //private string dBConnectionString = "Connection";
 
-        private static IDBBooking _dbBooking = new DBBooking();
+        private static IDBBooking _dbBooking = new DBBooking(DBConnection.Instance.GetOpenConnection());
 
         // Use a static property or method that NUnit can access for the ValueSource
         public static IEnumerable<Booking> TestBookings {

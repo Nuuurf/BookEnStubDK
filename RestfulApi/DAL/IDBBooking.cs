@@ -6,6 +6,8 @@ namespace RestfulApi.DAL {
 
         bool CreateBooking(Booking booking);
 
+        bool CreateMultipleBookings(List<List<Booking>> dateGroupedBookings);
+
         //bool DeleteBooking(int bookingID);
 
         //bool UpdateBooking(int bookingID, Booking booking);
