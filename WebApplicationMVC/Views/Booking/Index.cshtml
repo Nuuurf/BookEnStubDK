@@ -29,7 +29,7 @@
                             <h5 class="mb-0 mr-5 pr-5">Ledige Tider</h5>
                             <!-- Datepicker input field -->
                             <div class="input-group date">
-                                <input type="text" class="form-control datepicker">
+                                <input type="text" class="form-control datepicker" id="dateInput">
                                 <div class="input-group-append">
                                     <span class="input-group-text">
                                         <i class="fa fa-calendar"></i>
@@ -206,34 +206,66 @@
                 return dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
 
-            // Iterate through the apiResponse array and append each element to the ul as li items
-            $.each(apiResponse, function (index, item) {
-                var startTime = formatTime(item.timeStart);
-                var endTime = formatTime(item.timeEnd);
-                var availableStubs = item.availableStubs;
+            $(document).ready(function () {
+                $('#dateInput').on('keydown', function (event) {
+                    // Check if the key pressed is Enter (key code 13)
+                    if (event.keyCode === 13) {
+                        // Prevent the default form submission behavior
+                        event.preventDefault();
 
-                var buttonClass = 'btn btn-primary btn-sm book-btn';
-                var buttonText = 'Book';
+                        // Get the value from the input field
+                        var inputData = $(this).val();
+                        console.log(inputData);
 
-                // Check if availableStubs is 0, then disable the button and change its color to danger
-                if (availableStubs === 0) {
-                    buttonClass = 'btn btn-danger btn-sm book-btn disabled';
-                    buttonText = 'Booket';
-                }
-
-                var listItem = $('<li>', {
-                    class: 'list-group-item d-flex justify-content-between align-items-center',
-                    html: startTime + ' - ' + endTime +
-                        '<div class="">' +
-                        '<small class="text-muted">' + availableStubs + ' tider ledige</small>' +
-                        '</div>' +
-                        '<button class="' + buttonClass + '" data-time="' + startTime + ' - ' + endTime + '">' +
-                        '<i class="fas fa-plus"></i> ' + buttonText +
-                        '</button>'
+                        // Make an AJAX GET request
+                        $.ajax({
+                            url: 'https://localhost:8000/api/getTimes',
+                            type: 'GET',
+                            data: { data: inputData },
+                            success: function (response) {
+                                // Handle the successful response here
+                                console.log('Response:', response);
+                                processApiResponse(response);
+                            },
+                            error: function (xhr, status, error) {
+                                // Handle errors here
+                                console.error('Error:', error);
+                            }
+                        });
+                    }
                 });
-
-                $('#available-times').append(listItem);
             });
+
+            function processApiResponse(apiResponse) {
+                // Iterate through the apiResponse array and append each element to the ul as li items
+                $.each(apiResponse, function (index, item) {
+                    var startTime = formatTime(item.timeStart);
+                    var endTime = formatTime(item.timeEnd);
+                    var availableStubs = item.availableStubs;
+
+                    var buttonClass = 'btn btn-primary btn-sm book-btn';
+                    var buttonText = 'Book';
+
+                    // Check if availableStubs is 0, then disable the button and change its color to danger
+                    if (availableStubs === 0) {
+                        buttonClass = 'btn btn-danger btn-sm book-btn disabled';
+                        buttonText = 'Booket';
+                    }
+
+                    var listItem = $('<li>', {
+                        class: 'list-group-item d-flex justify-content-between align-items-center',
+                        html: startTime + ' - ' + endTime +
+                            '<div class="">' +
+                            '<small class="text-muted">' + availableStubs + ' tider ledige</small>' +
+                            '</div>' +
+                            '<button class="' + buttonClass + '" data-time="' + startTime + ' - ' + endTime + '">' +
+                            '<i class="fas fa-plus"></i> ' + buttonText +
+                            '</button>'
+                    });
+
+                    $('#available-times').append(listItem);
+                });
+            }
 
             $(function () {
                 $('.book-btn').on('click', function () {
@@ -280,7 +312,7 @@
                 todayHighlight: true,
                 weekStart: 1,
                 autoclose: true,
-            }).datepicker("setDate", "0");
+            }); //.datepicker("setDate", "0")
         </script>
 
     </body>
