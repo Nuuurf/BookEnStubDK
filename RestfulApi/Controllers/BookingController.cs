@@ -124,7 +124,6 @@ namespace RestfulApi.Controllers
                     return StatusCode(500, $"Internal Server Error: {ex.Message}");
                 }
             }
-
             else {
                 return BadRequest("No JSON object were transmitted with request");
             }
@@ -132,14 +131,13 @@ namespace RestfulApi.Controllers
 
         [HttpPost]
         [Route("/Booking/Multiple")]
-        public IActionResult CreateMultipleBooking([FromBody] Booking[]? bookings = null) {
+        public async Task<IActionResult> CreateMultipleBooking([FromBody] Booking[]? bookings = null) {
             if (bookings != null) {
                 try {
-                    BookingDataControl bdc = new BookingDataControl();
 
                     List<Booking> bookingList = new List<Booking>(bookings);
 
-                    bool succss = bdc.CreateMultipleBookings(bookingList);
+                    bool succss = await _bookingdata.CreateMultipleBookings(bookingList);
 
                     if (succss) {
                         return Ok(succss);

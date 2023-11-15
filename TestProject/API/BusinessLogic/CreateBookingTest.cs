@@ -20,9 +20,11 @@ namespace TestProject.API.BusinessLogic
             //Arrange
             var mockDBBokking = new Mock<IDBBooking>();
 
-            DateTime bookingDate = DateTime.Now.AddDays(1);
+            DateTime bookingStart = DateTime.Now.AddDays(1);
+            DateTime bookingEnd = DateTime.Now.AddDays(1).AddHours(1);
             Booking booking = new Booking();
-            booking.TimeStart = bookingDate;
+            booking.TimeStart = bookingStart;
+            booking.TimeEnd = bookingEnd;
 
             mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(1);
 
@@ -67,10 +69,10 @@ namespace TestProject.API.BusinessLogic
             BookingDataControl controller = new BookingDataControl(mockDBBokking.Object);
 
             //Act   
-            var result = await controller.CreateBooking(booking);
+            AsyncTestDelegate result = () => controller.CreateBooking(booking);
 
             //Assert
-            Assert.AreEqual(0, result);
+            Assert.ThrowsAsync<ArgumentNullException>(result);
         }
     }
 }

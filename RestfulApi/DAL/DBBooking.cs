@@ -104,14 +104,16 @@ namespace RestfulApi.DAL {
             string script = "InsertBooking";
             int newBookingId = 0;
 
-              using (SqlConnection con = conn.GetOpenConnection())
-            {
-                var parameter = new { date = booking.TimeStart };
-                int result = await con.QueryFirstOrDefaultAsync<int>(script, parameter, commandType : CommandType.StoredProcedure);
+            try {
+                var parameter = new { date = booking.TimeStart, note = booking.Notes };
+                int result = await conn.QueryFirstOrDefaultAsync<int>(script, parameter, commandType: CommandType.StoredProcedure);
 
                 newBookingId = result;
             }
-                return newBookingId;
+            catch {
+                return await Task.FromResult(0);
+            }
+            return newBookingId;
 
         }
         /// <summary>
@@ -121,12 +123,12 @@ namespace RestfulApi.DAL {
         /// <param name="booking"> the booking object that needs to be persisted</param>
         /// <param name="transaction"> A transaction which has an existing connection assigned to it</param>
         /// <returns>A boolean indicading where the action was successful or not</returns>
-        public bool CreateBooking(Booking booking, SqlTransaction transaction) {
+        public async Task<bool> CreateBooking(Booking booking, SqlTransaction transaction) {
             string script = "Insert into booking (TimeStart, TimeEnd, Notes, StubId) values (@TimeStart, @TimeEnd, @Notes, @StubId)";
 
             try {
                 // Use the existing transaction object for the command
-                conn.Execute(script, booking, transaction);
+                await conn.ExecuteAsync(script, booking, transaction);
                 return true;
             }
             catch (Exception) {
@@ -135,35 +137,41 @@ namespace RestfulApi.DAL {
             }
         }
         // Not implemented
-        public List<Booking> GetBookingsInTimeslot(DateTime start, DateTime end) {
+        public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end)
+        {
             string script = "SELECT id, TimeStart, TimeEnd, Notes, StubId FROM Booking WHERE TimeStart < @TimeEnd AND TimeEnd > @TimeStart";
 
-            List<Booking> bookings;
+            List<Booking> bookings = new List<Booking>();
 
-            try {
-                bookings = conn.Query<Booking>(script, new { TimeStart = start, TimeEnd = end }).ToList();
+            try
+            {
+                bookings = (await conn.QueryAsync<Booking>(script, new { TimeStart = start, TimeEnd = end })).ToList();
             }
             catch {
                 //if it fails send null for error handling in blc
                 bookings = null;
             }
+
+            return bookings.ToList();
         }
 
-        public async Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(DateTime date)
-        {
+        public async Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(DateTime date) {
             string script = "dbo.GetAvailableBookingsForDate";
-            
-            using (SqlConnection con = conn.GetOpenConnection())
-            {
+
+            try {
                 var parameter = new { date = date.Date };
 
-                var result = await con.QueryAsync<AvailableBookingsForTimeframe>(script, parameter, commandType: CommandType.StoredProcedure);
+                var result = await conn.QueryAsync<AvailableBookingsForTimeframe>(script, parameter, commandType: CommandType.StoredProcedure);
 
                 return result.ToList();
             }
+            catch {
+                return new List<AvailableBookingsForTimeframe>();
+            }
+
         }
 
-        public bool CreateMultipleBookings(List<List<Booking>> dateGroupedBookings) {
+        public async Task<bool> CreateMultipleBookings(List<List<Booking>> dateGroupedBookings) {
             bool success = false;
             int expectedAllChanges = 0;
             int actualAllChanges = 0;
@@ -172,13 +180,15 @@ namespace RestfulApi.DAL {
             int actualChangesTemp = 0;
             int expectedChangesTemp = 0;
             //find the maximal amount of bookings per timeslot
-            int maxBookingsPerTimeSlotTemp = GetMaxStubs();
+            int maxBookingsPerTimeSlotTemp = await GetMaxStubs();
 
             foreach (List<Booking> dateBookingGroup in dateGroupedBookings) {
                 //find the size of the group wanted for this timeslot
                 groupSizeTemp = dateBookingGroup.Count;
                 //find the amount of bookings already on timeslot.
-                bookingsOnDateTemp = GetBookingsInTimeslot(dateBookingGroup[0].TimeStart, dateBookingGroup[0].TimeEnd).Count;
+
+                bookingsOnDateTemp = GetBookingsInTimeslot(dateBookingGroup[0].TimeStart, dateBookingGroup[0].TimeEnd).Result.Count;
+
 
                 //if the group size wanted to be added can fit within the number of the remaining available stubs in the timeslot.
                 if (groupSizeTemp <= maxBookingsPerTimeSlotTemp - bookingsOnDateTemp) {
@@ -189,7 +199,7 @@ namespace RestfulApi.DAL {
 
                     foreach (Booking booking in dateBookingGroup) {
                         //if creation was successful increment actual changes
-                        if (CreateBooking(booking)) {
+                        if (await CreateBooking(booking) > 0) {
                             actualChangesTemp++;
                             actualAllChanges++;
                         }
@@ -212,9 +222,9 @@ namespace RestfulApi.DAL {
             return success;
         }
 
-        public int GetMaxStubs() {
+        public async Task<int> GetMaxStubs() {
             using (SqlConnection connection = DBConnection.Instance.GetOpenConnection()) {
-                return connection.QueryFirstOrDefault<int>("Select Count(*) from Stub");
+                return await connection.QueryFirstOrDefaultAsync<int>("Select Count(*) from Stub");
             }
             return -1;
         }

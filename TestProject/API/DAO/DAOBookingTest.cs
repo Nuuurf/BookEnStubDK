@@ -18,7 +18,7 @@ namespace TestProject.API.DAO {
             //StubID = 1,
         };
 
-    private static Booking booking2 = new Booking {
+        private static Booking booking2 = new Booking {
         TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
         TimeEnd = new DateTime(2023, 11, 10, 11, 0, 0),
         Notes = "Some generic notes",
@@ -80,22 +80,22 @@ namespace TestProject.API.DAO {
         }
 
         [TearDown]
-        public void TearDown() {
+        public async Task TearDown() {
             using (SqlConnection con = DBConnection.Instance.GetOpenConnection()) {
-                string script = "Delete from booking where notes = 'some generic notes'";
+                string script = "Delete from booking where notes = 'Some generic notes'";
 
-                con.Execute(script);
+                await con.ExecuteAsync(script);
             }
         }
 
         [Test]
-        public void CreateBooking_ShouldReturnTrueIfValidInterval([ValueSource(nameof(TestBookings))] Booking inBooking)
+        public async Task CreateBooking_ShouldReturnTrueIfValidInterval([ValueSource(nameof(TestBookings))] Booking inBooking)
         {
-            Assert.True(_dbBooking.CreateBooking(inBooking));
+            Assert.True(await _dbBooking.CreateBooking(inBooking) > 0);
         }
 
         [Test]
-        public void GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates)
+        public async Task GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates)
         {
 
             // Arrange
@@ -106,7 +106,7 @@ namespace TestProject.API.DAO {
             TestContext.WriteLine($"Testing timeslot: Start - {start}, End - {end}");
 
             // Act
-            var bookings = _dbBooking.GetBookingsInTimeslot(start, end);
+            var bookings = await _dbBooking.GetBookingsInTimeslot(start, end);
 
             // Additional Information
             TestContext.WriteLine($"Number of bookings returned: {bookings.Count}");

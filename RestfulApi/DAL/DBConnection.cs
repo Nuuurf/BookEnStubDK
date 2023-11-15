@@ -13,8 +13,8 @@ namespace RestfulApi.DAL
         private DBConnection()
         {
             string dataSource = "hildur.ucn.dk";
-            string initialCatalog = "DMA-CSD-S225_10461233";
-            string userID = "DMA-CSD-S225_10461233"; //42
+            string initialCatalog = "DMA-CSD-S225_10461242";
+            string userID = "DMA-CSD-S225_10461242"; //42
 
             string password = "Password1!"; //Environment.GetEnvironmentVariable("DB_PASSWORD") ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set.");
 

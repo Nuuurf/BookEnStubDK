@@ -5,7 +5,7 @@ namespace RestfulApi.DAL {
 
         public Task<int> CreateBooking(Booking booking);
 
-        bool CreateMultipleBookings(List<List<Booking>> dateGroupedBookings);
+        public Task<bool> CreateMultipleBookings(List<List<Booking>> dateGroupedBookings);
 
         //bool DeleteBooking(int bookingID);
 
@@ -14,6 +14,7 @@ namespace RestfulApi.DAL {
         public Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end);
 
         public Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(DateTime date);
+        public Task<int> GetMaxStubs();
 
         //List<Booking> GetBookingsForDay(DateTime date);
     }
