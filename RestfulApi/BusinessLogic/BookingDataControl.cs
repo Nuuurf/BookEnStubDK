@@ -1,4 +1,5 @@
-﻿using RestfulApi;
+﻿using Castle.Components.DictionaryAdapter.Xml;
+using RestfulApi;
 using RestfulApi.DAL;
 using RestfulApi.Models;
 using System.Data.Common;
@@ -7,10 +8,10 @@ using System.Data.SqlClient;
 namespace RestfulApi.BusinessLogic {
     public class BookingDataControl : IBookingData {
         //nono
-        private DBBooking _dBBooking;
+        private IDBBooking _dBBooking;
 
         //Ready for dependency injection
-        public BookingDataControl() {
+        public BookingDataControl(IDBBooking dbBooking) {
             //Needs to change with injection
             _dBBooking = new DBBooking(DBConnection.Instance.GetOpenConnection());
         }
@@ -199,23 +200,45 @@ namespace RestfulApi.BusinessLogic {
                 throw new ArgumentException("Booking date format exception. Booking dates preceding current date");
             }
             return validDates;
-        }
-
-        private int FindLowestAvailableNumber(int[] array) {
-            Array.Sort(array);
-
-            int lowestAvailableNumber = 1;
-
-            foreach (var number in array) {
-                if (number == lowestAvailableNumber) {
-                    lowestAvailableNumber++;
-                }
-                else if (number > lowestAvailableNumber) {
-                    break; // Found the lowest available number
-                }
+        public async Task<int> CreateBooking(Booking booking)
+        {
+            DateTime currentDate = DateTime.Now;
+            if(booking != null && booking.TimeStart < currentDate)
+            {
+                throw new ArgumentException("Booking date format exception. Booking start date exceeds booking end date");
             }
 
-            return lowestAvailableNumber;
+            int newBookingId = 0;
+
+            newBookingId = await _dBBooking.CreateBooking(booking);
+            return newBookingId;
+        }
+
+
+        public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(DateTime date)
+        {
+            DateTime currentDate = DateTime.Now.Date;
+
+            if(date < currentDate)
+            {
+                return null;
+            }
+            
+            List<AvailableBookingsForTimeframe> availableBookings = await _dBBooking.GetAvaiableBookingsForGivenDate(date);
+            
+            return availableBookings;
+        }
+
+        public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end)
+        {
+            if(start > end)
+            {
+                return null;
+            }
+
+            List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(start, end);
+
+            return bookings;
         }
 
         private int[] FindLowestAvailableNumbers(int[] array, int resourceLimit) {

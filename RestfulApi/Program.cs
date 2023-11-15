@@ -6,7 +6,6 @@ using System.Data.SqlClient;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddScoped<IBookingData, BookingDataControl>();
 builder.Services.AddScoped<IDBBooking, DBBooking>();
 //builder.Services.AddScoped<IDBBooking>(serviceProvider => {

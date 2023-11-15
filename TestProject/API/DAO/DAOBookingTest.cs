@@ -89,12 +89,14 @@ namespace TestProject.API.DAO {
         }
 
         [Test]
-        public void CreateBooking_ShouldReturnTrueIfValidInterval([ValueSource(nameof(TestBookings))] Booking inBooking) {
+        public void CreateBooking_ShouldReturnTrueIfValidInterval([ValueSource(nameof(TestBookings))] Booking inBooking)
+        {
             Assert.True(_dbBooking.CreateBooking(inBooking));
         }
 
         [Test]
-        public void GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates) {
+        public void GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates)
+        {
 
             // Arrange
             var start = inDates[0];
@@ -111,7 +113,8 @@ namespace TestProject.API.DAO {
             TestContext.WriteLine($"Expected number of bookings: {expectedBookingCount}");
 
             // Assert
-            foreach (var booking in bookings) {
+            foreach (var booking in bookings)
+            {
                 TestContext.WriteLine($"Booking ID: {booking.Id}, Start Time: {booking.TimeStart}, End Time: {booking.TimeEnd}");
                 Assert.GreaterOrEqual(booking.TimeStart, start, $"Booking ID {booking.Id} start time should be within the timeslot");
                 Assert.LessOrEqual(booking.TimeEnd, end, $"Booking ID {booking.Id} end time should be within the timeslot");
@@ -134,7 +137,7 @@ namespace TestProject.API.DAO {
         //    int passed = 0;
         //    int forIndex = 0;
         //    string forIndexInformation = "";
-            
+
         //    //Act
         //    foreach (var booking in bookings) {
         //        forIndexInformation += $"{forIndex} - booking - start: {booking.TimeStart} - end: {booking.TimeEnd} \n";

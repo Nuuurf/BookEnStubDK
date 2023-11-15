@@ -8,78 +8,66 @@ using Moq;
 using RestfulApi.Controllers;
 using RestfulApi.DAL;
 using RestfulApi.Models;
+using RestfulApi.BusinessLogic;
 
 namespace TestProject.API.Controller
 {
     public class CreateBookingTest
     {
-
         [Test]
-        public void CreateBooking_ReturnsOK_WithNewBooking()
+        public async Task CreateBooking_ReturnsOK_WithNewBooking()
         {
             //Arrange
-            var mockDBBokking = new Mock<IDBBooking>();
-            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).Returns(true);
+            var mockDBBokking = new Mock<IBookingData>();
+            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(1);
 
             BookingController controller = new BookingController(mockDBBokking.Object);
 
             Booking booking = new Booking();
 
             //Act   
-            var result = controller.CreateBooking(booking) as OkObjectResult;
+            var result = await controller.CreateBooking(booking) as OkObjectResult;
 
             //Assert
             Assert.NotNull(result);
             Assert.AreEqual(200, result.StatusCode);
-
         }
 
 
         [Test]
-        public void CreateBooking_ReturnBadRequest_WithNoBooking()
+        public async Task CreateBooking_ReturnBadRequest_WithNoBooking()
         {
             //Arrange
-            var mockDBBokking = new Mock<IDBBooking>();
-            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).Returns(false);
+            var mockDBBokking = new Mock<IBookingData>();
+            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(0);
 
             BookingController controller = new BookingController(mockDBBokking.Object);
-            Booking booking = new Booking();
-
 
             //Act
-            var result = controller.CreateBooking(booking) as BadRequestObjectResult;
+            var result = await controller.CreateBooking(null) as BadRequestObjectResult;
 
             //Assert
             Assert.NotNull(result);
             Assert.AreEqual(400, result.StatusCode);
-
         }
 
-        //[Test]
-        //public void CreateBooking_ReturnInternalError_WithNullBooking()
-        //{
-        //    //Arrange
-        //    var mockDBBokking = new Mock<IDBBooking>();
-        //    mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).Returns(null);
+        [Test]
+        public async Task CreateBookingFailed_ReturnUnproccessableEntity_WithBooking()
+        {
+            //Arrange
+            var mockDBBokking = new Mock<IBookingData>();
+            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(0);
 
-        //    BookingController controller = new BookingController(mockDBBokking.Object);
+            BookingController controller = new BookingController(mockDBBokking.Object);
 
-        //    //Act
-        //    var result = controller.CreateBooking(null);
+            Booking booking = new Booking();
 
-        //    if (result is ObjectResult objectResult)
-        //    {
-        //        Assert.AreEqual(500, objectResult.StatusCode);
-        //    }
-        //    else
-        //    {
-        //        Assert.Fail();
-        //    }
+            //Act   
+            var result = await controller.CreateBooking(booking) as UnprocessableEntityObjectResult;
 
-        //    //Assert
-        //    Assert.NotNull(result);
-        
-        //} 
-
+            //Assert
+            Assert.NotNull(result);
+            Assert.AreEqual(422, result.StatusCode);
+        }
     }
 }

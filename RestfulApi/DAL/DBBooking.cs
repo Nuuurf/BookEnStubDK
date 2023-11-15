@@ -3,6 +3,8 @@ using System.Data.SqlClient;
 using System.Data;
 using Dapper;
 using Microsoft.VisualBasic;
+using System.Data;
+using System.Linq.Expressions;
 
 namespace RestfulApi.DAL {
     public class DBBooking : IDBBooking {
@@ -96,24 +98,22 @@ namespace RestfulApi.DAL {
         /// </summary>
         /// <param name="booking"> the booking object that needs to be persisted</param>
         /// <returns>A boolean indicading where the action was successful or not</returns>
-        public bool CreateBooking(Booking booking) {
-            string script = "Insert into booking (TimeStart, TimeEnd, Notes, StubId) values (@TimeStart, @TimeEnd, @Notes, @StubId)";
 
-            bool success = false;
+        public async Task<int> CreateBooking(Booking booking)
+        {
+            string script = "InsertBooking";
+            int newBookingId = 0;
 
-            try {
-                conn.Execute(script, booking);
-                success = true;
+              using (SqlConnection con = conn.GetOpenConnection())
+            {
+                var parameter = new { date = booking.TimeStart };
+                int result = await con.QueryFirstOrDefaultAsync<int>(script, parameter, commandType : CommandType.StoredProcedure);
+
+                newBookingId = result;
             }
-            catch {
-                //if it fails send false for errorhandling in blc
-                success = false;
-            }
+                return newBookingId;
 
-            return success;
         }
-
-
         /// <summary>
         /// Inserts a new booking with its values into the database.
         /// Version of the createBooking command compatible within transactions
@@ -147,8 +147,20 @@ namespace RestfulApi.DAL {
                 //if it fails send null for error handling in blc
                 bookings = null;
             }
+        }
 
-            return bookings;
+        public async Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(DateTime date)
+        {
+            string script = "dbo.GetAvailableBookingsForDate";
+            
+            using (SqlConnection con = conn.GetOpenConnection())
+            {
+                var parameter = new { date = date.Date };
+
+                var result = await con.QueryAsync<AvailableBookingsForTimeframe>(script, parameter, commandType: CommandType.StoredProcedure);
+
+                return result.ToList();
+            }
         }
 
         public bool CreateMultipleBookings(List<List<Booking>> dateGroupedBookings) {
@@ -207,5 +219,4 @@ namespace RestfulApi.DAL {
             return -1;
         }
     }
-
 }

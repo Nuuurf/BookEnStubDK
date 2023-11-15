@@ -1,0 +1,324 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Doctor Appointment Booking</title>
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+        <!-- Font Awesome CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+        <!-- Bootstrap Datepicker CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    </head>
+    <body>
+
+        <div class="container mt-4 pb-3 mb-5">
+            <h2 class="mb-4">Tidsbooking</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h5 class="mb-0 mr-5 pr-5">Ledige Tider</h5>
+                            <!-- Datepicker input field -->
+                            <div class="input-group date">
+                                <input type="text" class="form-control datepicker" id="dateInput">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group" id="available-times">
+                                <!-- Time slots will be added dynamically here -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h5 class="mb-0">Valgte Tidspunkter</h5>
+                            <button class="btn btn-success btn-sm confirm-booking-btn" disabled>
+                                <!--confirm-booking-btn to check button press-->
+                                Bekræft Booking <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group" id="selected-appointments">
+                                <!-- Selected appointments will be added here dynamically -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+        <!-- Bootstrap JS and Popper.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+        <!-- Bootstrap Datepicker JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+
+        <script>
+            // Mock API response
+            var apiResponse = [
+                {
+                    "timeStart": "2023-11-15T00:00:00",
+                    "timeEnd": "2023-11-15T01:00:00",
+                    "availableStubs": 9
+                },
+                {
+                    "timeStart": "2023-11-15T01:00:00",
+                    "timeEnd": "2023-11-15T02:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T02:00:00",
+                    "timeEnd": "2023-11-15T03:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T03:00:00",
+                    "timeEnd": "2023-11-15T04:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T04:00:00",
+                    "timeEnd": "2023-11-15T05:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T05:00:00",
+                    "timeEnd": "2023-11-15T06:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T06:00:00",
+                    "timeEnd": "2023-11-15T07:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T07:00:00",
+                    "timeEnd": "2023-11-15T08:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T08:00:00",
+                    "timeEnd": "2023-11-15T09:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T09:00:00",
+                    "timeEnd": "2023-11-15T10:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T10:00:00",
+                    "timeEnd": "2023-11-15T11:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T11:00:00",
+                    "timeEnd": "2023-11-15T12:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T12:00:00",
+                    "timeEnd": "2023-11-15T13:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T13:00:00",
+                    "timeEnd": "2023-11-15T14:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T14:00:00",
+                    "timeEnd": "2023-11-15T15:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T15:00:00",
+                    "timeEnd": "2023-11-15T16:00:00",
+                    "availableStubs": 0
+                },
+                {
+                    "timeStart": "2023-11-15T16:00:00",
+                    "timeEnd": "2023-11-15T17:00:00",
+                    "availableStubs": 6
+                },
+                {
+                    "timeStart": "2023-11-15T17:00:00",
+                    "timeEnd": "2023-11-15T18:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T18:00:00",
+                    "timeEnd": "2023-11-15T19:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T19:00:00",
+                    "timeEnd": "2023-11-15T20:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T20:00:00",
+                    "timeEnd": "2023-11-15T21:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T21:00:00",
+                    "timeEnd": "2023-11-15T22:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T22:00:00",
+                    "timeEnd": "2023-11-15T23:00:00",
+                    "availableStubs": 10
+                },
+                {
+                    "timeStart": "2023-11-15T23:00:00",
+                    "timeEnd": "2023-11-16T00:00:00",
+                    "availableStubs": 10
+                }
+            ];
+
+            // Function to format the date and time
+            function formatTime(dateTimeString) {
+                var dateTime = new Date(dateTimeString);
+                return dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            // Runs a GET request to fetch available times for entered date
+            $(document).ready(function () {
+                $('#dateInput').on('keydown', function (event) {
+                    // Check if the key pressed is Enter (key code 13)
+                    if (event.keyCode === 13) {
+                        // Prevent the default form submission behavior
+                        event.preventDefault();
+
+                        // Get the value from the input field
+                        var inputData = $(this).val();
+                        //console.log(inputData);
+
+                        // Make an AJAX GET request
+                        $.ajax({
+                            url: 'https://localhost:8000/api/getTimes',
+                            type: 'GET',
+                            data: { data: inputData },
+                            success: function (response) {
+                                // Handle the successful response here
+                                console.log('Response:', response);
+                                processApiResponse(response);
+                            },
+                            error: function (xhr, status, error) {
+                                // Handle errors here
+                                console.error('Error:', error);
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Loop through API response and add times to list for display
+            function processApiResponse(apiResponse) {
+                // Iterate through the apiResponse array and append each element to the ul as li items
+                $.each(apiResponse, function (index, item) {
+                    var startTime = formatTime(item.timeStart);
+                    var endTime = formatTime(item.timeEnd);
+                    var availableStubs = item.availableStubs;
+
+                    var buttonClass = 'btn btn-primary btn-sm book-btn';
+                    var buttonText = 'Book';
+
+                    // Check if availableStubs is 0, then disable the button and change its color to danger
+                    if (availableStubs === 0) {
+                        buttonClass = 'btn btn-danger btn-sm book-btn disabled';
+                        buttonText = 'Booket';
+                    }
+
+                    var listItem = $('<li>', {
+                        class: 'list-group-item d-flex justify-content-between align-items-center',
+                        html: startTime + ' - ' + endTime +
+                            '<div class="">' +
+                            '<small class="text-muted">' + availableStubs + ' tider ledige</small>' +
+                            '</div>' +
+                            '<button class="' + buttonClass + '" data-time="' + startTime + ' - ' + endTime + '">' +
+                            '<i class="fas fa-plus"></i> ' + buttonText +
+                            '</button>'
+                    });
+
+                    $('#available-times').append(listItem);
+                });
+            }
+
+            // Activate and deactivate confirm booking button
+            $(function () {
+                $('.book-btn').on('click', function () {
+                    var selectedTime = $(this).data('time');
+
+                    // Add the selected appointment to the "Selected Appointments" list
+                    $('#selected-appointments').append(
+                        '<li class="list-group-item">' + selectedTime +
+                        ' <button class="btn btn-danger btn-sm cancel-btn"><i class="fas fa-times"></i> Fjern</button></li>'
+                    );
+
+                    // Check the number of selected appointments
+                    var selectedAppointmentsCount = $('#selected-appointments li').length;
+
+                    // Enable or disable the confirm booking button based on the count
+                    if (selectedAppointmentsCount > 0) {
+                        $('.confirm-booking-btn').prop('disabled', false);
+                    } else {
+                        $('.confirm-booking-btn').prop('disabled', true);
+                    }
+                });
+
+                // Event handler for cancel buttons
+                $('#selected-appointments').on('click', '.cancel-btn', function () {
+                    // Remove the canceled appointment from the list
+                    $(this).closest('li').remove();
+
+                    // Check the number of selected appointments after removal
+                    var selectedAppointmentsCount = $('#selected-appointments li').length;
+
+                    // Enable or disable the confirm booking button based on the count
+                    if (selectedAppointmentsCount > 0) {
+                        $('.confirm-booking-btn').prop('disabled', false);
+                    } else {
+                        $('.confirm-booking-btn').prop('disabled', true);
+                    }
+                });
+            });
+
+            // Initialize datepicker
+            $('.datepicker').datepicker({
+                format: 'dd/mm/yyyy',
+                todayBtn: true,
+                todayHighlight: true,
+                weekStart: 1,
+                autoclose: true,
+            }); //.datepicker("setDate", "0")
+        </script>
+
+    </body>
+    </html>
+
+}

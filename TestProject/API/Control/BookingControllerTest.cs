@@ -23,33 +23,35 @@ namespace TestProject.API.Control {
         }
 
         [Test]
-        public void CreateBooking_ShouldBeTrue() {
+        public async Task CreateBooking_ShouldBeTrue()
+        {
             //Arrange
-            BookingDataControl bdc = new BookingDataControl();
+            BookingDataControl bdc = new BookingDataControl(new DBBooking());
 
-            
-            Booking booking = new Booking { //booking to test with
+            Booking booking = new Booking
+            { //booking to test with
                 Notes = "Delete me please",
-                TimeStart = DateTime.Now,
-                TimeEnd = DateTime.Now.AddHours(1),
+                TimeStart = DateTime.Now.AddHours(1),
+                TimeEnd = DateTime.Now.AddHours(2),
             };
 
-            bool createReturn = false;
+            int createReturn = 0;
 
             //Act
-            createReturn = bdc.CreateBooking(booking);
+            createReturn = await bdc.CreateBooking(booking);
 
             //Assert
-            Assert.IsTrue(createReturn);
+            Assert.IsTrue(createReturn > 0);
         }
 
         [Test]
-        public void CreateBooking_ShouldThrowArgumentException() {
+        public async Task CreateBooking_ShouldThrowArgumentException()
+        {
             //Arrange
-            BookingDataControl bdc = new BookingDataControl();
+            BookingDataControl bdc = new BookingDataControl(new DBBooking());
 
-
-            Booking booking = new Booking { //booking to test with
+            Booking booking = new Booking
+            { //booking to test with
                 Notes = "Delete me please",
                 //instantiate date before the current time
                 TimeStart = DateTime.Now.AddHours(-2),
@@ -57,11 +59,10 @@ namespace TestProject.API.Control {
             };
 
             //Act
-            TestDelegate act = () => bdc.CreateBooking(booking);
+            AsyncTestDelegate act = () => bdc.CreateBooking(booking);
 
             //Assert
-            Assert.Throws<ArgumentException>(act);
+            Assert.ThrowsAsync<ArgumentException>(act);
         }
-
     }
 }

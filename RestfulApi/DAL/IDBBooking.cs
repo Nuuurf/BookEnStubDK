@@ -3,8 +3,7 @@
 namespace RestfulApi.DAL {
     public interface IDBBooking {
 
-
-        bool CreateBooking(Booking booking);
+        public Task<int> CreateBooking(Booking booking);
 
         bool CreateMultipleBookings(List<List<Booking>> dateGroupedBookings);
 
@@ -12,9 +11,10 @@ namespace RestfulApi.DAL {
 
         //bool UpdateBooking(int bookingID, Booking booking);
 
-        List<Booking> GetBookingsInTimeslot(DateTime start, DateTime end);
+        public Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end);
+
+        public Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(DateTime date);
 
         //List<Booking> GetBookingsForDay(DateTime date);
-
     }
 }
