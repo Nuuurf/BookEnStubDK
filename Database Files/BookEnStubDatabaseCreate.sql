@@ -6,6 +6,10 @@ CREATE TABLE Customer (
     Phone VARCHAR(12) NOT NULL
 );
 
+CREATE TABLE Stub (
+    Id INT PRIMARY KEY,
+);
+
 CREATE TABLE Booking (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     TimeStart DATETIME NOT NULL,
@@ -15,8 +19,4 @@ CREATE TABLE Booking (
 	StubId INT,
 	FOREIGN KEY (StubID) REFERENCES Stub(Id),
     FOREIGN KEY (CustomerId) REFERENCES Customer(Id)
-);
-
-CREATE TABLE Stub (
-    Id INT PRIMARY KEY,
 );
