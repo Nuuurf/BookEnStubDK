@@ -85,23 +85,50 @@ namespace RestfulApi.Controllers {
                 }
             }
             else {
-                return BadRequest("No JSON object has been transmitted with request");
+                return BadRequest("No JSON object were transmitted with request");
             }
         }
-/*
-        // URL: api/booking
-        [HttpDelete("{id}")]
-        public IActionResult DeleteBooking(int id) {
-            try {
-                bool bookingSuccess = _DBBooking.DeleteBooking(id);
-                if (bookingSuccess == false) {
-                    return NotFound("Booking not deleted");
-                }
 
-                return Ok(bookingSuccess);
-            } catch (Exception ex) {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+        [HttpPost]
+        [Route("/Booking/Multiple")]
+        public IActionResult CreateMultipleBooking([FromBody] Booking[]? bookings = null) {
+            if (bookings != null) {
+                try {
+                    BookingDataControl bdc = new BookingDataControl();
+
+                    List<Booking> bookingList = new List<Booking>(bookings);
+
+                    bool succss = bdc.CreateMultipleBookings(bookingList);
+
+                    if (succss) {
+                        return Ok(succss);
+                    }
+                    else {
+                        return UnprocessableEntity("DA: kunne ikke oprette bookinger, kapasitet oversteget med en eller flere bookinger");
+                    }
+                }
+                catch (Exception ex) {
+                    return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                }
             }
-        }*/
+            else {
+                return BadRequest("No JSON objects were transmitted with request");
+            }
+        }
+        /*
+                // URL: api/booking
+                [HttpDelete("{id}")]
+                public IActionResult DeleteBooking(int id) {
+                    try {
+                        bool bookingSuccess = _DBBooking.DeleteBooking(id);
+                        if (bookingSuccess == false) {
+                            return NotFound("Booking not deleted");
+                        }
+
+                        return Ok(bookingSuccess);
+                    } catch (Exception ex) {
+                        return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                    }
+                }*/
     }
 }

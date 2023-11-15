@@ -10,7 +10,7 @@ namespace RestfulApi.DAL {
         private SqlConnection conn;
         private SqlTransaction trans;
 
-        public DBBooking(SqlConnection? inCon = null) {
+        public DBBooking(SqlConnection inCon) {
             if (inCon == null) {
                 conn = DBConnection.Instance.GetOpenConnection();
             }
@@ -19,7 +19,7 @@ namespace RestfulApi.DAL {
             }
         }
 
-        public DBBooking(SqlTransaction inTrans = null) {
+        public DBBooking(SqlTransaction inTrans) {
             if (inTrans == null) {
                 throw new Exception("Cannot use null as transaction object");
             }
@@ -27,6 +27,10 @@ namespace RestfulApi.DAL {
                 trans = inTrans;
                 conn = inTrans.Connection;
             }
+        }
+
+        public DBBooking() {
+            conn = DBConnection.Instance.GetOpenConnection();
         }
 
         /// <summary>
