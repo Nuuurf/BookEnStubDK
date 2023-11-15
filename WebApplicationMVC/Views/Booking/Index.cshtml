@@ -206,6 +206,7 @@
                 return dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
 
+            // Runs a GET request to fetch available times for entered date
             $(document).ready(function () {
                 $('#dateInput').on('keydown', function (event) {
                     // Check if the key pressed is Enter (key code 13)
@@ -215,7 +216,7 @@
 
                         // Get the value from the input field
                         var inputData = $(this).val();
-                        console.log(inputData);
+                        //console.log(inputData);
 
                         // Make an AJAX GET request
                         $.ajax({
@@ -236,6 +237,7 @@
                 });
             });
 
+            // Loop through API response and add times to list for display
             function processApiResponse(apiResponse) {
                 // Iterate through the apiResponse array and append each element to the ul as li items
                 $.each(apiResponse, function (index, item) {
@@ -267,6 +269,7 @@
                 });
             }
 
+            // Activate and deactivate confirm booking button
             $(function () {
                 $('.book-btn').on('click', function () {
                     var selectedTime = $(this).data('time');
