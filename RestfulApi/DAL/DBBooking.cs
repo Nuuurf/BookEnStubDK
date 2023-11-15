@@ -76,20 +76,21 @@ namespace RestfulApi.DAL {
         /// </summary>
         /// <param name="booking"> the booking object that needs to be persisted</param>
         /// <returns>A boolean indicading where the action was successful or not</returns>
-        public bool CreateBooking(Booking booking)
+        public async Task<int> CreateBooking(Booking booking)
         {
-            string script = "Insert into booking (TimeStart, TimeEnd, Notes, StubId) values (@TimeStart, @TimeEnd, @Notes, @StubId)";
+            string script = "InsertBooking";
 
-            bool success = false;
+            int newBookingId = 0;
 
             using (SqlConnection con = conn.GetOpenConnection())
             {
-                    con.Execute(script, booking);
-                    success = true;
-                }
+                var parameter = new { date = booking.TimeStart };
+                int result = await con.QueryFirstOrDefaultAsync<int>(script, parameter, commandType : CommandType.StoredProcedure);
 
-                return success;
+                newBookingId = result;
             }
+                return newBookingId;
+        }
         // Not implemented
         public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end)
         {

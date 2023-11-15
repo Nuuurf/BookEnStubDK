@@ -60,5 +60,26 @@ namespace TestProject.API.Controller
             Assert.AreEqual(bookings, result.Value);
             Assert.AreEqual(200, result.StatusCode);
         }
+
+        [Test]
+        public async Task GetBookingsInTimeSlot_ReturnsNotFound_WithInvalidDates()
+        {
+            //Arrange
+            var mockDBBokking = new Mock<IBookingData>();
+
+            List<Booking> nullList = null;
+            mockDBBokking.Setup(repo => repo.GetBookingsInTimeslot(It.IsAny<DateTime>(), It.IsAny<DateTime>())).ReturnsAsync(nullList);
+
+            BookingController controller = new BookingController(mockDBBokking.Object);
+
+            //Act
+            DateTime start = DateTime.Now;
+            DateTime end = start.AddHours(-1);
+
+            var result = await controller.GetBookingsInTimeslot(start, end);
+
+            //Assert
+            Assert.IsInstanceOf<NotFoundObjectResult>(result);
+        }
     }
-}
+}   

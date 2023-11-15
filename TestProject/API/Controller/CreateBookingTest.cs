@@ -19,7 +19,7 @@ namespace TestProject.API.Controller
         {
             //Arrange
             var mockDBBokking = new Mock<IBookingData>();
-            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(true);
+            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(1);
 
             BookingController controller = new BookingController(mockDBBokking.Object);
 
@@ -39,19 +39,35 @@ namespace TestProject.API.Controller
         {
             //Arrange
             var mockDBBokking = new Mock<IBookingData>();
-            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(false);
+            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(0);
 
             BookingController controller = new BookingController(mockDBBokking.Object);
-            Booking booking = new Booking();
-
 
             //Act
-            var result = await controller.CreateBooking(booking) as BadRequestObjectResult;
+            var result = await controller.CreateBooking(null) as BadRequestObjectResult;
 
             //Assert
             Assert.NotNull(result);
             Assert.AreEqual(400, result.StatusCode);
+        }
 
+        [Test]
+        public async Task CreateBookingFailed_ReturnUnproccessableEntity_WithBooking()
+        {
+            //Arrange
+            var mockDBBokking = new Mock<IBookingData>();
+            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(0);
+
+            BookingController controller = new BookingController(mockDBBokking.Object);
+
+            Booking booking = new Booking();
+
+            //Act   
+            var result = await controller.CreateBooking(booking) as UnprocessableEntityObjectResult;
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.AreEqual(422, result.StatusCode);
         }
     }
 }

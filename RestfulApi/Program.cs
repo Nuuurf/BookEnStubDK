@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<IBookingData, BookingDataControl>();
-builder.Services.AddScoped<DBBooking>();
+builder.Services.AddScoped<IDBBooking, DBBooking>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

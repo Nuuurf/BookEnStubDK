@@ -106,11 +106,11 @@ namespace RestfulApi.Controllers
                 try
                 {
 
-                    bool success = await _bookingdata.CreateBooking(booking);
+                    int newBookingId = await _bookingdata.CreateBooking(booking);
 
-                    if (success)
+                    if (newBookingId != 0)
                     {
-                        return Ok(success);
+                        return Ok(newBookingId);
                     }
                     else
                     {
