@@ -131,16 +131,14 @@ namespace RestfulApi.Controllers
 
         [HttpPost]
         [Route("/Booking/Multiple")]
-        public async Task<IActionResult> CreateMultipleBooking([FromBody] Booking[]? bookings = null) {
+        public async Task<IActionResult> CreateMultipleBooking([FromBody] List<Booking>? bookings = null) {
             if (bookings != null) {
                 try {
 
-                    List<Booking> bookingList = new List<Booking>(bookings);
+                    bool success = await _bookingdata.CreateMultipleBookings(bookings);
 
-                    bool succss = await _bookingdata.CreateMultipleBookings(bookingList);
-
-                    if (succss) {
-                        return Ok(succss);
+                    if (success) {
+                        return Ok(success);
                     }
                     else {
                         return UnprocessableEntity("DA: kunne ikke oprette bookinger, kapasitet oversteget med en eller flere bookinger");

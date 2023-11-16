@@ -17,6 +17,7 @@ namespace TestProject.API.Control {
 
         private IDbConnection _connection;
 
+
         [SetUp]
         public void SetUp()
         {
