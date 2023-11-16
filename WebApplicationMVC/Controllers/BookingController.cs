@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace WebApplicationMVC.Controllers {
     public class BookingController : Controller {
@@ -6,8 +7,21 @@ namespace WebApplicationMVC.Controllers {
             return View();
         }
 
+        // API URL: /Booking/Confirm
+        // Added to prevent Error page
+        [HttpGet]
         public IActionResult Confirm() {
-            return View();
+            return RedirectToAction("Index");
+        }
+
+        // API URL: /Booking/Confirm
+        [HttpPost]
+        public IActionResult Confirm([FromBody] string data) {
+            if (data == "Confirm") {
+                return View();
+            } else {
+                return BadRequest("Invalid data or value");
+            }
         }
 
         // API URL: /Booking/GetAvailaibleTimes/{date}

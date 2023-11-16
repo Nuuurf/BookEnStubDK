@@ -20,7 +20,7 @@
     </head>
     <body>
 
-        <div class="container mt-4 pb-3 mb-5">
+        <div class="container mt-4 pb-3 mb-5" id="toplevelContainer">
             <h2 class="mb-4">Tidsbooking</h2>
             <div class="row">
                 <div class="col-md-6">
@@ -51,7 +51,7 @@
                             <h5 class="mb-0">Valgte Tidspunkter</h5>
                             <button class="btn btn-success btn-sm confirm-booking-btn" disabled>
                                 <!--confirm-booking-btn to check button press-->
-                                Bekræft Booking <i class="fas fa-check"></i>
+                                Bestil Booking <i class="fas fa-check"></i>
                             </button>
                         </div>
                         <div class="card-body">
@@ -75,24 +75,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
 
+        <!-- JQuery and javascript code for page functionality is below here -->
+
+        <!-- Rest of the script code is in this file -->
+        <script src="~/js/BookingPage.js"></script>
+
         <script>
-            // Function to format the date and time
-            function formatTime(dateTimeString) {
-                var dateTime = new Date(dateTimeString);
-                return dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            }
-
-            function formatDate(dateTimeString) {
-                var dateTime = new Date(dateTimeString);
-
-                var year = dateTime.getFullYear();
-                var month = ('0' + (dateTime.getMonth() + 1)).slice(-2);
-                var day = ('0' + dateTime.getDate()).slice(-2);
-
-                return year + '/' + month + '/' + day;
-            }
-
-
             // Runs a GET request to fetch available times for entered date
             $(document).ready(function () {
                 $('#dateInput').on('keydown', function (event) {
@@ -134,131 +122,32 @@
                 });
             });
 
-            // Event delegation for book-btn click events
-            $(document).on('click', '.book-btn', function () {
-                var selectedTime = $(this).data('time');
-                var hiddenDate = $(this).closest('.list-group-item').find('.hidden-date').text();
+            $(document).ready(function () {
+                $('.confirm-booking-btn').on('click', function () {
+                    saveAppointmentsToLocalStorage();
+                    var selectedAppointments = localStorage.getItem('selectedAppointments');
 
-                // Add the selected appointment to the "Selected Appointments" list
-                $('#selected-appointments').append(
-                    '<li class="list-group-item">' + hiddenDate + ' - ' + selectedTime +
-                    ' <button class="btn btn-danger btn-sm cancel-btn"><i class="fas fa-times"></i> Fjern</button></li>'
-                );
-
-                // Check the number of selected appointments
-                var selectedAppointmentsCount = $('#selected-appointments li').length;
-
-                // Enable or disable the confirm booking button based on the count
-                if (selectedAppointmentsCount > 0) {
-                    $('.confirm-booking-btn').prop('disabled', false);
-                } else {
-                    $('.confirm-booking-btn').prop('disabled', true);
-                }
-            });
-
-            // Event handler for cancel buttons
-            $('#selected-appointments').on('click', '.cancel-btn', function () {
-                // Remove the canceled appointment from the list
-                $(this).closest('li').remove();
-
-                // Check the number of selected appointments after removal
-                var selectedAppointmentsCount = $('#selected-appointments li').length;
-
-                // Enable or disable the confirm booking button based on the count
-                if (selectedAppointmentsCount > 0) {
-                    $('.confirm-booking-btn').prop('disabled', false);
-                } else {
-                    $('.confirm-booking-btn').prop('disabled', true);
-                }
-            });
-
-
-
-            // Loop through API response and add times to list for display
-            function processApiResponse(apiResponse) {
-                $('#available-times').empty();
-                // Iterate through the apiResponse array and append each element to the ul as li items
-                $.each(apiResponse, function (index, item) {
-                    var startTime = formatTime(item.timeStart);
-                    var endTime = formatTime(item.timeEnd);
-                    var date = formatDate(item.timeStart);
-                    var availableStubs = item.availableStubs;
-
-                    var buttonClass = 'btn btn-primary btn-sm book-btn';
-                    var buttonText = 'Book';
-
-                    // Check if availableStubs is 0, then disable the button and change its color to danger
-                    if (availableStubs === 0) {
-                        buttonClass = 'btn btn-danger btn-sm book-btn disabled';
-                        buttonText = 'Booket';
+                    if (selectedAppointments != null) {
+                        $.ajax({
+                            url: '@Url.Action("Confirm", "Booking")',
+                            type: 'POST', // Change the type to POST
+                            contentType: 'application/json', // Set content type to specify JSON data
+                            data: JSON.stringify("Confirm"),
+                            success: function (response) {
+                                // Handle the success response (if needed)
+                                $('body').html(response);
+                            },
+                            error: function (xhr, status, error) {
+                                // Handle errors
+                                console.error('Error:', error);
+                            }
+                        });
+                    } else {
+                        Console.log("No appointments for booking added")
                     }
-
-                    var listItem = $('<li>', {
-                        class: 'list-group-item d-flex justify-content-between align-items-center',
-                        html: '<div class="hidden-date" style="display:none;">' + date + '</div>' +
-                            startTime + ' - ' + endTime +
-                            '<div class="">' +
-                            '<small class="text-muted">' + availableStubs + ' tider ledige</small>' +
-                            '</div>' +
-                            '<button class="' + buttonClass + '" data-time="' + startTime + ' - ' + endTime + '">' +
-                            '<i class="fas fa-plus"></i> ' + buttonText +
-                            '</button>'
-                    });
-
-                    $('#available-times').append(listItem);
                 });
-            }
-
-            function saveAppointmentsToLocalStorage() {
-                var appointments = [];
-
-                // Loop through each selected appointment in the list
-                $('#selected-appointments li').each(function () {
-                    var appointmentText = $(this).text().trim();
-
-                    // Trim the last 6 characters
-                    appointmentText = appointmentText.slice(0, -6);
-
-                    // Find the index of the first hyphen ("-")
-                    var firstHyphenIndex = appointmentText.indexOf('-');
-
-                    // Extract date and time based on the first hyphen index
-                    var hiddenDate = appointmentText.substr(0, firstHyphenIndex).trim();
-                    var selectedTime = appointmentText.substr(firstHyphenIndex + 1).trim();
-
-                    // Create an object for each appointment
-                    var appointment = {
-                        date: hiddenDate,
-                        time: selectedTime
-                    };
-
-                    // Push the appointment object to the array
-                    appointments.push(appointment);
-                });
-
-                // Convert the array to a JSON string and save it to localStorage
-                localStorage.setItem('selectedAppointments', JSON.stringify(appointments));
-            }
-
-            // Event handler for confirm booking button
-            $('.confirm-booking-btn').on('click', function () {
-                // Call the function to save selected appointments to localStorage
-                saveAppointmentsToLocalStorage();
-
-                // Add any additional logic or actions needed after confirming the booking
-                console.log('Booking confirmed!');
             });
-
-            // Initialize datepicker
-            $('.datepicker').datepicker({
-                format: 'dd/mm/yyyy',
-                todayBtn: true,
-                todayHighlight: true,
-                weekStart: 1,
-                autoclose: true,
-            }); //.datepicker("setDate", "0")
         </script>
-
     </body>
     </html>
 }
