@@ -2,9 +2,10 @@
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
-using RestfulApi.DAL;
 using System.Data.SqlClient;
 using Dapper;
+using Microsoft.AspNetCore.Builder;
+using RestfulApi.DAL;
 
 namespace TestProject.API.DAO {
     public class DAOBookingTest {
@@ -13,14 +14,16 @@ namespace TestProject.API.DAO {
             TimeStart = new DateTime(2023, 11, 10, 9, 0, 0),
             TimeEnd = new DateTime(2023, 11, 10, 10, 0, 0),
             Notes = "Some generic notes",
+            StubId = 1
             //CustomerID = 1,
             //StubID = 1,
         };
 
         private static Booking booking2 = new Booking {
-            TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
-            TimeEnd = new DateTime(2023, 11, 10, 11, 0, 0),
-            Notes = "Some generic notes",
+        TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
+        TimeEnd = new DateTime(2023, 11, 10, 11, 0, 0),
+        Notes = "Some generic notes",
+        StubId = 2
             //CustomerID = 2,
             //StubID = 1,
         };
@@ -29,6 +32,7 @@ namespace TestProject.API.DAO {
             TimeStart = new DateTime(2023, 11, 10, 11, 0, 0),
             TimeEnd = new DateTime(2023, 11, 10, 12, 0, 0),
             Notes = "Some generic notes",
+            StubId = 3
             //CustomerID = 3,
             //StubID = 2,
         };
@@ -77,22 +81,22 @@ namespace TestProject.API.DAO {
         }
 
         [TearDown]
-        public void TearDown() {
+        public async Task TearDown() {
             using (SqlConnection con = DBConnection.Instance.GetOpenConnection()) {
-                string script = "Delete from booking where notes = 'some generic notes'";
+                string script = "Delete from booking where notes = 'Some generic notes'";
 
-                con.Execute(script);
+                await con.ExecuteAsync(script);
             }
         }
 
         [Test]
-        public void CreateBooking_ShouldReturnTrueIfValidInterval([ValueSource(nameof(TestBookings))] Booking inBooking)
+        public async Task CreateBooking_ShouldReturnTrueIfValidInterval([ValueSource(nameof(TestBookings))] Booking inBooking)
         {
-            Assert.True(_dbBooking.CreateBooking(inBooking));
+            Assert.True(await _dbBooking.CreateBooking(DBConnection.Instance.GetOpenConnection(), inBooking) > 0);
         }
 
         [Test]
-        public void GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates)
+        public async Task GetBookingWithinTimeslot_ShouldOnlyRetrieveOnesWithinTimeslot([ValueSource(nameof(TestDates))] DateTime[] inDates)
         {
 
             // Arrange
@@ -103,7 +107,7 @@ namespace TestProject.API.DAO {
             TestContext.WriteLine($"Testing timeslot: Start - {start}, End - {end}");
 
             // Act
-            var bookings = _dbBooking.GetBookingsInTimeslot(start, end);
+            var bookings = await _dbBooking.GetBookingsInTimeslot(DBConnection.Instance.GetOpenConnection(),start, end);
 
             // Additional Information
             TestContext.WriteLine($"Number of bookings returned: {bookings.Count}");

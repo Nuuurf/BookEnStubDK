@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using RestfulApi.BusinessLogic;
 using RestfulApi.Controllers;
 using RestfulApi.DAL;
 using RestfulApi.Models;
+using TestProject.API.DAO;
 
 namespace TestProject.API.BusinessLogic
 {
@@ -17,23 +19,27 @@ namespace TestProject.API.BusinessLogic
         [Test]
         public async Task CreateBooking_ReturnsNewBookingId_WithNewBooking()
         {
-            //Arrange
-            var mockDBBokking = new Mock<IDBBooking>();
+            // Arrange
+            
+            var mockDBBooking = new Mock<IDBBooking>();
+            mockDBBooking.Setup(repo => repo.CreateBooking(
+                    It.IsAny<IDbConnection>(),
+                    It.IsAny<Booking>(), It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(1); // Assuming the method returns an int (e.g., the new booking ID)
 
-            DateTime bookingDate = DateTime.Now.AddDays(1);
-            Booking booking = new Booking();
-            booking.TimeStart = bookingDate;
+            BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, null);
 
-            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(1);
+            DateTime bookingStart = DateTime.Now.AddDays(1);
+            DateTime bookingEnd = bookingStart.AddHours(1);
+            Booking booking = new Booking { TimeStart = bookingStart, TimeEnd = bookingEnd };
 
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object);
-
-            //Act   
+            // Act
             var result = await controller.CreateBooking(booking);
 
-            //Assert
+            // Assert
             Assert.AreEqual(1, result);
         }
+
 
         [Test]
         public async Task CreateBooking_ReturnsZero_WithPriorDate()
@@ -45,9 +51,14 @@ namespace TestProject.API.BusinessLogic
             Booking booking = new Booking();
             booking.TimeStart = bookingDate;
 
-            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(0);
+            mockDBBokking.Setup(repo => repo.CreateBooking(
+                    It.IsAny<IDbConnection>(),
+                    It.IsAny<Booking>(),
+                    It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(1);
 
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object);
+
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
 
             //Act   
             AsyncTestDelegate result = () => controller.CreateBooking(booking);
@@ -60,17 +71,23 @@ namespace TestProject.API.BusinessLogic
         public async Task CreateBooking_ReturnsZero_WithNullBooking()
         {
             //Arrange
+            var mockDbConnection = new Mock<IDbConnection>();
+            mockDbConnection.Setup(conn => conn.Open()).Verifiable(); // Setup to verify that Open is called
             var mockDBBokking = new Mock<IDBBooking>();
             Booking booking = null;
 
-            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(0);
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object);
+            mockDBBokking.Setup(repo => repo.CreateBooking(
+                    It.IsAny<IDbConnection>(),
+                    It.IsAny<Booking>(),
+                    It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(1);
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, mockDbConnection.Object);
 
             //Act   
-            var result = await controller.CreateBooking(booking);
+            AsyncTestDelegate result = () => controller.CreateBooking(booking);
 
             //Assert
-            Assert.AreEqual(0, result);
+            Assert.ThrowsAsync<ArgumentNullException>(result);
         }
     }
 }

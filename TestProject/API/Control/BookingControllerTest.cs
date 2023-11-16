@@ -4,29 +4,39 @@ using RestfulApi.DAL;
 using RestfulApi.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TestProject.API.DAO;
 
 namespace TestProject.API.Control {
 
     public class BookingControllerTest {
 
+        private IDbConnection _connection;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _connection = DBConnection.Instance.GetOpenConnection();
+        }
         [TearDown]
         public void TearDown() {
-            using (SqlConnection con = DBConnection.Instance.GetOpenConnection()) {
+            using (IDbConnection con = _connection) {
                 string script = "Delete from booking where notes = 'Delete me please'";
 
                 con.Execute(script);
             }
+            _connection.Close();
         }
 
         [Test]
         public async Task CreateBooking_ShouldBeTrue()
         {
             //Arrange
-            BookingDataControl bdc = new BookingDataControl(new DBBooking());
+            BookingDataControl bdc = new BookingDataControl(new DBBooking(), _connection);
 
             Booking booking = new Booking
             { //booking to test with
@@ -40,6 +50,7 @@ namespace TestProject.API.Control {
             //Act
             createReturn = await bdc.CreateBooking(booking);
 
+
             //Assert
             Assert.IsTrue(createReturn > 0);
         }
@@ -48,7 +59,7 @@ namespace TestProject.API.Control {
         public async Task CreateBooking_ShouldThrowArgumentException()
         {
             //Arrange
-            BookingDataControl bdc = new BookingDataControl(new DBBooking());
+            BookingDataControl bdc = new BookingDataControl(new DBBooking(), _connection);
 
             Booking booking = new Booking
             { //booking to test with

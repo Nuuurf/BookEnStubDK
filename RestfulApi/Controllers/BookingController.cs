@@ -124,11 +124,37 @@ namespace RestfulApi.Controllers
                     return StatusCode(500, $"Internal Server Error: {ex.Message}");
                 }
             }
-            else
-            {
-                return BadRequest("No JSON object has been transmitted with request");
+            else {
+                return BadRequest("No JSON object were transmitted with request");
             }
         }
+
+        [HttpPost]
+        [Route("/Booking/Multiple")]
+        public async Task<IActionResult> CreateMultipleBooking([FromBody] Booking[]? bookings = null) {
+            if (bookings != null) {
+                try {
+
+                    List<Booking> bookingList = new List<Booking>(bookings);
+
+                    bool succss = await _bookingdata.CreateMultipleBookings(bookingList);
+
+                    if (succss) {
+                        return Ok(succss);
+                    }
+                    else {
+                        return UnprocessableEntity("DA: kunne ikke oprette bookinger, kapasitet oversteget med en eller flere bookinger");
+                    }
+                }
+                catch (Exception ex) {
+                    return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                }
+            }
+            else {
+                return BadRequest("No JSON objects were transmitted with request");
+            }
+        }
+
         /*
                 // URL: api/booking
                 [HttpDelete("{id}")]
@@ -138,7 +164,6 @@ namespace RestfulApi.Controllers
                         if (bookingSuccess == false) {
                             return NotFound("Booking not deleted");
                         }
-
                         return Ok(bookingSuccess);
                     } catch (Exception ex) {
                         return StatusCode(500, $"Internal Server Error: {ex.Message}");
