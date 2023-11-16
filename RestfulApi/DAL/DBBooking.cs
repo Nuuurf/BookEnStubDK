@@ -88,23 +88,19 @@ namespace RestfulApi.DAL {
 
         }
         // Not implemented
-        public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end)
-        {
+        public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end) {
             string script = "SELECT id, TimeStart, TimeEnd, Notes, StubId FROM Booking WHERE TimeStart < @TimeEnd AND TimeEnd > @TimeStart";
 
-            using (SqlConnection con = conn.GetOpenConnection())
-            {
-               var bookings = await con.QueryAsync<Booking>(script, new { TimeStart = start, TimeEnd = end });
+            using (SqlConnection con = conn.GetOpenConnection()) {
+                var bookings = await con.QueryAsync<Booking>(script, new { TimeStart = start, TimeEnd = end });
                 return bookings.ToList();
             }
         }
 
-        public async Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(DateTime date)
-        {
+        public async Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(DateTime date) {
             string script = "dbo.GetAvailableBookingsForDate";
-            
-            using (SqlConnection con = conn.GetOpenConnection())
-            {
+
+            using (SqlConnection con = conn.GetOpenConnection()) {
                 var parameter = new { date = date.Date };
 
                 var result = await con.QueryAsync<AvailableBookingsForTimeframe>(script, parameter, commandType: CommandType.StoredProcedure);
