@@ -26,9 +26,9 @@ namespace TestProject.API.BusinessLogic
                 new Booking {Id = 1, TimeStart = currentTime, TimeEnd = currentTime.AddHours(1), Notes = "Hello" },
                 new Booking {Id = 2, TimeStart = currentTime, TimeEnd = currentTime.AddHours(1), Notes = "Olleh" } };
 
-            mockDBBokking.Setup(repo => repo.GetBookingsInTimeslot(It.IsAny<DateTime>(), It.IsAny<DateTime>())).ReturnsAsync(bookings);
+            mockDBBokking.Setup(repo => repo.GetBookingsInTimeslot(null, It.IsAny<DateTime>(), It.IsAny<DateTime>(), null)).ReturnsAsync(bookings);
 
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object); 
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null); 
 
             //Act
             DateTime start = DateTime.Now;
@@ -48,9 +48,9 @@ namespace TestProject.API.BusinessLogic
             var mockDBBokking = new Mock<IDBBooking>();
             List<Booking> bookings = null;
 
-            mockDBBokking.Setup(repo => repo.GetBookingsInTimeslot(It.IsAny<DateTime>(), It.IsAny<DateTime>())).ReturnsAsync(bookings);
+            mockDBBokking.Setup(repo => repo.GetBookingsInTimeslot(null, It.IsAny<DateTime>(), It.IsAny<DateTime>(), null)).ReturnsAsync(bookings);
 
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object);
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
 
             //Act
             DateTime start = DateTime.Now;

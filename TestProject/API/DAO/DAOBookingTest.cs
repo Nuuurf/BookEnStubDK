@@ -2,9 +2,10 @@
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
-using RestfulApi.DAL;
 using System.Data.SqlClient;
 using Dapper;
+using Microsoft.AspNetCore.Builder;
+using RestfulApi.DAL;
 
 namespace TestProject.API.DAO {
     public class DAOBookingTest {
@@ -43,7 +44,7 @@ namespace TestProject.API.DAO {
 
         //private string dBConnectionString = "Connection";
 
-        private static IDBBooking _dbBooking = new DBBooking(DBConnection.Instance.GetOpenConnection());
+        private static IDBBooking _dbBooking = new DBBooking();
 
         // Use a static property or method that NUnit can access for the ValueSource
         public static IEnumerable<Booking> TestBookings {
@@ -91,7 +92,7 @@ namespace TestProject.API.DAO {
         [Test]
         public async Task CreateBooking_ShouldReturnTrueIfValidInterval([ValueSource(nameof(TestBookings))] Booking inBooking)
         {
-            Assert.True(await _dbBooking.CreateBooking(inBooking) > 0);
+            Assert.True(await _dbBooking.CreateBooking(DBConnection.Instance.GetOpenConnection(), inBooking) > 0);
         }
 
         [Test]
@@ -106,7 +107,7 @@ namespace TestProject.API.DAO {
             TestContext.WriteLine($"Testing timeslot: Start - {start}, End - {end}");
 
             // Act
-            var bookings = await _dbBooking.GetBookingsInTimeslot(start, end);
+            var bookings = await _dbBooking.GetBookingsInTimeslot(DBConnection.Instance.GetOpenConnection(),start, end);
 
             // Additional Information
             TestContext.WriteLine($"Number of bookings returned: {bookings.Count}");

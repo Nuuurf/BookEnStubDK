@@ -1,20 +1,21 @@
-﻿using RestfulApi.Models;
+﻿using System.Data;
+using RestfulApi.Models;
 
 namespace RestfulApi.DAL {
     public interface IDBBooking {
 
-        public Task<int> CreateBooking(Booking booking);
+        public Task<int> CreateBooking(IDbConnection conn, Booking booking, IDbTransaction transaction = null);
 
-        public Task<bool> CreateMultipleBookings(List<List<Booking>> dateGroupedBookings);
+        public Task<bool> CreateMultipleBookings(IDbConnection conn, List<List<Booking>> dateGroupedBookings, IDbTransaction transaction = null);
 
         //bool DeleteBooking(int bookingID);
 
         //bool UpdateBooking(int bookingID, Booking booking);
 
-        public Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end);
+        public Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, DateTime start, DateTime end, IDbTransaction transaction = null);
 
-        public Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(DateTime date);
-        public Task<int> GetMaxStubs();
+        public Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null);
+        public Task<int> GetMaxStubs(IDbConnection conn, IDbTransaction transaction = null);
 
         //List<Booking> GetBookingsForDay(DateTime date);
     }

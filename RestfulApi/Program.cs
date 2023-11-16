@@ -1,11 +1,20 @@
 using RestfulApi.BusinessLogic;
 using RestfulApi.DAL;
+using System.Data;
 using System.Data.Sql;
 using System.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddScoped<IDbConnection>(provider =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    var connection = new SqlConnection(connectionString);
+    connection.Open();
+    return connection;
+});
+
 builder.Services.AddScoped<IBookingData, BookingDataControl>();
 builder.Services.AddScoped<IDBBooking, DBBooking>();
 //builder.Services.AddScoped<IDBBooking>(serviceProvider => {

@@ -2,19 +2,21 @@
 using RestfulApi;
 using RestfulApi.DAL;
 using RestfulApi.Models;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Transactions;
 
 namespace RestfulApi.BusinessLogic {
     public class BookingDataControl : IBookingData {
 
         private readonly IDBBooking _dBBooking;
-
+        private readonly IDbConnection _connection;
         //Ready for dependency injection
-        public BookingDataControl(IDBBooking dbBooking) {
+        public BookingDataControl(IDBBooking dbBooking, IDbConnection connection) {
             //Needs to change with injection
             _dBBooking = dbBooking;
-            //_dBBooking = new DBBooking(DBConnection.Instance.GetOpenConnection());
+            _connection = connection;
         }
 
         public async Task<int> CreateBooking(Booking booking)
@@ -29,8 +31,16 @@ namespace RestfulApi.BusinessLogic {
             }
 
             int newBookingId = 0;
-            newBookingId = await _dBBooking.CreateBooking(booking);
-
+            
+                try
+                {
+                    newBookingId = await _dBBooking.CreateBooking(_connection, booking);
+                }
+                catch
+                {
+                    newBookingId = 0;
+                }
+            
             if (newBookingId <= 0)
             {
                 throw new Exception("There are not available stubs for bookings in the desired timeslot");
@@ -57,97 +67,64 @@ namespace RestfulApi.BusinessLogic {
             }
             dateGroupedBookings = GroupBookingsByDate(bookings);
 
-            //Try assigning valid stubIds to all bookings
-            foreach (List<Booking> listedListBooking in dateGroupedBookings)
+            using (var transaction = _connection.BeginTransaction(System.Data.IsolationLevel.Serializable))
             {
-
-                //Assign available stubIds to stubs in group;
-                int[] stubAvailableNumbers = new int[0];
-                int lowestAvailableNumberTemp = 0;
-
-                List<Booking> BookingsAlreadyOnDate
-                    = await _dBBooking.GetBookingsInTimeslot(listedListBooking[0].TimeStart,
-                        listedListBooking[0].TimeEnd);
-
-                int[] stubNumbersTemp = new int[BookingsAlreadyOnDate.Count];
-
-                if ((BookingsAlreadyOnDate.Count + listedListBooking.Count) <= await _dBBooking.GetMaxStubs())
+                foreach (List<Booking> listedListBooking in dateGroupedBookings)
                 {
-                    //Get stubIds for stub already on date
-                    for (int i = 0; i < BookingsAlreadyOnDate.Count; i++)
-                    {
-                        stubNumbersTemp[i] = BookingsAlreadyOnDate[i].StubId;
-                    }
 
-                    stubAvailableNumbers = FindLowestAvailableNumbers(stubNumbersTemp, await _dBBooking.GetMaxStubs());
+                    //Assign available stubIds to stubs in group;
+                    int[] stubAvailableNumbers = new int[0];
+                    int lowestAvailableNumberTemp = 0;
 
-                    //Run through and assign available numbers
-                    for (int i = 0; i < listedListBooking.Count; i++)
+                    List<Booking> BookingsAlreadyOnDate
+                        = await _dBBooking.GetBookingsInTimeslot(_connection, listedListBooking[0].TimeStart,
+                            listedListBooking[0].TimeEnd, transaction);
+
+                    int[] stubNumbersTemp = new int[BookingsAlreadyOnDate.Count];
+
+                    if ((BookingsAlreadyOnDate.Count + listedListBooking.Count) <= await _dBBooking.GetMaxStubs(_connection, transaction))
                     {
-                        listedListBooking[i].StubId = stubAvailableNumbers[i];
-                    }
-                }
-                else
-                {
-                    //One of the grouped timeslots cannot fit within timeslot.
-                    return false;
-                }
-                using (SqlTransaction trans = DBConnection.Instance.GetOpenConnection().BeginTransaction(System.Data.IsolationLevel.Serializable))
-                {
-                    success = await _dBBooking.CreateMultipleBookings(dateGroupedBookings);
-                    if (success)
-                    {
-                        trans.Commit();
+                        //Get stubIds for stub already on date
+                        for (int i = 0; i < BookingsAlreadyOnDate.Count; i++)
+                        {
+                            stubNumbersTemp[i] = BookingsAlreadyOnDate[i].StubId;
+                        }
+
+                        stubAvailableNumbers = FindLowestAvailableNumbers(stubNumbersTemp, await _dBBooking.GetMaxStubs(_connection, transaction));
+
+                        //Run through and assign available numbers
+                        for (int i = 0; i < listedListBooking.Count; i++)
+                        {
+                            listedListBooking[i].StubId = stubAvailableNumbers[i];
+                        }
                     }
                     else
                     {
-                        trans.Rollback();
+                        //One of the grouped timeslots cannot fit within timeslot.
+                        return false;
+                    }
+
+                    success = await _dBBooking.CreateMultipleBookings(_connection, dateGroupedBookings, transaction);
+                    if (success)
+                    {
+                        transaction.Commit();
+
+                        return success;
+                    }
+                    else
+                    {
+                        transaction.Rollback();
+
+                        return success;
                     }
                 }
+                //Try assigning valid stubIds to all bookings
+                return success;
             }
-            return success;
+            
         }
+        
 
-        private List<List<Booking>> GroupBookingsByDate(List<Booking> unPairedBookings) {
-            List<List<Booking>> pairedBookings = new List<List<Booking>>();
-
-            foreach (Booking booking in unPairedBookings) {
-                bool addedToGroup = false;
-
-                foreach (List<Booking> bookingGroup in pairedBookings) {
-                    if (bookingGroup[0].TimeStart == booking.TimeStart && bookingGroup[0].TimeEnd == booking.TimeEnd) {
-                        bookingGroup.Add(booking);
-                        addedToGroup = true;
-                        break; // Found matching group, no need to continue searching
-                    }
-                }
-
-                // If not added to any existing group, create a new group
-                if (!addedToGroup) {
-                    List<Booking> newGroup = new List<Booking> { booking };
-                    pairedBookings.Add(newGroup);
-                }
-            }
-
-            return pairedBookings;
-        }
-
-        private bool ValidateBookingDates(Booking booking) {
-            bool validDates = false;
-
-            if (booking.TimeStart >= DateTime.Now.AddMinutes(-1) && booking.TimeEnd > DateTime.Now) {
-                if (booking.TimeStart < booking.TimeEnd) {
-                    validDates = true;
-                }
-                else
-                    new ArgumentException("Booking date format exception. Booking start date exceeds booking end date");
-            }
-            else {
-                throw new ArgumentException("Booking date format exception. Booking dates preceding current date");
-            }
-
-            return validDates;
-        }
 
         public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(DateTime date) {
             DateTime currentDate = DateTime.Now.Date;
@@ -155,9 +132,8 @@ namespace RestfulApi.BusinessLogic {
             if (date < currentDate) {
                 return null;
             }
-
-            List<AvailableBookingsForTimeframe> availableBookings = await _dBBooking.GetAvaiableBookingsForGivenDate(date);
-
+            List<AvailableBookingsForTimeframe> availableBookings = await _dBBooking.GetAvaiableBookingsForGivenDate(_connection, date);
+            
             return availableBookings;
         }
 
@@ -165,9 +141,8 @@ namespace RestfulApi.BusinessLogic {
             if (start > end) {
                 return null;
             }
-
-            List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(start, end);
-
+            List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(_connection, start, end);
+            
             return bookings;
         }
 
@@ -198,7 +173,55 @@ namespace RestfulApi.BusinessLogic {
             return result.ToArray();
         }
 
+        private List<List<Booking>> GroupBookingsByDate(List<Booking> unPairedBookings)
+        {
+            List<List<Booking>> pairedBookings = new List<List<Booking>>();
 
+            foreach (Booking booking in unPairedBookings)
+            {
+                bool addedToGroup = false;
+
+                foreach (List<Booking> bookingGroup in pairedBookings)
+                {
+                    if (bookingGroup[0].TimeStart == booking.TimeStart && bookingGroup[0].TimeEnd == booking.TimeEnd)
+                    {
+                        bookingGroup.Add(booking);
+                        addedToGroup = true;
+                        break; // Found matching group, no need to continue searching
+                    }
+                }
+
+                // If not added to any existing group, create a new group
+                if (!addedToGroup)
+                {
+                    List<Booking> newGroup = new List<Booking> { booking };
+                    pairedBookings.Add(newGroup);
+                }
+            }
+
+            return pairedBookings;
+        }
+
+        private bool ValidateBookingDates(Booking booking)
+        {
+            bool validDates = false;
+
+            if (booking.TimeStart >= DateTime.Now.AddMinutes(-1) && booking.TimeEnd > DateTime.Now)
+            {
+                if (booking.TimeStart < booking.TimeEnd)
+                {
+                    validDates = true;
+                }
+                else
+                    new ArgumentException("Booking date format exception. Booking start date exceeds booking end date");
+            }
+            else
+            {
+                throw new ArgumentException("Booking date format exception. Booking dates preceding current date");
+            }
+
+            return validDates;
+        }
         /*private List<List<Booking>> GroupBookingsByDate1(List<Booking> unPairedBookings) {
             List<List<Booking>> pairedBookings = new List<List<Booking>>();
 

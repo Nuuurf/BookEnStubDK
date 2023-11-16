@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 
-namespace RestfulApi.DAL
+namespace TestProject.API.DAO
 {
     public sealed class DBConnection
     {
@@ -14,9 +14,9 @@ namespace RestfulApi.DAL
         {
             string dataSource = "hildur.ucn.dk";
             string initialCatalog = "DMA-CSD-S225_10461242";
-            string userID = "DMA-CSD-S225_10461242"; //42
+            string userID = "DMA-CSD-S225_10461242";
 
-            string password = "Password1!"; //Environment.GetEnvironmentVariable("DB_PASSWORD") ?? throw new InvalidOperationException("DB_PASSWORD environment variable is not set.");
+            string password = "Password1!";
 
             connectionString = $"Data Source={dataSource};Initial Catalog={initialCatalog};User ID={userID};Password={password};";
 
@@ -31,32 +31,6 @@ namespace RestfulApi.DAL
                 throw new InvalidOperationException("Couldn't open connection to the database");
 
             return connection;
-        }
-        // Method to begin a transaction
-        public SqlTransaction BeginTransaction()
-        {
-            var connection = GetOpenConnection();
-            return connection.BeginTransaction();
-        }
-
-        // Method to commit a transaction
-        public void CommitTransaction(SqlTransaction transaction)
-        {
-            if (transaction != null && transaction.Connection != null)
-            {
-                transaction.Commit();
-                transaction.Connection.Close();
-            }
-        }
-
-        // Method to roll back a transaction
-        public void RollbackTransaction(SqlTransaction transaction)
-        {
-            if (transaction != null && transaction.Connection != null)
-            {
-                transaction.Rollback();
-                transaction.Connection.Close();
-            }
         }
         public List<ConnectionState> TryConnection()
         {

@@ -5,47 +5,28 @@ using Dapper;
 using Microsoft.VisualBasic;
 using System.Data;
 using System.Linq.Expressions;
+using System.Transactions;
+using System.Data.Common;
 
 namespace RestfulApi.DAL {
     public class DBBooking : IDBBooking {
 
-        private SqlConnection conn;
-        private SqlTransaction trans;
-
-        public DBBooking(SqlConnection inCon) {
-            if (inCon == null) {
-                conn = DBConnection.Instance.GetOpenConnection();
-            }
-            else {
-                conn = inCon;
-            }
-        }
-
-        public DBBooking(SqlTransaction inTrans) {
-            if (inTrans == null) {
-                throw new Exception("Cannot use null as transaction object");
-            }
-            else {
-                trans = inTrans;
-                conn = inTrans.Connection;
-            }
-        }
 
         public DBBooking() {
-            conn = DBConnection.Instance.GetOpenConnection();
         }
 
         /// <summary>
         /// Gets a single booking with the id matching the booking in the database.
         /// </summary>
         /// <param name="id"> the id of the booking object that needs to be retrieved</param>
+        /// <param name="conn"></param>
         /// <returns>A Booking object which is either null or not, depening if the object was found or not</returns>
-        public Booking GetSingleBooking(int id) {
+        public Booking GetSingleBooking(IDbConnection conn, int id, IDbTransaction transaction = null) {
             string script = "SELECT * FROM Booking WHERE Id = @id";
 
             Booking booking = null;
             try {
-                booking = conn.QueryFirst<Booking>(script, new { id }); // Queries database for booking matching id and returns first result
+                booking = conn.QueryFirst<Booking>(script, new { id }, transaction: transaction); // Queries database for booking matching id and returns first result
             }
             catch {
                 //if it fails send null for errorhandling in blc
@@ -76,13 +57,13 @@ namespace RestfulApi.DAL {
         /// </summary>
         /// <param name="id"> the id of the booking object that needs to be deleted</param>
         /// <returns>A boolean indicading where the action was successful or not</returns>
-        public bool DeleteBooking(int id) {
+        public bool DeleteBooking(IDbConnection conn, int id, IDbTransaction transaction) {
             string script = "DELETE FROM Booking WHERE Id = @id";
 
             bool success = false;
 
             try {
-                conn.Execute(script, new { id });
+                conn.Execute(script, new { id }, transaction: transaction);
                 success = true;
             }
             catch {
@@ -96,17 +77,18 @@ namespace RestfulApi.DAL {
         /// <summary>
         /// Inserts a new booking with its values into the database.
         /// </summary>
+        /// <param name="conn"></param>
         /// <param name="booking"> the booking object that needs to be persisted</param>
+        /// <param name="transaction"></param>
         /// <returns>A boolean indicading where the action was successful or not</returns>
-
-        public async Task<int> CreateBooking(Booking booking)
+        public async Task<int> CreateBooking(IDbConnection conn, Booking booking, IDbTransaction transaction = null)
         {
             string script = "InsertBooking";
             int newBookingId = 0;
 
             try {
                 var parameter = new { date = booking.TimeStart, note = booking.Notes };
-                int result = await conn.QueryFirstOrDefaultAsync<int>(script, parameter, commandType: CommandType.StoredProcedure);
+                int result = await conn.QueryFirstOrDefaultAsync<int>(script, parameter, commandType: CommandType.StoredProcedure, transaction: transaction);
 
                 newBookingId = result;
             }
@@ -116,14 +98,14 @@ namespace RestfulApi.DAL {
             return newBookingId;
 
         }
-        /// <summary>
+        /*/// <summary>
         /// Inserts a new booking with its values into the database.
         /// Version of the createBooking command compatible within transactions
         /// </summary>
         /// <param name="booking"> the booking object that needs to be persisted</param>
         /// <param name="transaction"> A transaction which has an existing connection assigned to it</param>
         /// <returns>A boolean indicading where the action was successful or not</returns>
-        public async Task<bool> CreateBooking(Booking booking, SqlTransaction transaction) {
+        public async Task<bool> CreateBooking(IDbConnection conn, Booking booking) {
             string script = "Insert into booking (TimeStart, TimeEnd, Notes, StubId) values (@TimeStart, @TimeEnd, @Notes, @StubId)";
 
             try {
@@ -135,9 +117,9 @@ namespace RestfulApi.DAL {
                 //if it fails return false for errorhandling in blc
                 return false;
             }
-        }
+        }*/
         // Not implemented
-        public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end)
+        public async Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, DateTime start, DateTime end, IDbTransaction transaction = null)
         {
             string script = "SELECT id, TimeStart, TimeEnd, Notes, StubId FROM Booking WHERE TimeStart < @TimeEnd AND TimeEnd > @TimeStart";
 
@@ -145,7 +127,7 @@ namespace RestfulApi.DAL {
 
             try
             {
-                bookings = (await conn.QueryAsync<Booking>(script, new { TimeStart = start, TimeEnd = end })).ToList();
+                bookings = (await conn.QueryAsync<Booking>(script, new { TimeStart = start, TimeEnd = end }, transaction: transaction)).ToList();
             }
             catch {
                 //if it fails send null for error handling in blc
@@ -155,13 +137,13 @@ namespace RestfulApi.DAL {
             return bookings.ToList();
         }
 
-        public async Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(DateTime date) {
+        public async Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null) {
             string script = "dbo.GetAvailableBookingsForDate";
 
             try {
                 var parameter = new { date = date.Date };
 
-                var result = await conn.QueryAsync<AvailableBookingsForTimeframe>(script, parameter, commandType: CommandType.StoredProcedure);
+                var result = await conn.QueryAsync<AvailableBookingsForTimeframe>(script, parameter, commandType: CommandType.StoredProcedure, transaction: transaction);
 
                 return result.ToList();
             }
@@ -171,7 +153,7 @@ namespace RestfulApi.DAL {
 
         }
 
-        public async Task<bool> CreateMultipleBookings(List<List<Booking>> dateGroupedBookings) {
+        public async Task<bool> CreateMultipleBookings(IDbConnection conn, List<List<Booking>> dateGroupedBookings, IDbTransaction transaction = null) {
             bool success = false;
             int expectedAllChanges = 0;
             int actualAllChanges = 0;
@@ -180,15 +162,14 @@ namespace RestfulApi.DAL {
             int actualChangesTemp = 0;
             int expectedChangesTemp = 0;
             //find the maximal amount of bookings per timeslot
-            int maxBookingsPerTimeSlotTemp = await GetMaxStubs();
+            int maxBookingsPerTimeSlotTemp = await GetMaxStubs(conn, transaction);
 
             foreach (List<Booking> dateBookingGroup in dateGroupedBookings) {
                 //find the size of the group wanted for this timeslot
                 groupSizeTemp = dateBookingGroup.Count;
                 //find the amount of bookings already on timeslot.
 
-                bookingsOnDateTemp = GetBookingsInTimeslot(dateBookingGroup[0].TimeStart, dateBookingGroup[0].TimeEnd).Result.Count;
-
+                bookingsOnDateTemp = GetBookingsInTimeslot(conn, dateBookingGroup[0].TimeStart, dateBookingGroup[0].TimeEnd, transaction).Result.Count;
 
                 //if the group size wanted to be added can fit within the number of the remaining available stubs in the timeslot.
                 if (groupSizeTemp <= maxBookingsPerTimeSlotTemp - bookingsOnDateTemp) {
@@ -199,7 +180,7 @@ namespace RestfulApi.DAL {
 
                     foreach (Booking booking in dateBookingGroup) {
                         //if creation was successful increment actual changes
-                        if (await CreateBooking(booking) > 0) {
+                        if (await CreateBooking(conn, booking, transaction) > 0) {
                             actualChangesTemp++;
                             actualAllChanges++;
                         }
@@ -222,11 +203,16 @@ namespace RestfulApi.DAL {
             return success;
         }
 
-        public async Task<int> GetMaxStubs() {
-            using (SqlConnection connection = DBConnection.Instance.GetOpenConnection()) {
-                return await connection.QueryFirstOrDefaultAsync<int>("Select Count(*) from Stub");
+        public async Task<int> GetMaxStubs(IDbConnection conn, IDbTransaction transaction = null) {
+            try
+            {
+                return await conn.QueryFirstOrDefaultAsync<int>("Select Count(*) from Stub", transaction: transaction);
             }
-            return -1;
+            catch
+            {
+                return -1;
+            }
+            
         }
     }
 }
