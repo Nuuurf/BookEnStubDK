@@ -63,5 +63,29 @@ List<Booking> bookingList = new List<Booking>();
             Assert.AreEqual(400, result.StatusCode);
 
         }
+
+        [Test]
+        public async Task CreateMultipleBookingTest_ThrowsException_InternalError()
+        {
+            //Arrange
+            var mockDBBokking = new Mock<IBookingData>();
+            List<Booking> bookingList = new List<Booking>();
+            mockDBBokking.Setup(repo => repo.CreateMultipleBookings(It.IsAny<List<Booking>>()))
+                .Throws(new Exception());
+
+            BookingController controller = new BookingController(mockDBBokking.Object);
+
+            //Act
+
+            var resultTask = controller.CreateMultipleBooking(bookingList);
+            var result = await resultTask;
+
+            //Assert
+            if (result is ObjectResult objectResult)
+            {
+                Assert.AreEqual(500, objectResult.StatusCode);
+            }
+            Assert.IsInstanceOf<ObjectResult>(result);
+        }
     }
 }

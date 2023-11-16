@@ -11,6 +11,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NuGet.Frameworks;
 using TestProject.API.DAO;
 
 namespace TestProject.API.BusinessLogic
@@ -96,5 +97,23 @@ namespace TestProject.API.BusinessLogic
             Assert.IsFalse(result);
         }
 
-    }
+        [Test]
+        public async Task CreateMultipleBookings_ShouldReturnFalse_WithInvalidDates()
+        {
+            //Arrange
+            var mockDBBokking = new Mock<IDBBooking>();
+            List<Booking> bookingList = new List<Booking> {new Booking{TimeStart = DateTime.Now.AddHours(2), TimeEnd = DateTime.Now.AddHours(1)} };
+            mockDBBokking.Setup(repo => repo.CreateMultipleBookings(It.IsAny<IDbConnection>(),
+                    It.IsAny<List<List<Booking>>>(),
+                    It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(false);
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
+
+            //Act
+var result = await controller.CreateMultipleBookings(bookingList);
+        //Assert
+Assert.IsFalse(result);
+        }
+
+        }
 }
