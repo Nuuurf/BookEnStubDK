@@ -75,7 +75,35 @@
         <script src="~/js/ConfirmPage.js"></script> 
 
         <script>
-           
+            $(document).ready(function () {
+                $('.btn-book-confirm').on('click', function () {
+                    // Retrieve data from local storage
+                    var selectedAppointments = localStorage.getItem('selectedAppointments');
+
+                    if (selectedAppointments) {
+                        // Prepare the JSON object for the POST request
+                        var postData = JSON.stringify({ appointments: selectedAppointments });
+
+                        // Make the POST request
+                        $.ajax({
+                            url: '@Url.Action("BookAppointment", "Booking")',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: selectedAppointments,
+                            success: function (response) {
+                                // Handle success
+                                console.log('Booking confirmed:', response);
+                            },
+                            error: function (xhr, status, error) {
+                                // Handle error
+                                console.error('Error confirming booking:', error);
+                            }
+                        });
+                    } else {
+                        console.log('No appointments found in local storage');
+                    }
+                });
+            });
         </script>
     </body>
     </html>
