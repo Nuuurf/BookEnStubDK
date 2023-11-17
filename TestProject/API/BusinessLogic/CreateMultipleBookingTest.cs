@@ -115,5 +115,94 @@ var result = await controller.CreateMultipleBookings(bookingList);
 Assert.IsFalse(result);
         }
 
+        [Test]
+        public async Task CreateMultipleBookings_ShouldReturnTrue_WithBookingsAlreadyOnDate()
+        {
+            // Arrange
+            var dBBookingMock = new Mock<IDBBooking>();
+            var connectionMock = new Mock<IDbConnection>();
+            var transactionMock = new Mock<IDbTransaction>();
+
+            var testBookings = new List<Booking>
+            {
+                new Booking { TimeStart = new DateTime(2023, 11, 17, 10, 0, 0),
+                    TimeEnd = new DateTime(2023, 11, 17, 11, 0, 0) },
+                // Add more Booking objects to simulate various scenarios
+            };
+
+            var existingBookings = new List<Booking>
+            {
+                new Booking
+                {
+                    TimeStart = new DateTime(2023, 11, 17, 10, 0, 0),
+                    TimeEnd = new DateTime(2023, 11, 17, 11, 0, 0),
+                    StubId = 1
+                }
+            };
+            int maxStubs = 10; // Assume enough stubs are available
+
+            dBBookingMock.Setup(repo => repo.GetBookingsInTimeslot(It.IsAny<IDbConnection>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(existingBookings);
+
+            dBBookingMock.Setup(repo => repo.GetMaxStubs(It.IsAny<IDbConnection>(), It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(maxStubs);
+
+            dBBookingMock.Setup(repo =>
+                    repo.CreateMultipleBookings(It.IsAny<IDbConnection>(), It.IsAny<List<List<Booking>>>(), It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(true);
+            connectionMock.Setup(repo => repo.BeginTransaction(It.IsAny<System.Data.IsolationLevel>())).Returns(transactionMock.Object);
+            var service = new BookingDataControl(dBBookingMock.Object, connectionMock.Object);
+
+            // Act
+            bool success = await service.CreateMultipleBookings(testBookings);
+
+            // Assert
+            foreach (var booking in testBookings)
+            {
+                Assert.IsTrue(booking.StubId > 0); // Check if StubId is assigned
+            }
+            Assert.IsTrue(success);
         }
+        [Test]
+        public async Task CreateMultipleBookings_ShouldReturnFalse_WithFullBookingsAlreadyOnDate()
+        {
+            // Arrange
+            var dBBookingMock = new Mock<IDBBooking>();
+            var connectionMock = new Mock<IDbConnection>();
+            var transactionMock = new Mock<IDbTransaction>();
+            DateTime timeStart = new DateTime(2023, 11, 17, 10, 0, 0);
+            DateTime timeEnd = new DateTime(2023, 11, 17, 11, 0, 0);
+
+            var testBookings = new List<Booking>{new Booking { TimeStart = timeStart, TimeEnd = timeEnd },};
+            
+            var existingBookings = new List<Booking>
+            {
+                new Booking{ TimeStart = timeStart, TimeEnd = timeEnd, StubId = 1 },
+                new Booking{ TimeStart = timeStart, TimeEnd = timeEnd, StubId = 2 },
+                new Booking{ TimeStart = timeStart, TimeEnd = timeEnd, StubId = 3 }
+            };
+            int maxStubs = 3; 
+
+            dBBookingMock.Setup(repo => repo.GetBookingsInTimeslot(It.IsAny<IDbConnection>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(existingBookings);
+
+            dBBookingMock.Setup(repo => repo.GetMaxStubs(It.IsAny<IDbConnection>(), It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(maxStubs);
+            dBBookingMock.Setup(repo =>
+                    repo.CreateMultipleBookings(It.IsAny<IDbConnection>(), It.IsAny<List<List<Booking>>>(), It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(false);
+            connectionMock.Setup(repo => repo.BeginTransaction(It.IsAny<System.Data.IsolationLevel>())).Returns(transactionMock.Object);
+            var service = new BookingDataControl(dBBookingMock.Object, connectionMock.Object);
+
+            // Act
+            bool success = await service.CreateMultipleBookings(testBookings);
+
+            // Assert
+            foreach (var booking in testBookings)
+            {
+                Assert.IsTrue(booking.StubId == 0); // Check if StubId is assigned
+            }
+            Assert.IsFalse(success);
+        }
+    }
 }
