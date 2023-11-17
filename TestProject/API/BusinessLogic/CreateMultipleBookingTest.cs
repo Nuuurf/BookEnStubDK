@@ -125,8 +125,8 @@ Assert.IsFalse(result);
 
             var testBookings = new List<Booking>
             {
-                new Booking { TimeStart = new DateTime(2023, 11, 17, 10, 0, 0),
-                    TimeEnd = new DateTime(2023, 11, 17, 11, 0, 0) },
+                new Booking { TimeStart = DateTime.Now.AddHours(1),
+                    TimeEnd = DateTime.Now.AddHours(2) },
                 // Add more Booking objects to simulate various scenarios
             };
 
@@ -134,8 +134,8 @@ Assert.IsFalse(result);
             {
                 new Booking
                 {
-                    TimeStart = new DateTime(2023, 11, 17, 10, 0, 0),
-                    TimeEnd = new DateTime(2023, 11, 17, 11, 0, 0),
+                    TimeStart = DateTime.Now.AddHours(1),
+                    TimeEnd = DateTime.Now.AddHours(2),
                     StubId = 1
                 }
             };
@@ -170,8 +170,8 @@ Assert.IsFalse(result);
             var dBBookingMock = new Mock<IDBBooking>();
             var connectionMock = new Mock<IDbConnection>();
             var transactionMock = new Mock<IDbTransaction>();
-            DateTime timeStart = new DateTime(2023, 11, 17, 10, 0, 0);
-            DateTime timeEnd = new DateTime(2023, 11, 17, 11, 0, 0);
+            DateTime timeStart = DateTime.Now.AddHours(1);
+            DateTime timeEnd = DateTime.Now.AddHours(2);
 
             var testBookings = new List<Booking>{new Booking { TimeStart = timeStart, TimeEnd = timeEnd },};
             
