@@ -81,5 +81,31 @@ namespace TestProject.API.Controller
             //Assert
             Assert.IsInstanceOf<NotFoundObjectResult>(result);
         }
+
+        [Test]
+        public async Task GetBookingsInTimeSlot_ThrowsException_InternalError()
+        {
+            //Arrange
+            var mockDBBokking = new Mock<IBookingData>();
+
+            mockDBBokking.Setup(repo => repo.GetBookingsInTimeslot(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Throws(new Exception());
+
+            BookingController controller = new BookingController(mockDBBokking.Object);
+
+            //Act
+            DateTime start = DateTime.Now;
+            DateTime end = start.AddHours(-1);
+
+            var resultTask = controller.GetBookingsInTimeslot(start, end);
+            var result = await resultTask;
+
+            //Assert
+            if (result is ObjectResult objectResult)
+            {
+                Assert.AreEqual(500, objectResult.StatusCode);
+            }
+            Assert.IsInstanceOf<ObjectResult>(result);
+        }
     }
 }   

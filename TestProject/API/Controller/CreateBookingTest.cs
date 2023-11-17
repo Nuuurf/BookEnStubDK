@@ -69,5 +69,29 @@ namespace TestProject.API.Controller
             Assert.NotNull(result);
             Assert.AreEqual(422, result.StatusCode);
         }
+
+        [Test]
+        public async Task CreateBookingFailed_ThrowsException_InternalError()
+        {
+            //Arrange
+            var mockDBBokking = new Mock<IBookingData>();
+Booking booking = new Booking();
+            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>()))
+                .Throws(new Exception());
+
+            BookingController controller = new BookingController(mockDBBokking.Object);
+
+            //Act
+
+            var resultTask = controller.CreateBooking(booking);
+            var result = await resultTask;
+
+            //Assert
+            if (result is ObjectResult objectResult)
+            {
+                Assert.AreEqual(500, objectResult.StatusCode);
+            }
+            Assert.IsInstanceOf<ObjectResult>(result);
+            }
     }
 }

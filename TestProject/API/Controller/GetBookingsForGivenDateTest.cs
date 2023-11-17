@@ -80,5 +80,29 @@ namespace TestProject.API.Controller
             Assert.IsNotNull(result);
             Assert.AreEqual(400, result.StatusCode);
         }
+
+        [Test]
+        public async Task GetBookingForGivenDate_ThrowsException_InternalError()
+        {
+            //Arrange
+            var mockDBBokking = new Mock<IBookingData>();
+            DateTime date = DateTime.Now.Date.AddDays(1);
+            mockDBBokking.Setup(repo => repo.GetAvailableBookingsForGivenDate(It.IsAny<DateTime>()))
+                .Throws(new Exception());
+
+            BookingController controller = new BookingController(mockDBBokking.Object);
+            string stringDate = date.ToString("yyyy-MM-dd");
+            //Act
+
+            var resultTask = controller.GetBookingsForGivenDate(stringDate);
+            var result = await resultTask;
+
+            //Assert
+            if (result is ObjectResult objectResult)
+            {
+                Assert.AreEqual(500, objectResult.StatusCode);
+            }
+            Assert.IsInstanceOf<ObjectResult>(result);
+        }
     }
 }

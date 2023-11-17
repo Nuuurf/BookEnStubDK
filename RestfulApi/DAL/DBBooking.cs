@@ -21,7 +21,7 @@ namespace RestfulApi.DAL {
         /// <param name="id"> the id of the booking object that needs to be retrieved</param>
         /// <param name="conn"></param>
         /// <returns>A Booking object which is either null or not, depening if the object was found or not</returns>
-        public Booking GetSingleBooking(IDbConnection conn, int id, IDbTransaction transaction = null) {
+        /*public Booking GetSingleBooking(IDbConnection conn, int id, IDbTransaction transaction = null) {
             string script = "SELECT * FROM Booking WHERE Id = @id";
 
             Booking booking = null;
@@ -34,7 +34,7 @@ namespace RestfulApi.DAL {
             }
 
             return booking;
-        }
+        }*/
 
         //public bool UpdateBooking(Booking updatedBooking)
         //{
@@ -57,7 +57,7 @@ namespace RestfulApi.DAL {
         /// </summary>
         /// <param name="id"> the id of the booking object that needs to be deleted</param>
         /// <returns>A boolean indicading where the action was successful or not</returns>
-        public bool DeleteBooking(IDbConnection conn, int id, IDbTransaction transaction) {
+        /*public bool DeleteBooking(IDbConnection conn, int id, IDbTransaction transaction) {
             string script = "DELETE FROM Booking WHERE Id = @id";
 
             bool success = false;
@@ -72,7 +72,7 @@ namespace RestfulApi.DAL {
             }
 
             return success;
-        }
+        }*/
 
         /// <summary>
         /// Inserts a new booking with its values into the database.
@@ -98,26 +98,6 @@ namespace RestfulApi.DAL {
             return newBookingId;
 
         }
-        /*/// <summary>
-        /// Inserts a new booking with its values into the database.
-        /// Version of the createBooking command compatible within transactions
-        /// </summary>
-        /// <param name="booking"> the booking object that needs to be persisted</param>
-        /// <param name="transaction"> A transaction which has an existing connection assigned to it</param>
-        /// <returns>A boolean indicading where the action was successful or not</returns>
-        public async Task<bool> CreateBooking(IDbConnection conn, Booking booking) {
-            string script = "Insert into booking (TimeStart, TimeEnd, Notes, StubId) values (@TimeStart, @TimeEnd, @Notes, @StubId)";
-
-            try {
-                // Use the existing transaction object for the command
-                await conn.ExecuteAsync(script, booking, transaction);
-                return true;
-            }
-            catch (Exception) {
-                //if it fails return false for errorhandling in blc
-                return false;
-            }
-        }*/
         // Not implemented
         public async Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, DateTime start, DateTime end, IDbTransaction transaction = null)
         {
@@ -137,7 +117,7 @@ namespace RestfulApi.DAL {
             return bookings.ToList();
         }
 
-        public async Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null) {
+        public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null) {
             string script = "dbo.GetAvailableBookingsForDate";
 
             try {

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="15.0.0">
-  <zoom_level>10</zoom_level>
+  <zoom_level>14</zoom_level>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>510</x>
-      <y>340</y>
-      <w>100</w>
-      <h>100</h>
+      <x>350</x>
+      <y>322</y>
+      <w>140</w>
+      <h>140</h>
     </coordinates>
     <panel_attributes>Stub
 --
@@ -19,10 +19,10 @@ Number
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>710</x>
-      <y>340</y>
-      <w>100</w>
-      <h>100</h>
+      <x>630</x>
+      <y>322</y>
+      <w>140</w>
+      <h>140</h>
     </coordinates>
     <panel_attributes>Booking
 -
@@ -35,10 +35,10 @@ Notes</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>910</x>
-      <y>340</y>
-      <w>100</w>
-      <h>100</h>
+      <x>1134</x>
+      <y>322</y>
+      <w>154</w>
+      <h>140</h>
     </coordinates>
     <panel_attributes>Customer
 -
@@ -52,25 +52,51 @@ TelefonNumber</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>800</x>
-      <y>380</y>
-      <w>130</w>
-      <h>40</h>
+      <x>1008</x>
+      <y>378</y>
+      <w>154</w>
+      <h>56</h>
     </coordinates>
     <panel_attributes>m1=*
 m2=1</panel_attributes>
-    <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>600</x>
-      <y>380</y>
-      <w>130</w>
-      <h>40</h>
+      <x>476</x>
+      <y>378</y>
+      <w>182</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>m1=1
+m2=0..*</panel_attributes>
+    <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>882</x>
+      <y>322</y>
+      <w>140</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>Booking Order
+-
+halign=left
+Booking Date</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>378</y>
+      <w>154</w>
+      <h>56</h>
     </coordinates>
     <panel_attributes>m1=1..*
-m2=1..*</panel_attributes>
-    <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
+m2=1</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
   </element>
 </diagram>

@@ -14,7 +14,7 @@ namespace RestfulApi.DAL {
 
         public Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, DateTime start, DateTime end, IDbTransaction transaction = null);
 
-        public Task<List<AvailableBookingsForTimeframe>> GetAvaiableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null);
+        public Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null);
         public Task<int> GetMaxStubs(IDbConnection conn, IDbTransaction transaction = null);
 
         //List<Booking> GetBookingsForDay(DateTime date);

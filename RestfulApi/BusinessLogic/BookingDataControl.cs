@@ -132,7 +132,7 @@ namespace RestfulApi.BusinessLogic {
             if (date < currentDate) {
                 return null;
             }
-            List<AvailableBookingsForTimeframe> availableBookings = await _dBBooking.GetAvaiableBookingsForGivenDate(_connection, date);
+            List<AvailableBookingsForTimeframe> availableBookings = await _dBBooking.GetAvailableBookingsForGivenDate(_connection, date);
             
             return availableBookings;
         }
