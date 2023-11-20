@@ -1,15 +1,17 @@
 ﻿// Function to format the date and time
 function formatTime(date) {
-    var utcDate = date + 'Z'; //Add Z to make it UTC
-    var dateTime = new Date(utcDate);
+    var utcDate = date + 'Z';
+        var dateTime = new Date(utcDate);
 
-    return dateTime.toLocaleTimeString('da-DK', {
+    var formattedTime = dateTime.toLocaleTimeString('da-DK', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
         timeZone: 'Europe/Copenhagen'
     });
+    return formattedTime;
 }
+
 
 // Function to format the date only
 function formatDate(dateTimeString) {
@@ -66,7 +68,6 @@ function processApiResponse(apiResponse) {
     // Iterate through the apiResponse array and append each element to the ul as li items
     $.each(apiResponse, function (index, item) {
         var startTime = formatTime(item.timeStart);
-        console.log(startTime);
         var endTime = formatTime(item.timeEnd);
         var date = formatDate(item.timeStart);
         var availableStubs = item.availableStubs;
