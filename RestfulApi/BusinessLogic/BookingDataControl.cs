@@ -1,5 +1,4 @@
-﻿using Castle.Components.DictionaryAdapter.Xml;
-using RestfulApi;
+﻿using RestfulApi;
 using RestfulApi.DAL;
 using RestfulApi.Models;
 using System.Data;
@@ -35,9 +34,11 @@ namespace RestfulApi.BusinessLogic {
             
                 try
                 {
-                    using(var transaction = _connection.BeginTransaction()) {
-                    newBookingId = await _dBBooking.CreateBooking(_connection, booking, transaction);
-                    newBookingOrderId = await _dBBooking.AddBookingsToBookingOrder(_connection, new int[] { newBookingId }, transaction);
+                    using(var transaction = _connection.BeginTransaction())
+                    {
+                        newBookingOrderId = await _dBBooking.CreateNewBookingOrder(_connection, transaction);
+                    newBookingId = await _dBBooking.CreateBooking(_connection, booking, newBookingOrderId, transaction);
+                    //newBookingOrderId = await _dBBooking.AddBookingsToBookingOrder(_connection, new int[] { newBookingId }, transaction);
                     }
                 }
                 catch
@@ -74,6 +75,7 @@ namespace RestfulApi.BusinessLogic {
 
             using (var transaction = _connection.BeginTransaction(System.Data.IsolationLevel.Serializable))
             {
+                newBookingOrderId = await _dBBooking.CreateNewBookingOrder(_connection, transaction);
                 foreach (List<Booking> listedListBooking in dateGroupedBookings)
                 {
 
@@ -109,8 +111,8 @@ namespace RestfulApi.BusinessLogic {
                         return -1;
                     }
 
-                    newBookingOrderId = await _dBBooking.CreateMultipleBookings(_connection, dateGroupedBookings, transaction);
-                    if (newBookingOrderId > 0)
+                    success = await _dBBooking.CreateMultipleBookings(_connection, dateGroupedBookings, newBookingOrderId, transaction);
+                    if (success)
                     {
                         transaction.Commit();
 
@@ -227,39 +229,6 @@ namespace RestfulApi.BusinessLogic {
 
             return validDates;
         }
-        /*private List<List<Booking>> GroupBookingsByDate1(List<Booking> unPairedBookings) {
-            List<List<Booking>> pairedBookings = new List<List<Booking>>();
-
-            //Iterate through all unpaired bookings.
-            foreach (Booking booking in unPairedBookings) {
-
-                //If paired bookings are empty add a new list with booking as baseline
-                if (pairedBookings.Count == 0) {
-                    pairedBookings.Add(new List<Booking> { booking });
-                }
-                //iterate through all groups to find a match
-                else {
-                    foreach (List<Booking> bookingGroup in pairedBookings) {
-                        bool groupFound = false;
-
-                        //Compare first element in group to booking
-                        if (bookingGroup[0].TimeStart == booking.TimeStart) {
-                            if (bookingGroup[0].TimeEnd == booking.TimeEnd) {
-                                //add if it matches any
-                                groupFound = true;
-                                bookingGroup.Add(booking);
-                            }
-                        }
-                        //if no match is found in any of the paired bookings
-                        //Make new group
-                        if (!groupFound) {
-                            pairedBookings.Add(new List<Booking> { booking });
-                        }
-                    }
-                }
-            }
-
-            return pairedBookings;
-        }*/
+        
     }
 }

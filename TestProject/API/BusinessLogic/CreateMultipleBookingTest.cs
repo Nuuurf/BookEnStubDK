@@ -105,8 +105,9 @@ namespace TestProject.API.BusinessLogic
             List<Booking> bookingList = new List<Booking> {new Booking{TimeStart = DateTime.Now.AddHours(2), TimeEnd = DateTime.Now.AddHours(1)} };
             mockDBBokking.Setup(repo => repo.CreateMultipleBookings(It.IsAny<IDbConnection>(),
                     It.IsAny<List<List<Booking>>>(),
+                    It.IsAny<int>(),
                     It.IsAny<IDbTransaction>()))
-                .ReturnsAsync(-1);
+                .ReturnsAsync(false);
             BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
 
             //Act
@@ -148,8 +149,9 @@ namespace TestProject.API.BusinessLogic
                 .ReturnsAsync(maxStubs);
 
             dBBookingMock.Setup(repo =>
-                    repo.CreateMultipleBookings(It.IsAny<IDbConnection>(), It.IsAny<List<List<Booking>>>(), It.IsAny<IDbTransaction>()))
-                .ReturnsAsync(1);
+                    repo.CreateMultipleBookings(It.IsAny<IDbConnection>(), It.IsAny<List<List<Booking>>>(),
+                        It.IsAny<int>(), It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(true);
             connectionMock.Setup(repo => repo.BeginTransaction(It.IsAny<System.Data.IsolationLevel>())).Returns(transactionMock.Object);
             var service = new BookingDataControl(dBBookingMock.Object, connectionMock.Object);
 
@@ -189,8 +191,9 @@ namespace TestProject.API.BusinessLogic
             dBBookingMock.Setup(repo => repo.GetMaxStubs(It.IsAny<IDbConnection>(), It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(maxStubs);
             dBBookingMock.Setup(repo =>
-                    repo.CreateMultipleBookings(It.IsAny<IDbConnection>(), It.IsAny<List<List<Booking>>>(), It.IsAny<IDbTransaction>()))
-                .ReturnsAsync(-1);
+                    repo.CreateMultipleBookings(It.IsAny<IDbConnection>(), It.IsAny<List<List<Booking>>>(),
+                        It.IsAny<int>(), It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(false);
             connectionMock.Setup(repo => repo.BeginTransaction(It.IsAny<System.Data.IsolationLevel>())).Returns(transactionMock.Object);
             var service = new BookingDataControl(dBBookingMock.Object, connectionMock.Object);
 

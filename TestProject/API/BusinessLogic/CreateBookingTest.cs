@@ -22,12 +22,22 @@ namespace TestProject.API.BusinessLogic
         {
             // Arrange
             var mockDBBooking = new Mock<IDBBooking>();
+            var mockDBConnection = new Mock<IDbConnection>();
+
             mockDBBooking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
-                    It.IsAny<Booking>(), It.IsAny<IDbTransaction>()))
+                    It.IsAny<Booking>(),
+                    It.IsAny<int>(),
+                    It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(1); // Assuming the method returns an int (e.g., the new booking ID)
 
-            BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, null);
+            mockDBBooking.Setup(repo =>
+                    repo.CreateNewBookingOrder(It.IsAny<IDbConnection>(),
+                        It.IsAny<IDbTransaction>()))
+                .ReturnsAsync(1);
+
+            mockDBConnection.Setup(repo => repo.BeginTransaction());
+            BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, mockDBConnection.Object);
 
             DateTime bookingStart = DateTime.Now.AddDays(1);
             DateTime bookingEnd = bookingStart.AddHours(1);
@@ -53,7 +63,7 @@ namespace TestProject.API.BusinessLogic
             mockDBBokking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
-                    It.IsAny<IDbTransaction>()))
+                    It.IsAny<int>(), It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(1);
 
 
@@ -75,7 +85,7 @@ namespace TestProject.API.BusinessLogic
             mockDBBokking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
-                    It.IsAny<IDbTransaction>()))
+                    It.IsAny<int>(), It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(1);
             BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
 
@@ -96,6 +106,7 @@ namespace TestProject.API.BusinessLogic
             mockDBBokking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
+                    It.IsAny<int>(),
                     It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(1);
             BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
@@ -117,6 +128,7 @@ namespace TestProject.API.BusinessLogic
             mockDBBokking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
+                    It.IsAny<int>(),
                     It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(0);
             BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
@@ -138,6 +150,7 @@ namespace TestProject.API.BusinessLogic
             mockDBBokking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
+                    It.IsAny<int>(),
                     It.IsAny<IDbTransaction>()))
                 .ThrowsAsync(new Exception("Sql Exception"));
             BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);

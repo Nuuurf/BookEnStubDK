@@ -4,13 +4,13 @@ using RestfulApi.Models;
 namespace RestfulApi.DAL {
     public interface IDBBooking {
 
-        public Task<int> CreateBooking(IDbConnection conn, Booking booking, IDbTransaction transaction = null);
+        public Task<int> CreateBooking(IDbConnection conn, Booking booking, int bookingOrderID, IDbTransaction transaction = null);
 
-        public Task<int> CreateMultipleBookings(IDbConnection conn, List<List<Booking>> dateGroupedBookings, IDbTransaction transaction = null);
+        public Task<bool> CreateMultipleBookings(IDbConnection conn, List<List<Booking>> dateGroupedBookings, int bookingOrderID, IDbTransaction transaction = null);
 
-        public Task<int> AddBookingsToBookingOrder(IDbConnection conn, int[] bookingIds, IDbTransaction trans);
+        public Task<int> CreateNewBookingOrder(IDbConnection conn, IDbTransaction trans);
 
-        //bool DeleteBooking(int bookingID);
+         //bool DeleteBooking(int bookingID);
 
         //bool UpdateBooking(int bookingID, Booking booking);
 
