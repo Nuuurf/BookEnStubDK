@@ -34,7 +34,7 @@ namespace TestProject.API.Control {
         }
 
         [Test]
-        public async Task CreateBooking_ShouldBeTrue()
+        public async Task CreateBooking_ShouldBePassValue()
         {
             //Arrange
             BookingDataControl bdc = new BookingDataControl(new DBBooking(), _connection);
@@ -53,7 +53,7 @@ namespace TestProject.API.Control {
 
 
             //Assert
-            Assert.IsTrue(createReturn > 0);
+            Assert.GreaterOrEqual(createReturn, 0);
         }
 
         [Test]

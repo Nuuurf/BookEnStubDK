@@ -6,7 +6,9 @@ namespace RestfulApi.DAL {
 
         public Task<int> CreateBooking(IDbConnection conn, Booking booking, IDbTransaction transaction = null);
 
-        public Task<bool> CreateMultipleBookings(IDbConnection conn, List<List<Booking>> dateGroupedBookings, IDbTransaction transaction = null);
+        public Task<int> CreateMultipleBookings(IDbConnection conn, List<List<Booking>> dateGroupedBookings, IDbTransaction transaction = null);
+
+        public Task<int> AddBookingsToBookingOrder(IDbConnection conn, int[] bookingIds, IDbTransaction trans);
 
         //bool DeleteBooking(int bookingID);
 

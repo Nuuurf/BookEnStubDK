@@ -30,11 +30,15 @@ namespace RestfulApi.BusinessLogic {
                 throw new ArgumentException("Booking date format exception. Booking start date exceeds booking end date");
             }
 
-            int newBookingId = 0;
+            int newBookingId = -1;
+            int newBookingOrderId = -1;
             
                 try
                 {
-                    newBookingId = await _dBBooking.CreateBooking(_connection, booking);
+                    using(var transaction = _connection.BeginTransaction()) {
+                    newBookingId = await _dBBooking.CreateBooking(_connection, booking, transaction);
+                    newBookingOrderId = await _dBBooking.AddBookingsToBookingOrder(_connection, new int[] { newBookingId }, transaction);
+                    }
                 }
                 catch
                 {
@@ -45,11 +49,12 @@ namespace RestfulApi.BusinessLogic {
             {
                 throw new Exception("There are not available stubs for bookings in the desired timeslot");
             }
-            return newBookingId;
+            return newBookingOrderId;
         }
 
-        public async Task<bool> CreateMultipleBookings(List<Booking> bookings)
+        public async Task<int> CreateMultipleBookings(List<Booking> bookings)
         {
+            int newBookingOrderId = -1;
             bool success = false;
             bool DatesAreValid = true;
             List<List<Booking>> dateGroupedBookings = new List<List<Booking>>();
@@ -58,12 +63,12 @@ namespace RestfulApi.BusinessLogic {
             {
                 if (!bookings.All(ValidateBookingDates))
                 {
-                    return false;
+                    return -1;
                 }
             }
             catch
             {
-                return false;
+                return -1;
             }
             dateGroupedBookings = GroupBookingsByDate(bookings);
 
@@ -101,25 +106,25 @@ namespace RestfulApi.BusinessLogic {
                     else
                     {
                         //One of the grouped timeslots cannot fit within timeslot.
-                        return false;
+                        return -1;
                     }
 
-                    success = await _dBBooking.CreateMultipleBookings(_connection, dateGroupedBookings, transaction);
-                    if (success)
+                    newBookingOrderId = await _dBBooking.CreateMultipleBookings(_connection, dateGroupedBookings, transaction);
+                    if (newBookingOrderId > 0)
                     {
                         transaction.Commit();
 
-                        return success;
+                        return newBookingOrderId;
                     }
                     else
                     {
                         transaction.Rollback();
 
-                        return success;
+                        return -1;
                     }
                 }
                 //Try assigning valid stubIds to all bookings
-                return success;
+                return newBookingOrderId;
             }
             
         }

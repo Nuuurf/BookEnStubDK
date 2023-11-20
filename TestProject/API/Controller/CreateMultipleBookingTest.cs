@@ -20,7 +20,7 @@ namespace TestProject.API.Controller
             //Arrange
 List<Booking> bookingList = new List<Booking>();
             var mockDBBokking = new Mock<IBookingData>();
-            mockDBBokking.Setup(repo => repo.CreateMultipleBookings(bookingList)).ReturnsAsync(true);
+            mockDBBokking.Setup(repo => repo.CreateMultipleBookings(bookingList)).ReturnsAsync(1);
             BookingController controller = new BookingController(mockDBBokking.Object);
 
             //Act 
@@ -37,7 +37,7 @@ List<Booking> bookingList = new List<Booking>();
             //Arrange
             List<Booking> bookingList = new List<Booking>();
             var mockDBBokking = new Mock<IBookingData>();
-            mockDBBokking.Setup(repo => repo.CreateMultipleBookings(bookingList)).ReturnsAsync(false);
+            mockDBBokking.Setup(repo => repo.CreateMultipleBookings(bookingList)).ReturnsAsync(-1);
             BookingController controller = new BookingController(mockDBBokking.Object);
 
             //Act 
@@ -53,7 +53,7 @@ List<Booking> bookingList = new List<Booking>();
             //Arrange
             List<Booking> bookingList = null;
             var mockDBBokking = new Mock<IBookingData>();
-            mockDBBokking.Setup(repo => repo.CreateMultipleBookings(bookingList)).ReturnsAsync(false);
+            mockDBBokking.Setup(repo => repo.CreateMultipleBookings(bookingList)).ReturnsAsync(-1);
             BookingController controller = new BookingController(mockDBBokking.Object);
 
             //Act 

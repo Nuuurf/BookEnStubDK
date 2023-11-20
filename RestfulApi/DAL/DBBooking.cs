@@ -117,6 +117,37 @@ namespace RestfulApi.DAL {
             return bookings.ToList();
         }
 
+        //Takes one or more booking ids and joins them with a booking order that it creates in the database;
+        public async Task<int> AddBookingsToBookingOrder(IDbConnection conn, int[] bookingIds, IDbTransaction trans = null) {
+            const string insertBookingOrderQuery = "INSERT INTO BookingOrder DEFAULT VALUES; SELECT SCOPE_IDENTITY();";
+            int bookingOrderId = -1;
+
+            try {
+                // Create a new BookingOrder
+                bookingOrderId = await conn.ExecuteScalarAsync<int>(insertBookingOrderQuery, trans);
+            }
+            catch {
+                // Return fail value if failed to create BookingOrder
+                return -1;
+            }
+
+            // Prepare a collection of anonymous objects for bulk insert
+            var bulkInsertParams = bookingIds.Select(id => new { BookingOrderId = bookingOrderId });
+
+            const string insertBookingQuery = "INSERT INTO Booking (BookingOrderId) VALUES (@BookingOrderId);";
+            try {
+                // Perform bulk insert in a single query
+                await conn.ExecuteAsync(insertBookingQuery, bulkInsertParams);
+            }
+            catch {
+                // Return fail value if bulk insert failed
+                return -1;
+            }
+
+            // Return the generated bookingOrderId
+            return bookingOrderId;
+        }
+
         public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null) {
             string script = "dbo.GetAvailableBookingsForDate";
 
@@ -133,14 +164,15 @@ namespace RestfulApi.DAL {
 
         }
 
-        public async Task<bool> CreateMultipleBookings(IDbConnection conn, List<List<Booking>> dateGroupedBookings, IDbTransaction transaction = null) {
-            bool success = false;
+        public async Task<int> CreateMultipleBookings(IDbConnection conn, List<List<Booking>> dateGroupedBookings, IDbTransaction transaction = null) {
+            int generatedBookingOrderId = -1;
             int expectedAllChanges = 0;
             int actualAllChanges = 0;
             int groupSizeTemp = 0;
             int bookingsOnDateTemp = 0;
             int actualChangesTemp = 0;
             int expectedChangesTemp = 0;
+            List<int> generatedBookingIds = new List<int>();
             //find the maximal amount of bookings per timeslot
             int maxBookingsPerTimeSlotTemp = await GetMaxStubs(conn, transaction);
 
@@ -159,28 +191,41 @@ namespace RestfulApi.DAL {
                     expectedAllChanges += dateBookingGroup.Count;
 
                     foreach (Booking booking in dateBookingGroup) {
-                        //if creation was successful increment actual changes
-                        if (await CreateBooking(conn, booking, transaction) > 0) {
+                        int generatedId = await CreateBooking(conn, booking, transaction);
+                        if(generatedId > 0) {
                             actualChangesTemp++;
                             actualAllChanges++;
+                            generatedBookingIds.Add(generatedId);
                         }
+
+                        ////if creation was successful increment actual changes
+                        //if (await CreateBooking(conn, booking, transaction) > 0) {
+                        //    actualChangesTemp++;
+                        //    actualAllChanges++;
+                        //}
                     }
                     if (actualChangesTemp != expectedChangesTemp) {
                         //something went wrong in the database somehow
-                        return false;
+                        return -1;
+                    }
+                    else {
+                        //add to a booking order
+                        generatedBookingOrderId = await AddBookingsToBookingOrder(conn, generatedBookingIds.ToArray(), transaction);
                     }
                 }
                 else {
                     //it is not possible to complete the whole booking.
-                    return false;
+                    return -1;
                 }
 
             }
             //Everything has updates as expected
             if (expectedAllChanges == actualAllChanges) {
-                success = true;
+                return generatedBookingOrderId;
             }
-            return success;
+            else {
+                return -1;
+            }
         }
 
         public async Task<int> GetMaxStubs(IDbConnection conn, IDbTransaction transaction = null) {
