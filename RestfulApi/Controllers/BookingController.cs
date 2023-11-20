@@ -135,10 +135,10 @@ namespace RestfulApi.Controllers
             if (bookings != null) {
                 try {
 
-                    bool success = await _bookingdata.CreateMultipleBookings(bookings);
+                    int generatedBookingOrderId= await _bookingdata.CreateMultipleBookings(bookings);
 
-                    if (success) {
-                        return Ok(success);
+                    if (generatedBookingOrderId > 0) {
+                        return Ok(generatedBookingOrderId);
                     }
                     else {
                         return UnprocessableEntity("DA: kunne ikke oprette bookinger, kapasitet oversteget med en eller flere bookinger");

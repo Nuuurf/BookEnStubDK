@@ -57,7 +57,7 @@ public class CreateBookingTest
             int bookingID = 0;
             using (var transactions = conn.BeginTransaction())
             {
-                bookingID = await _dbBooking.CreateBooking(conn, inBooking, transactions);
+                bookingID = await _dbBooking.CreateBooking(conn, inBooking,1, transactions);
                 transactions.Rollback();
             }
             Assert.True(bookingID > 0);
@@ -82,9 +82,9 @@ public class CreateBookingTest
                 int stubCount = await _dbBooking.GetMaxStubs(conn, transaction);
                 for (int i = 0; i < stubCount; i++)
                 {
-                    await _dbBooking.CreateBooking(conn, overlappingBooking, transaction);
+                    await _dbBooking.CreateBooking(conn, overlappingBooking, 1, transaction);
                 }
-bookingID = await _dbBooking.CreateBooking(conn, overlappingBooking, transaction);
+bookingID = await _dbBooking.CreateBooking(conn, overlappingBooking,1, transaction);
                 transaction.Rollback();
             }
 

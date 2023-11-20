@@ -16,78 +16,19 @@ namespace RestfulApi.DAL {
         }
 
         /// <summary>
-        /// Gets a single booking with the id matching the booking in the database.
-        /// </summary>
-        /// <param name="id"> the id of the booking object that needs to be retrieved</param>
-        /// <param name="conn"></param>
-        /// <returns>A Booking object which is either null or not, depening if the object was found or not</returns>
-        /*public Booking GetSingleBooking(IDbConnection conn, int id, IDbTransaction transaction = null) {
-            string script = "SELECT * FROM Booking WHERE Id = @id";
-
-            Booking booking = null;
-            try {
-                booking = conn.QueryFirst<Booking>(script, new { id }, transaction: transaction); // Queries database for booking matching id and returns first result
-            }
-            catch {
-                //if it fails send null for errorhandling in blc
-                return null;
-            }
-
-            return booking;
-        }*/
-
-        //public bool UpdateBooking(Booking updatedBooking)
-        //{
-        //    string script = "UPDATE Booking SET TimeStart = @StartTime, TimeEnd = @EndTime, Notes = @Notes WHERE Id = @Id";
-
-        //    int rowsAffected = 0;
-
-        //    try {
-        //        rowsAffected = conn.Execute(script, updatedBooking);
-        //    }
-        //    catch {
-        //        return false;
-        //    }
-
-        //    return rowsAffected > 0;
-        //}
-
-        /// <summary>
-        /// Deletes a booking with the id matching the booking in the database.
-        /// </summary>
-        /// <param name="id"> the id of the booking object that needs to be deleted</param>
-        /// <returns>A boolean indicading where the action was successful or not</returns>
-        /*public bool DeleteBooking(IDbConnection conn, int id, IDbTransaction transaction) {
-            string script = "DELETE FROM Booking WHERE Id = @id";
-
-            bool success = false;
-
-            try {
-                conn.Execute(script, new { id }, transaction: transaction);
-                success = true;
-            }
-            catch {
-                //if it fails send false for errorhandling in blc
-                success = false;
-            }
-
-            return success;
-        }*/
-
-        /// <summary>
         /// Inserts a new booking with its values into the database.
         /// </summary>
         /// <param name="conn"></param>
         /// <param name="booking"> the booking object that needs to be persisted</param>
         /// <param name="transaction"></param>
         /// <returns>A boolean indicading where the action was successful or not</returns>
-        public async Task<int> CreateBooking(IDbConnection conn, Booking booking, IDbTransaction transaction = null)
+        public async Task<int> CreateBooking(IDbConnection conn, Booking booking, int bookingOrderID, IDbTransaction transaction = null)
         {
             string script = "InsertBooking";
             int newBookingId = 0;
 
             try {
-                var parameter = new { date = booking.TimeStart, note = booking.Notes };
+                var parameter = new { date = booking.TimeStart, orderId = bookingOrderID, note = booking.Notes };
                 int result = await conn.QueryFirstOrDefaultAsync<int>(script, parameter, commandType: CommandType.StoredProcedure, transaction: transaction);
 
                 newBookingId = result;
@@ -116,6 +57,27 @@ namespace RestfulApi.DAL {
 
             return bookings.ToList();
         }
+        public async Task<int> CreateNewBookingOrder(IDbConnection conn, IDbTransaction trans = null)
+        {
+            const string insertBookingOrderQuery = "INSERT INTO BookingOrder DEFAULT VALUES; SELECT SCOPE_IDENTITY();";
+            int bookingOrderId = -1;
+
+            try
+            {
+                // Create a new BookingOrder
+                var commandDefinition = new CommandDefinition(insertBookingOrderQuery, transaction: trans);
+                bookingOrderId = await conn.ExecuteScalarAsync<int>(commandDefinition);
+
+            }
+            catch
+            {
+                // Return fail value if failed to create BookingOrder
+                return -1;
+            }
+
+            return bookingOrderId;
+        }
+        
 
         public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null) {
             string script = "dbo.GetAvailableBookingsForDate";
@@ -133,14 +95,15 @@ namespace RestfulApi.DAL {
 
         }
 
-        public async Task<bool> CreateMultipleBookings(IDbConnection conn, List<List<Booking>> dateGroupedBookings, IDbTransaction transaction = null) {
-            bool success = false;
+        public async Task<bool> CreateMultipleBookings(IDbConnection conn, List<List<Booking>> dateGroupedBookings, int bookingOrderID, IDbTransaction transaction = null) {
+            int generatedBookingOrderId = -1;
             int expectedAllChanges = 0;
             int actualAllChanges = 0;
             int groupSizeTemp = 0;
             int bookingsOnDateTemp = 0;
             int actualChangesTemp = 0;
             int expectedChangesTemp = 0;
+            List<int> generatedBookingIds = new List<int>();
             //find the maximal amount of bookings per timeslot
             int maxBookingsPerTimeSlotTemp = await GetMaxStubs(conn, transaction);
 
@@ -159,17 +122,24 @@ namespace RestfulApi.DAL {
                     expectedAllChanges += dateBookingGroup.Count;
 
                     foreach (Booking booking in dateBookingGroup) {
-                        //if creation was successful increment actual changes
-                        if (await CreateBooking(conn, booking, transaction) > 0) {
+                        int generatedId = await CreateBooking(conn, booking, bookingOrderID, transaction);
+                        if(generatedId > 0) {
                             actualChangesTemp++;
                             actualAllChanges++;
+                            generatedBookingIds.Add(generatedId);
                         }
+
+                        ////if creation was successful increment actual changes
+                        //if (await CreateBooking(conn, booking, transaction) > 0) {
+                        //    actualChangesTemp++;
+                        //    actualAllChanges++;
+                        //}
                     }
                     if (actualChangesTemp != expectedChangesTemp) {
                         //something went wrong in the database somehow
                         return false;
                     }
-                }
+                    }
                 else {
                     //it is not possible to complete the whole booking.
                     return false;
@@ -177,10 +147,14 @@ namespace RestfulApi.DAL {
 
             }
             //Everything has updates as expected
-            if (expectedAllChanges == actualAllChanges) {
-                success = true;
+            if (expectedAllChanges == actualAllChanges)
+            {
+                return true;
             }
-            return success;
+            else
+            {
+                return false;
+            }
         }
 
         public async Task<int> GetMaxStubs(IDbConnection conn, IDbTransaction transaction = null) {
@@ -194,5 +168,7 @@ namespace RestfulApi.DAL {
             }
             
         }
+
+        
     }
 }
