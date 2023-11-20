@@ -33,8 +33,9 @@ namespace RestfulApi.DAL {
 
                 newBookingId = result;
             }
-            catch {
-                return await Task.FromResult(0);
+            catch
+            {
+                throw new Exception("Booking could not be created");
             }
             return newBookingId;
 

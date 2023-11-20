@@ -1,4 +1,5 @@
-﻿using RestfulApi.DAL;
+﻿using Microsoft.AspNetCore.Mvc;
+using RestfulApi.DAL;
 using RestfulApi.Models;
 using System;
 using System.Collections.Generic;
@@ -74,22 +75,23 @@ public class CreateBookingTest
             };
 
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
-            int bookingID = 1;
-
+            AsyncTestDelegate result;
             // Act
             using (var transaction = conn.BeginTransaction())
             {
+                int bookingOrderID = await _dbBooking.CreateNewBookingOrder(conn, transaction);
                 int stubCount = await _dbBooking.GetMaxStubs(conn, transaction);
                 for (int i = 0; i < stubCount; i++)
                 {
-                    await _dbBooking.CreateBooking(conn, overlappingBooking, 1, transaction);
+                    await _dbBooking.CreateBooking(conn, overlappingBooking, bookingOrderID, transaction);
                 }
-bookingID = await _dbBooking.CreateBooking(conn, overlappingBooking,1, transaction);
+
+                 result = () => _dbBooking.CreateBooking(conn, overlappingBooking, bookingOrderID, transaction);
                 transaction.Rollback();
             }
 
             // Assert
-            Assert.True(bookingID == 0, "Overlapping bookings should not be allowed");
+            Assert.ThrowsAsync<Exception>(result);
         }
 
 

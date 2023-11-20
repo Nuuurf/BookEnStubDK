@@ -99,7 +99,7 @@ namespace RestfulApi.Controllers
 
         // URL: api/booking
         [HttpPost]
-        public async Task<IActionResult> CreateBooking([FromBody] Booking? booking = null)
+        public async Task<IActionResult> CreateBooking([FromBody] List<Booking>? booking = null)
         {
             if (booking != null)
             {
