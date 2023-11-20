@@ -38,7 +38,7 @@ namespace TestProject.API.BusinessLogic
 
 
         [Test]
-        public async Task CreateMultipleBooking_ShouldBeTrue()
+        public async Task CreateMultipleBooking_ShouldBePassValue()
         {
             //Arrange
             BookingDataControl bdc = new BookingDataControl(new DBBooking(), _connection);
@@ -50,14 +50,14 @@ namespace TestProject.API.BusinessLogic
             };
 
             //Act
-            bool result = await bdc.CreateMultipleBookings(bookings);
+            int result = await bdc.CreateMultipleBookings(bookings);
 
             //Assert
-            Assert.IsTrue(result);
+            Assert.GreaterOrEqual(result, 0);
         }
 
         [Test]
-        public async Task CreateMultipleBooking_ShouldBeFalse()
+        public async Task CreateMultipleBooking_ShouldBeFailValue()
         {
             //Arrange
             BookingDataControl bdc = new BookingDataControl(new DBBooking(), _connection);
@@ -69,10 +69,10 @@ namespace TestProject.API.BusinessLogic
             };
 
             //Act
-            bool result = await bdc.CreateMultipleBookings(bookings);
+            int result = await bdc.CreateMultipleBookings(bookings);
 
             //Assert
-            Assert.IsFalse(result);
+            Assert.LessOrEqual(result, 0);
         }
 
         [Test]
@@ -91,32 +91,33 @@ namespace TestProject.API.BusinessLogic
             }
 
             //Act
-            bool result = await bdc.CreateMultipleBookings(bookings);
+            int result = await bdc.CreateMultipleBookings(bookings);
 
             //Assert
-            Assert.IsFalse(result);
+            Assert.LessOrEqual(result, 0);
         }
 
         [Test]
-        public async Task CreateMultipleBookings_ShouldReturnFalse_WithInvalidDates()
+        public async Task CreateMultipleBookings_ShouldReturnFailValue_WithInvalidDates()
         {
             //Arrange
             var mockDBBokking = new Mock<IDBBooking>();
             List<Booking> bookingList = new List<Booking> {new Booking{TimeStart = DateTime.Now.AddHours(2), TimeEnd = DateTime.Now.AddHours(1)} };
             mockDBBokking.Setup(repo => repo.CreateMultipleBookings(It.IsAny<IDbConnection>(),
                     It.IsAny<List<List<Booking>>>(),
+                    It.IsAny<int>(),
                     It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(false);
             BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
 
             //Act
-var result = await controller.CreateMultipleBookings(bookingList);
-        //Assert
-Assert.IsFalse(result);
+            var result = await controller.CreateMultipleBookings(bookingList);
+            //Assert
+            Assert.LessOrEqual(result, 0);
         }
 
         [Test]
-        public async Task CreateMultipleBookings_ShouldReturnTrue_WithBookingsAlreadyOnDate()
+        public async Task CreateMultipleBookings_ShouldReturnPassValue_WithBookingsAlreadyOnDate()
         {
             // Arrange
             var dBBookingMock = new Mock<IDBBooking>();
@@ -148,23 +149,24 @@ Assert.IsFalse(result);
                 .ReturnsAsync(maxStubs);
 
             dBBookingMock.Setup(repo =>
-                    repo.CreateMultipleBookings(It.IsAny<IDbConnection>(), It.IsAny<List<List<Booking>>>(), It.IsAny<IDbTransaction>()))
+                    repo.CreateMultipleBookings(It.IsAny<IDbConnection>(), It.IsAny<List<List<Booking>>>(),
+                        It.IsAny<int>(), It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(true);
             connectionMock.Setup(repo => repo.BeginTransaction(It.IsAny<System.Data.IsolationLevel>())).Returns(transactionMock.Object);
             var service = new BookingDataControl(dBBookingMock.Object, connectionMock.Object);
 
             // Act
-            bool success = await service.CreateMultipleBookings(testBookings);
+            int success = await service.CreateMultipleBookings(testBookings);
 
             // Assert
             foreach (var booking in testBookings)
             {
                 Assert.IsTrue(booking.StubId > 0); // Check if StubId is assigned
             }
-            Assert.IsTrue(success);
+            Assert.GreaterOrEqual(success, 0);
         }
         [Test]
-        public async Task CreateMultipleBookings_ShouldReturnFalse_WithFullBookingsAlreadyOnDate()
+        public async Task CreateMultipleBookings_ShouldReturnFailValue_WithFullBookingsAlreadyOnDate()
         {
             // Arrange
             var dBBookingMock = new Mock<IDBBooking>();
@@ -189,20 +191,21 @@ Assert.IsFalse(result);
             dBBookingMock.Setup(repo => repo.GetMaxStubs(It.IsAny<IDbConnection>(), It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(maxStubs);
             dBBookingMock.Setup(repo =>
-                    repo.CreateMultipleBookings(It.IsAny<IDbConnection>(), It.IsAny<List<List<Booking>>>(), It.IsAny<IDbTransaction>()))
+                    repo.CreateMultipleBookings(It.IsAny<IDbConnection>(), It.IsAny<List<List<Booking>>>(),
+                        It.IsAny<int>(), It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(false);
             connectionMock.Setup(repo => repo.BeginTransaction(It.IsAny<System.Data.IsolationLevel>())).Returns(transactionMock.Object);
             var service = new BookingDataControl(dBBookingMock.Object, connectionMock.Object);
 
             // Act
-            bool success = await service.CreateMultipleBookings(testBookings);
+            int success = await service.CreateMultipleBookings(testBookings);
 
             // Assert
             foreach (var booking in testBookings)
             {
                 Assert.IsTrue(booking.StubId == 0); // Check if StubId is assigned
             }
-            Assert.IsFalse(success);
+            Assert.LessOrEqual(success, 0);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Castle.Components.DictionaryAdapter.Xml;
-using RestfulApi;
+﻿using RestfulApi;
 using RestfulApi.DAL;
 using RestfulApi.Models;
 using System.Data;
@@ -30,11 +29,17 @@ namespace RestfulApi.BusinessLogic {
                 throw new ArgumentException("Booking date format exception. Booking start date exceeds booking end date");
             }
 
-            int newBookingId = 0;
+            int newBookingId = -1;
+            int newBookingOrderId = -1;
             
                 try
                 {
-                    newBookingId = await _dBBooking.CreateBooking(_connection, booking);
+                    using(var transaction = _connection.BeginTransaction())
+                    {
+                        newBookingOrderId = await _dBBooking.CreateNewBookingOrder(_connection, transaction);
+                    newBookingId = await _dBBooking.CreateBooking(_connection, booking, newBookingOrderId, transaction);
+                    //newBookingOrderId = await _dBBooking.AddBookingsToBookingOrder(_connection, new int[] { newBookingId }, transaction);
+                    }
                 }
                 catch
                 {
@@ -45,11 +50,12 @@ namespace RestfulApi.BusinessLogic {
             {
                 throw new Exception("There are not available stubs for bookings in the desired timeslot");
             }
-            return newBookingId;
+            return newBookingOrderId;
         }
 
-        public async Task<bool> CreateMultipleBookings(List<Booking> bookings)
+        public async Task<int> CreateMultipleBookings(List<Booking> bookings)
         {
+            int newBookingOrderId = -1;
             bool success = false;
             bool DatesAreValid = true;
             List<List<Booking>> dateGroupedBookings = new List<List<Booking>>();
@@ -58,17 +64,18 @@ namespace RestfulApi.BusinessLogic {
             {
                 if (!bookings.All(ValidateBookingDates))
                 {
-                    return false;
+                    return -1;
                 }
             }
             catch
             {
-                return false;
+                return -1;
             }
             dateGroupedBookings = GroupBookingsByDate(bookings);
 
             using (var transaction = _connection.BeginTransaction(System.Data.IsolationLevel.Serializable))
             {
+                newBookingOrderId = await _dBBooking.CreateNewBookingOrder(_connection, transaction);
                 foreach (List<Booking> listedListBooking in dateGroupedBookings)
                 {
 
@@ -101,25 +108,25 @@ namespace RestfulApi.BusinessLogic {
                     else
                     {
                         //One of the grouped timeslots cannot fit within timeslot.
-                        return false;
+                        return -1;
                     }
 
-                    success = await _dBBooking.CreateMultipleBookings(_connection, dateGroupedBookings, transaction);
+                    success = await _dBBooking.CreateMultipleBookings(_connection, dateGroupedBookings, newBookingOrderId, transaction);
                     if (success)
                     {
                         transaction.Commit();
 
-                        return success;
+                        return newBookingOrderId;
                     }
                     else
                     {
                         transaction.Rollback();
 
-                        return success;
+                        return -1;
                     }
                 }
                 //Try assigning valid stubIds to all bookings
-                return success;
+                return newBookingOrderId;
             }
             
         }
@@ -222,39 +229,6 @@ namespace RestfulApi.BusinessLogic {
 
             return validDates;
         }
-        /*private List<List<Booking>> GroupBookingsByDate1(List<Booking> unPairedBookings) {
-            List<List<Booking>> pairedBookings = new List<List<Booking>>();
-
-            //Iterate through all unpaired bookings.
-            foreach (Booking booking in unPairedBookings) {
-
-                //If paired bookings are empty add a new list with booking as baseline
-                if (pairedBookings.Count == 0) {
-                    pairedBookings.Add(new List<Booking> { booking });
-                }
-                //iterate through all groups to find a match
-                else {
-                    foreach (List<Booking> bookingGroup in pairedBookings) {
-                        bool groupFound = false;
-
-                        //Compare first element in group to booking
-                        if (bookingGroup[0].TimeStart == booking.TimeStart) {
-                            if (bookingGroup[0].TimeEnd == booking.TimeEnd) {
-                                //add if it matches any
-                                groupFound = true;
-                                bookingGroup.Add(booking);
-                            }
-                        }
-                        //if no match is found in any of the paired bookings
-                        //Make new group
-                        if (!groupFound) {
-                            pairedBookings.Add(new List<Booking> { booking });
-                        }
-                    }
-                }
-            }
-
-            return pairedBookings;
-        }*/
+        
     }
 }

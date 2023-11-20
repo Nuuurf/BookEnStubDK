@@ -3,7 +3,7 @@
 namespace RestfulApi.BusinessLogic {
     public interface IBookingData {
 
-        public Task<bool> CreateMultipleBookings(List<Booking> bookings);
+        public Task<int> CreateMultipleBookings(List<Booking> bookings);
         
         public Task<int> CreateBooking(Booking booking);
         
