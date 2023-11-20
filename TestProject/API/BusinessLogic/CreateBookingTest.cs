@@ -23,20 +23,26 @@ namespace TestProject.API.BusinessLogic
             // Arrange
             var mockDBBooking = new Mock<IDBBooking>();
             var mockDBConnection = new Mock<IDbConnection>();
+            var mockDbTransaction = new Mock<IDbTransaction>();
 
             mockDBBooking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
                     It.IsAny<int>(),
                     It.IsAny<IDbTransaction>()))
-                .ReturnsAsync(1); // Assuming the method returns an int (e.g., the new booking ID)
+                .ReturnsAsync(1); 
 
             mockDBBooking.Setup(repo =>
                     repo.CreateNewBookingOrder(It.IsAny<IDbConnection>(),
                         It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(1);
 
-            mockDBConnection.Setup(repo => repo.BeginTransaction());
+            // Setup mock transaction behavior
+            mockDBConnection.Setup(conn => conn.BeginTransaction())
+                .Returns(mockDbTransaction.Object);
+            mockDbTransaction.Setup(trans => trans.Commit());
+            mockDbTransaction.Setup(trans => trans.Rollback());
+
             BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, mockDBConnection.Object);
 
             DateTime bookingStart = DateTime.Now.AddDays(1);
@@ -48,6 +54,9 @@ namespace TestProject.API.BusinessLogic
 
             // Assert
             Assert.AreEqual(1, result);
+
+            mockDbTransaction.Verify(trans => trans.Commit(), Times.Once);
+            mockDbTransaction.Verify(trans => trans.Rollback(), Times.Never);
         }
 
 
