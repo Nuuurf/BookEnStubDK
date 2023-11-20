@@ -39,11 +39,19 @@ namespace RestfulApi.BusinessLogic {
                         newBookingOrderId = await _dBBooking.CreateNewBookingOrder(_connection, transaction);
                     newBookingId = await _dBBooking.CreateBooking(_connection, booking, newBookingOrderId, transaction);
                     //newBookingOrderId = await _dBBooking.AddBookingsToBookingOrder(_connection, new int[] { newBookingId }, transaction);
+                    if (newBookingId > 0 && newBookingOrderId > 0)
+                    {
+                        transaction.Commit();
+                    }
+                    else
+                    {
+                        transaction.Rollback();
+                    }
                     }
                 }
                 catch
                 {
-                    newBookingId = 0;
+                    newBookingId = -1;
                 }
             
             if (newBookingId <= 0)
