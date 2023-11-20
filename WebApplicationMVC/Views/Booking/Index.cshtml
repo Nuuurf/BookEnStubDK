@@ -84,7 +84,7 @@
             $(document).ready(function () {
                 $('#date-search-btn').on('click', function (event) {
                     // Get the value from the input field
-                    var inputData = $(this).val();
+                    var inputData = $('#dateInput').val();
                     var parts = inputData.split('/');
 
                     // Create a new Date object with the parts
@@ -95,7 +95,6 @@
                         formattedDate.getFullYear() + '-' +
                         ('0' + (formattedDate.getMonth() + 1)).slice(-2) + '-' +
                         ('0' + formattedDate.getDate()).slice(-2);
-                    //console.log(inputData);
 
                     // Make an AJAX GET request
                     $.ajax({
