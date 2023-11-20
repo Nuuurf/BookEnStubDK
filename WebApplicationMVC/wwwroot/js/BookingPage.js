@@ -1,9 +1,6 @@
 ﻿// Function to format the date and time
-function formatTime(dateTimeString) {
-    var dateTime = new Date(dateTimeString);
-    return dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
 
+const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 // Function to format the date only
 function formatDate(dateTimeString) {
     var dateTime = new Date(dateTimeString);
@@ -53,14 +50,27 @@ $('#selected-appointments').on('click', '.cancel-btn', function () {
     }
 });
 
+function formatTime(date, timezone) {
+    // Append 'Z' to the date string to ensure it's treated as UTC
+    var utcDate = date + 'Z';
+    var dateTime = new Date(utcDate);
+    return dateTime.toLocaleTimeString(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: timezone
+    });
+}
+
 
 // Loop through API response and add times to list for display
 function processApiResponse(apiResponse) {
     $('#available-times').empty();
     // Iterate through the apiResponse array and append each element to the ul as li items
     $.each(apiResponse, function (index, item) {
-        var startTime = formatTime(item.timeStart);
-        var endTime = formatTime(item.timeEnd);
+        var startTime = formatTime(item.timeStart, userTimeZone);
+        console.log(startTime);
+        var endTime = formatTime(item.timeEnd, userTimeZone);
         var date = formatDate(item.timeStart);
         var availableStubs = item.availableStubs;
 
