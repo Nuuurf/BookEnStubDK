@@ -206,7 +206,7 @@ namespace RestfulApi.BusinessLogic {
         {
             bool validDates = false;
 
-            if (booking.TimeStart >= DateTime.Now.AddMinutes(-1) && booking.TimeEnd > DateTime.Now)
+            if (booking.TimeStart >= DateTime.Now.ToUniversalTime().AddMinutes(-1) && booking.TimeEnd > DateTime.Now.ToUniversalTime())
             {
                 if (booking.TimeStart < booking.TimeEnd)
                 {

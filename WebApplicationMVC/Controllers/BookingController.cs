@@ -22,7 +22,7 @@ namespace WebApplicationMVC.Controllers {
             List<NewBooking> bookingList = new List<NewBooking>();
             NewBooking booking = new NewBooking();
 
-            //Convert to correct Model
+            //Convert to correct Class
             foreach (TempBooking item in data) {
                 string[] timeParts = item.Time.Split('-');
                 string startTime = timeParts[0].Trim();
@@ -34,21 +34,18 @@ namespace WebApplicationMVC.Controllers {
                 DateTime combinedDateTimeStart = date.Date + timeStart;
                 DateTime combinedDateTimeEnd = date.Date + timeEnd;
 
-                booking.TimeStart = combinedDateTimeStart.ToUniversalTime();
+                booking.TimeStart = combinedDateTimeStart.ToUniversalTime(); //Convert time
                 booking.TimeEnd = combinedDateTimeEnd.ToUniversalTime();
                 booking.Notes = "";
                 bookingList.Add(booking);
             }
 
-            //string json = JsonConvert.SerializeObject(bookingList);
             string jsonString = JsonConvert.SerializeObject(bookingList).ToString();
             string jsonStringWithoutBackslashes = jsonString.Replace("\\", "");
 
-            Console.WriteLine(jsonString);
-
-
             bool success = false;
             if (bookingList.Count > 1) {
+                success = await SendBooking(jsonStringWithoutBackslashes, true, "https://localhost:7021/Booking/Multiple");
                 return Ok();
             } else {
                 success = await SendBooking(jsonStringWithoutBackslashes, false, "https://localhost:7021/Booking/");
@@ -64,16 +61,10 @@ namespace WebApplicationMVC.Controllers {
 
         public async Task<bool> SendBooking(string appointments, bool multipleBookings, string apiUrl) {
             bool success = false;
-            string modified = appointments.Replace("[", "").Replace("]", "");
-            var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, object>>(modified);
-
-            var settings = new JsonSerializerSettings {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-            string camelCaseJson = JsonConvert.SerializeObject(jsonObject, settings);
+            string modified = multipleBookings ? appointments : appointments.Replace("[", "").Replace("]", "");
+            string camelCaseJson = ConvertJSONToCamelCase(modified);
 
             HttpContent content = new StringContent(camelCaseJson, Encoding.UTF8, "application/json");
-
 
             using (HttpClient client = new HttpClient()) {
                 try {
@@ -89,17 +80,25 @@ namespace WebApplicationMVC.Controllers {
                         success = true;
                     } else {
                         // Handle unsuccessful response
-                        // You might log the error or perform additional actions here
                         success = false;
                     }
                 } catch (Exception ex) {
                     // Handle exception
-                    // You might log the exception or perform additional actions here
                     success = false;
                 }
             }
-
             return success;
+        }
+
+        private string ConvertJSONToCamelCase(string jsonString) {
+            var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+
+            var settings = new JsonSerializerSettings {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            string camelCaseJson = JsonConvert.SerializeObject(jsonObject, settings);
+
+            return camelCaseJson;
         }
 
         // API URL: /Booking/Confirm

@@ -72,7 +72,7 @@
 
         <!-- JQuery and javascript code for page functionality is below here -->
         <!-- Rest of the script code is in this file, is under wwwroot/js/filename.js -->
-        <script src="~/js/ConfirmPage.js"></script> 
+        <script src="~/js/ConfirmPage.js"></script>
 
         <script>
             $(document).ready(function () {
@@ -93,6 +93,7 @@
                             success: function (response) {
                                 // Handle success
                                 console.log('Booking confirmed:', response);
+                                showBookingConfirmation();
                             },
                             error: function (xhr, status, error) {
                                 // Handle error
@@ -104,6 +105,36 @@
                     }
                 });
             });
+
+            function showBookingConfirmation() {
+                // Create a confirmation modal using Bootstrap classes
+                var confirmationModal = `
+                                            <div class="container mt-5">
+                                                <div class="row justify-content-center">
+                                                    <div class="col-md-6">
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <h5 class="mb-0">Booking Information</h5>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <div class="text-center">
+                                                                    <div class="icon-box">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-check-circle-fill text-success" viewBox="0 0 16 16">
+                          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        </svg>
+                                                                    </div>
+                                                                    <h4 class="mt-4">Booking Bekræftet!</h4>
+                                                                    <p>Din reservation er blevet bekræftet.</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>`;
+
+                // Append the modal to the body
+                $('body').html(confirmationModal);
+            }
         </script>
     </body>
     </html>

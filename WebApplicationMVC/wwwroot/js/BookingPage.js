@@ -1,7 +1,7 @@
 ﻿// Function to format the date and time
 function formatTime(date) {
     var utcDate = date + 'Z';
-        var dateTime = new Date(utcDate);
+    var dateTime = new Date(utcDate);
 
     var formattedTime = dateTime.toLocaleTimeString('da-DK', {
         hour: '2-digit',
@@ -65,6 +65,7 @@ $('#selected-appointments').on('click', '.cancel-btn', function () {
 // Loop through API response and add times to list for display
 function processApiResponse(apiResponse) {
     $('#available-times').empty();
+
     // Iterate through the apiResponse array and append each element to the ul as li items
     $.each(apiResponse, function (index, item) {
         var startTime = formatTime(item.timeStart);

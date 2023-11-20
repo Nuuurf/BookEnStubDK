@@ -31,9 +31,9 @@
                             <div class="input-group date">
                                 <input type="text" class="form-control datepicker" id="dateInput">
                                 <div class="input-group-append">
-                                    <span class="input-group-text">
-                                        <i class="fa fa-calendar"></i>
-                                    </span>
+                                    <button class="input-group-text" id="date-search-btn">
+                                        Søg <i class="fa fa-calendar"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -76,49 +76,42 @@
 
 
         <!-- JQuery and javascript code for page functionality is below here -->
-
         <!-- Rest of the script code is in this file -->
         <script src="~/js/BookingPage.js"></script>
 
         <script>
             // Runs a GET request to fetch available times for entered date
             $(document).ready(function () {
-                $('#dateInput').on('keydown', function (event) {
-                    // Check if the key pressed is Enter (key code 13)
-                    if (event.keyCode === 13) {
-                        // Prevent the default form submission behavior
-                        event.preventDefault();
+                $('#date-search-btn').on('click', function (event) {
+                    // Get the value from the input field
+                    var inputData = $(this).val();
+                    var parts = inputData.split('/');
 
-                        // Get the value from the input field
-                        var inputData = $(this).val();
-                        var parts = inputData.split('/');
+                    // Create a new Date object with the parts
+                    var formattedDate = new Date(parts[2], parts[1] - 1, parts[0]);
 
-                        // Create a new Date object with the parts
-                        var formattedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                    // Format the date as yyyy-mm-dd
+                    var formattedDateString =
+                        formattedDate.getFullYear() + '-' +
+                        ('0' + (formattedDate.getMonth() + 1)).slice(-2) + '-' +
+                        ('0' + formattedDate.getDate()).slice(-2);
+                    //console.log(inputData);
 
-                        // Format the date as yyyy-mm-dd
-                        var formattedDateString =
-                            formattedDate.getFullYear() + '-' +
-                            ('0' + (formattedDate.getMonth() + 1)).slice(-2) + '-' +
-                            ('0' + formattedDate.getDate()).slice(-2);
-                        //console.log(inputData);
-
-                        // Make an AJAX GET request
-                        $.ajax({
-                            url: '@Url.Action("GetAvailableTimes", "Booking")',
-                            type: 'GET',
-                            data: { date: formattedDateString },
-                            success: function (response) {
-                                // Handle the successful response here
-                                console.log('Response:', response);
-                                processApiResponse(response);
-                            },
-                            error: function (xhr, status, error) {
-                                // Handle errors here
-                                console.error('Error:', error);
-                            }
-                        });
-                    }
+                    // Make an AJAX GET request
+                    $.ajax({
+                        url: '@Url.Action("GetAvailableTimes", "Booking")',
+                        type: 'GET',
+                        data: { date: formattedDateString },
+                        success: function (response) {
+                            // Handle the successful response here
+                            console.log('Response:', response);
+                            processApiResponse(response);
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle errors here
+                            console.error('Error:', error);
+                        }
+                    });
                 });
             });
 
