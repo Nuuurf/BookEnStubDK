@@ -4,6 +4,7 @@ using RestfulApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -76,22 +77,28 @@ public class CreateBookingTest
 
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
             AsyncTestDelegate result;
-            // Act
-            using (var transaction = conn.BeginTransaction())
+            // Act & Assert
+            try
             {
-                int bookingOrderID = await _dbBooking.CreateNewBookingOrder(conn, transaction);
-                int stubCount = await _dbBooking.GetMaxStubs(conn, transaction);
-                for (int i = 0; i < stubCount; i++)
+                using (var transaction = conn.BeginTransaction())
                 {
+                    int bookingOrderID = await _dbBooking.CreateNewBookingOrder(conn, transaction);
+                    int stubCount = await _dbBooking.GetMaxStubs(conn, transaction);
+                    for (int i = 0; i < stubCount; i++)
+                    {
+                        await _dbBooking.CreateBooking(conn, overlappingBooking, bookingOrderID, transaction);
+                    }
+
                     await _dbBooking.CreateBooking(conn, overlappingBooking, bookingOrderID, transaction);
+                    transaction.Rollback();
+
+                    Assert.Fail("Expected an SqlException to be thrown.");
                 }
-
-                 result = () => _dbBooking.CreateBooking(conn, overlappingBooking, bookingOrderID, transaction);
-                transaction.Rollback();
             }
-
-            // Assert
-            Assert.ThrowsAsync<Exception>(result);
+            catch (SqlException ex)
+            {
+                Assert.AreEqual("No available stubs for timeslot: Nov 10 2020  9:00AM/Nov 10 2020 10:00AM", ex.Message);
+            }
         }
 
 

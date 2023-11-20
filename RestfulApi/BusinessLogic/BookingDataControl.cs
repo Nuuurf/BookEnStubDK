@@ -47,18 +47,11 @@ namespace RestfulApi.BusinessLogic {
 
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex)
                 {
                     transaction.Rollback();
 
-                    throw new Exception("Bookings could that be created");
-                }
-
-                if (newBookingOrderId <= 0)
-                {
-                    transaction.Rollback();
-
-                    throw new Exception("There are not available stubs for bookings in the desired timeslot");
+                    throw;
                 }
 
                 return newBookingOrderId;

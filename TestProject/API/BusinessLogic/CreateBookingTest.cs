@@ -162,20 +162,27 @@ namespace TestProject.API.BusinessLogic
         public async Task CreateBooking_DatabaseThrowsException()
         {
             //Arrange
-            var mockDBBokking = new Mock<IDBBooking>();
+            var mockDBBooking = new Mock<IDBBooking>();
+            var mockDBConnection = new Mock<IDbConnection>();
+            var mockDbTransaction = new Mock<IDbTransaction>();
 
             List<Booking> booking = new List<Booking>
             {
                 new Booking { TimeStart = DateTime.Now.AddDays(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(1) }
             };
 
-            mockDBBokking.Setup(repo => repo.CreateBooking(
+            mockDBBooking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
                     It.IsAny<int>(),
                     It.IsAny<IDbTransaction>()))
                 .ThrowsAsync(new Exception("Sql Exception"));
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
+            // Setup mock transaction behavior
+            mockDBConnection.Setup(conn => conn.BeginTransaction(It.IsAny<IsolationLevel>()))
+                .Returns(mockDbTransaction.Object);
+            mockDbTransaction.Setup(trans => trans.Commit());
+            mockDbTransaction.Setup(trans => trans.Rollback());
+            BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, mockDBConnection.Object);
 
             //Act   
             AsyncTestDelegate result = () => controller.CreateBooking(booking);
