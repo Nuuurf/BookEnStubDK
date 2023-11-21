@@ -43,28 +43,26 @@ namespace WebApplicationMVC.Controllers {
             string jsonString = JsonConvert.SerializeObject(bookingList).ToString();
             string jsonStringWithoutBackslashes = jsonString.Replace("\\", "");
 
-            bool success = false;
-            if (bookingList.Count > 1) {
-                success = await SendBooking(jsonStringWithoutBackslashes, true, "https://localhost:7021/Booking/Multiple");
-                return Ok();
-            } else {
-                success = await SendBooking(jsonStringWithoutBackslashes, false, "https://localhost:7021/Booking/");
-            }
+            (bool success, int id) = (false, 0);
+            (success, id) = await SendBooking(jsonStringWithoutBackslashes, "https://localhost:7021/Booking/Multiple");
 
-            if(success) {
-                return Ok("Booking confirmed successfully");
+            if (success) {
+                return Ok(new { Success = success, ID = id });
             } else {
                 return BadRequest("Error occured or booking timeslot is full");
             }
-            
+
         }
 
-        public async Task<bool> SendBooking(string appointments, bool multipleBookings, string apiUrl) {
+        public async Task<(bool success, int id)> SendBooking(string appointments, string apiUrl) {
             bool success = false;
-            string modified = multipleBookings ? appointments : appointments.Replace("[", "").Replace("]", "");
+            int id = -1;
+            string modified = appointments.Replace("[", "").Replace("]", "");
             string camelCaseJson = ConvertJSONToCamelCase(modified);
+            string test = "[]";
+            string appending = test.Insert(1, camelCaseJson);
 
-            HttpContent content = new StringContent(camelCaseJson, Encoding.UTF8, "application/json");
+            HttpContent content = new StringContent(appending, Encoding.UTF8, "application/json");
 
             using (HttpClient client = new HttpClient()) {
                 try {
@@ -75,7 +73,7 @@ namespace WebApplicationMVC.Controllers {
                     if (response.IsSuccessStatusCode) {
                         // Read and parse the response content
                         string responseData = await response.Content.ReadAsStringAsync();
-
+                        int.TryParse(responseData, out id);
                         // Assuming success when the response is received
                         success = true;
                     } else {
@@ -87,7 +85,7 @@ namespace WebApplicationMVC.Controllers {
                     success = false;
                 }
             }
-            return success;
+            return (success, id);
         }
 
         private string ConvertJSONToCamelCase(string jsonString) {
