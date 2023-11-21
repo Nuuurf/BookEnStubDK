@@ -39,12 +39,12 @@ namespace TestProject.API.Control {
             //Arrange
             BookingDataControl bdc = new BookingDataControl(new DBBooking(), _connection);
 
-            Booking booking = new Booking
+            List<Booking> booking = new List<Booking>
             { //booking to test with
-                Notes = "Delete me please",
-                TimeStart = DateTime.Now.AddHours(1),
-                TimeEnd = DateTime.Now.AddHours(2),
-            };
+                new Booking {Notes = "Delete me please",
+                    TimeStart = DateTime.Now.AddHours(1),
+                    TimeEnd = DateTime.Now.AddHours(2),}
+                };
 
             int createReturn = 0;
 
@@ -62,13 +62,16 @@ namespace TestProject.API.Control {
             //Arrange
             BookingDataControl bdc = new BookingDataControl(new DBBooking(), _connection);
 
-            Booking booking = new Booking
+            List<Booking> booking = new List<Booking>
             { //booking to test with
-                Notes = "Delete me please",
-                //instantiate date before the current time
-                TimeStart = DateTime.Now.AddHours(-2),
-                TimeEnd = DateTime.Now.AddHours(-1),
-            };
+                new Booking
+                {
+                    Notes = "Delete me please",
+                    //instantiate date before the current time
+                    TimeStart = DateTime.Now.AddHours(-2),
+                    TimeEnd = DateTime.Now.AddHours(-1),
+                }
+                };
 
             //Act
             AsyncTestDelegate act = () => bdc.CreateBooking(booking);

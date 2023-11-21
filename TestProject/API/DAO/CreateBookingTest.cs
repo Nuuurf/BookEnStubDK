@@ -1,8 +1,10 @@
-﻿using RestfulApi.DAL;
+﻿using Microsoft.AspNetCore.Mvc;
+using RestfulApi.DAL;
 using RestfulApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,22 +76,29 @@ public class CreateBookingTest
             };
 
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
-            int bookingID = 1;
-
-            // Act
-            using (var transaction = conn.BeginTransaction())
+            AsyncTestDelegate result;
+            // Act & Assert
+            try
             {
-                int stubCount = await _dbBooking.GetMaxStubs(conn, transaction);
-                for (int i = 0; i < stubCount; i++)
+                using (var transaction = conn.BeginTransaction())
                 {
-                    await _dbBooking.CreateBooking(conn, overlappingBooking, 1, transaction);
-                }
-bookingID = await _dbBooking.CreateBooking(conn, overlappingBooking,1, transaction);
-                transaction.Rollback();
-            }
+                    int bookingOrderID = await _dbBooking.CreateNewBookingOrder(conn, transaction);
+                    int stubCount = new Utilities().GetMaxDBStubs();
+                    for (int i = 0; i < stubCount; i++)
+                    {
+                        await _dbBooking.CreateBooking(conn, overlappingBooking, bookingOrderID, transaction);
+                    }
 
-            // Assert
-            Assert.True(bookingID == 0, "Overlapping bookings should not be allowed");
+                    await _dbBooking.CreateBooking(conn, overlappingBooking, bookingOrderID, transaction);
+                    transaction.Rollback();
+
+                    Assert.Fail("Expected an SqlException to be thrown.");
+                }
+            }
+            catch (SqlException ex)
+            {
+                Assert.AreEqual("No available stubs for timeslot: Nov 10 2020  9:00AM/Nov 10 2020 10:00AM", ex.Message);
+            }
         }
 
 
