@@ -21,6 +21,7 @@ namespace WebApplicationMVC.Controllers {
         public async Task<IActionResult> BookAppointment([FromBody] List<TempBooking> data) {
             List<NewBooking> bookingList = new List<NewBooking>();
             NewBooking booking = new NewBooking();
+            int id = -1;
 
             //Convert to correct Class
             foreach (TempBooking item in data) {
@@ -43,63 +44,56 @@ namespace WebApplicationMVC.Controllers {
             string jsonString = JsonConvert.SerializeObject(bookingList).ToString();
             string jsonStringWithoutBackslashes = jsonString.Replace("\\", "");
 
-            (bool success, int id) = (false, 0);
-            (success, id) = await SendBooking(jsonStringWithoutBackslashes, "https://localhost:7021/Booking/Multiple");
-
-            if (success) {
-                return Ok(new { Success = success, ID = id });
-            } else {
-                return BadRequest("Error occured or booking timeslot is full");
+            try {
+                id = await SendBooking(jsonStringWithoutBackslashes);
+            } catch (Exception) {
+                throw;
             }
+            return Ok(new { ID = id });
         }
 
-        public async Task<(bool success, int id)> SendBooking(string appointments, string apiUrl) {
-            bool success = false;
+        public async Task<int> SendBooking(string appointments) {
             int id = -1;
-            string modified = appointments.Replace("[", "").Replace("]", "");
-            string camelCaseJson = ConvertJSONToCamelCase(modified);
-            string test = "[]";
-            string appending = test.Insert(1, camelCaseJson);
+            string camelCaseJson = ConvertJSONToCamelCase(appointments);
 
-            HttpContent content = new StringContent(appending, Encoding.UTF8, "application/json");
+            HttpContent content = new StringContent(camelCaseJson, Encoding.UTF8, "application/json");
 
             using (HttpClient client = new HttpClient()) {
                 try {
                     // Make the GET request to the API
-                    HttpResponseMessage response = await client.PostAsync(apiUrl, content);
+                    HttpResponseMessage response = await client.PostAsync("https://localhost:7021/Booking/", content);
 
                     // Check if the request was successful
                     if (response.IsSuccessStatusCode) {
                         // Read and parse the response content
                         string responseData = await response.Content.ReadAsStringAsync();
                         int.TryParse(responseData, out id);
-                        // Assuming success when the response is received
-                        success = true;
                     } else {
                         // Handle unsuccessful response
-                        success = false;
+                        throw new Exception(response.Content.ToString());
                     }
                 } catch (Exception ex) {
                     // Handle exception
-                    success = false;
+                    throw;
                 }
             }
-            return (success, id);
+            return (id);
         }
 
         private string ConvertJSONToCamelCase(string jsonString) {
-            var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+            List<Dictionary<string, object>> data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonString);
+
 
             var settings = new JsonSerializerSettings {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
-            string camelCaseJson = JsonConvert.SerializeObject(jsonObject, settings);
+            string camelCaseJson = JsonConvert.SerializeObject(data, settings);
 
             return camelCaseJson;
         }
 
         // API URL: /Booking/Confirm
-        // Added to prevent Error page
+        // Added to prevent Error page and force user to specific page
         [HttpGet]
         public IActionResult Confirm() {
             return RedirectToAction("Index");
@@ -111,7 +105,7 @@ namespace WebApplicationMVC.Controllers {
             if (data == "Confirm") {
                 return View();
             } else {
-                return BadRequest("Invalid data or value");
+                return BadRequest("Invalid booking data");
             }
         }
 
@@ -135,7 +129,7 @@ namespace WebApplicationMVC.Controllers {
                         return Content(responseData, "application/json");
                     } else {
                         // Handle unsuccessful response
-                        return Json(new { error = $"Error: {response.StatusCode}" });
+                        return Json(new { error = $"Error: {response}" });
                     }
                 } catch (Exception ex) {
                     // Handle exception
