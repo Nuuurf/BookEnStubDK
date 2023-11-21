@@ -99,7 +99,7 @@ namespace RestfulApi.Controllers
 
         // URL: api/booking
         [HttpPost]
-        public async Task<IActionResult> CreateBooking([FromBody] Booking? booking = null)
+        public async Task<IActionResult> CreateBooking([FromBody] List<Booking>? booking = null)
         {
             if (booking != null)
             {
@@ -126,30 +126,6 @@ namespace RestfulApi.Controllers
             }
             else {
                 return BadRequest("No JSON object were transmitted with request");
-            }
-        }
-
-        [HttpPost]
-        [Route("/Booking/Multiple")]
-        public async Task<IActionResult> CreateMultipleBooking([FromBody] List<Booking>? bookings = null) {
-            if (bookings != null) {
-                try {
-
-                    int generatedBookingOrderId= await _bookingdata.CreateMultipleBookings(bookings);
-
-                    if (generatedBookingOrderId > 0) {
-                        return Ok(generatedBookingOrderId);
-                    }
-                    else {
-                        return UnprocessableEntity("DA: kunne ikke oprette bookinger, kapasitet oversteget med en eller flere bookinger");
-                    }
-                }
-                catch (Exception ex) {
-                    return StatusCode(500, $"Internal Server Error: {ex.Message}");
-                }
-            }
-            else {
-                return BadRequest("No JSON objects were transmitted with request");
             }
         }
 

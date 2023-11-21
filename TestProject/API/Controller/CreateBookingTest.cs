@@ -19,11 +19,11 @@ namespace TestProject.API.Controller
         {
             //Arrange
             var mockDBBokking = new Mock<IBookingData>();
-            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(1);
+            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>())).ReturnsAsync(1);
 
             BookingController controller = new BookingController(mockDBBokking.Object);
 
-            Booking booking = new Booking();
+            List<Booking> booking = new List<Booking>();
 
             //Act   
             var result = await controller.CreateBooking(booking) as OkObjectResult;
@@ -39,7 +39,7 @@ namespace TestProject.API.Controller
         {
             //Arrange
             var mockDBBokking = new Mock<IBookingData>();
-            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(0);
+            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>())).ReturnsAsync(0);
 
             BookingController controller = new BookingController(mockDBBokking.Object);
 
@@ -56,11 +56,11 @@ namespace TestProject.API.Controller
         {
             //Arrange
             var mockDBBokking = new Mock<IBookingData>();
-            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>())).ReturnsAsync(0);
+            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>())).ReturnsAsync(0);
 
             BookingController controller = new BookingController(mockDBBokking.Object);
 
-            Booking booking = new Booking();
+            List<Booking> booking = new List<Booking>();
 
             //Act   
             var result = await controller.CreateBooking(booking) as UnprocessableEntityObjectResult;
@@ -75,8 +75,8 @@ namespace TestProject.API.Controller
         {
             //Arrange
             var mockDBBokking = new Mock<IBookingData>();
-Booking booking = new Booking();
-            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<Booking>()))
+List<Booking> booking = new List<Booking>();
+            mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>()))
                 .Throws(new Exception());
 
             BookingController controller = new BookingController(mockDBBokking.Object);

@@ -38,7 +38,7 @@ namespace TestProject.API.BusinessLogic
                 .ReturnsAsync(1);
 
             // Setup mock transaction behavior
-            mockDBConnection.Setup(conn => conn.BeginTransaction())
+            mockDBConnection.Setup(conn => conn.BeginTransaction(It.IsAny<IsolationLevel>()))
                 .Returns(mockDbTransaction.Object);
             mockDbTransaction.Setup(trans => trans.Commit());
             mockDbTransaction.Setup(trans => trans.Rollback());
@@ -47,7 +47,7 @@ namespace TestProject.API.BusinessLogic
 
             DateTime bookingStart = DateTime.Now.AddDays(1);
             DateTime bookingEnd = bookingStart.AddHours(1);
-            Booking booking = new Booking { TimeStart = bookingStart, TimeEnd = bookingEnd };
+            List<Booking> booking = new List<Booking> {new Booking{ TimeStart = bookingStart, TimeEnd = bookingEnd} };
 
             // Act
             var result = await controller.CreateBooking(booking);
@@ -66,8 +66,7 @@ namespace TestProject.API.BusinessLogic
             //Arrange
             var mockDBBokking = new Mock<IDBBooking>();
             DateTime bookingDate = DateTime.Now.AddDays(-1);
-            Booking booking = new Booking();
-            booking.TimeStart = bookingDate;
+            List<Booking> booking = new List<Booking> { new Booking { TimeStart = bookingDate} };
 
             mockDBBokking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
@@ -90,7 +89,7 @@ namespace TestProject.API.BusinessLogic
         {
             //Arrange
             var mockDBBokking = new Mock<IDBBooking>();
-            Booking booking = null;
+            List<Booking> booking = null;
             mockDBBokking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
@@ -110,8 +109,7 @@ namespace TestProject.API.BusinessLogic
         {
             //Arrange
             var mockDBBokking = new Mock<IDBBooking>();
-            Booking booking = new Booking() { TimeStart = DateTime.Now.AddDays(2), TimeEnd = DateTime.Now.AddDays(1) };
-
+            List<Booking> booking = new List<Booking> { new Booking { TimeStart = DateTime.Now.AddDays(2), TimeEnd = DateTime.Now.AddDays(1) } };
             mockDBBokking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
@@ -131,38 +129,60 @@ namespace TestProject.API.BusinessLogic
         public async Task CreateBooking_ThrowsException_WithNoAvailbableStubsForBooking()
         {
             //Arrange
-            var mockDBBokking = new Mock<IDBBooking>();
-            Booking booking = new Booking { TimeStart = DateTime.Now.AddDays(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(1) };
+            var mockDBBooking = new Mock<IDBBooking>();
+            var mockDBConnection = new Mock<IDbConnection>();
+            var mockDbTransaction = new Mock<IDbTransaction>();
+            List<Booking> booking = new List<Booking> { new Booking { TimeStart = DateTime.Now.AddDays(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(1)} };
 
-            mockDBBokking.Setup(repo => repo.CreateBooking(
+            mockDBBooking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
                     It.IsAny<int>(),
                     It.IsAny<IDbTransaction>()))
-                .ReturnsAsync(0);
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
+                .Throws<Exception>();
+            // Setup mock transaction behavior
+            mockDBConnection.Setup(conn => conn.BeginTransaction(It.IsAny<IsolationLevel>()))
+                .Returns(mockDbTransaction.Object);
+            mockDbTransaction.Setup(trans => trans.Commit());
+            mockDbTransaction.Setup(trans => trans.Rollback());
+
+
+            BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, mockDBConnection.Object);
 
             //Act   
             AsyncTestDelegate result = () => controller.CreateBooking(booking);
 
             //Assert
             Assert.ThrowsAsync<Exception>(result);
+            mockDbTransaction.Verify(trans => trans.Commit(), Times.Never);
+            mockDbTransaction.Verify(trans => trans.Rollback(), Times.Once);
         }
 
         [Test]
         public async Task CreateBooking_DatabaseThrowsException()
         {
             //Arrange
-            var mockDBBokking = new Mock<IDBBooking>();
-            Booking booking = new Booking { TimeStart = DateTime.Now.AddDays(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(1) };
+            var mockDBBooking = new Mock<IDBBooking>();
+            var mockDBConnection = new Mock<IDbConnection>();
+            var mockDbTransaction = new Mock<IDbTransaction>();
 
-            mockDBBokking.Setup(repo => repo.CreateBooking(
+            List<Booking> booking = new List<Booking>
+            {
+                new Booking { TimeStart = DateTime.Now.AddDays(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(1) }
+            };
+
+            mockDBBooking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
                     It.IsAny<int>(),
                     It.IsAny<IDbTransaction>()))
                 .ThrowsAsync(new Exception("Sql Exception"));
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
+            // Setup mock transaction behavior
+            mockDBConnection.Setup(conn => conn.BeginTransaction(It.IsAny<IsolationLevel>()))
+                .Returns(mockDbTransaction.Object);
+            mockDbTransaction.Setup(trans => trans.Commit());
+            mockDbTransaction.Setup(trans => trans.Rollback());
+            BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, mockDBConnection.Object);
 
             //Act   
             AsyncTestDelegate result = () => controller.CreateBooking(booking);
