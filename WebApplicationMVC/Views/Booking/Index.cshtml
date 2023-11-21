@@ -32,7 +32,7 @@
                                 <input type="text" class="form-control datepicker" id="dateInput">
                                 <div class="input-group-append">
                                     <button class="input-group-text" id="date-search-btn">
-                                        Søg <i class="fa fa-calendar"></i>
+                                       <strong class="pr-2">Søg </strong><i class="fa fa-calendar"></i>
                                     </button>
                                 </div>
                             </div>
@@ -103,7 +103,6 @@
                         data: { date: formattedDateString },
                         success: function (response) {
                             // Handle the successful response here
-                            console.log('Response:', response);
                             processApiResponse(response);
                         },
                         error: function (xhr, status, error) {

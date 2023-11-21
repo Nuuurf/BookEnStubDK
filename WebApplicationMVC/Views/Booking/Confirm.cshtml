@@ -57,6 +57,12 @@
                                     <input type="tel" class="form-control" id="phoneNumber" placeholder="Ex: +45 88 88 88 88">
                                 </div>
 
+                                <!-- Notes -->
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Kommentar</label>
+                                    <input type="text" class="form-control" id="notes" placeholder="Ex: Fødselsdag, kan vi få flag?">
+                                </div>
+
                                 <!-- Submit Button -->
                                 <button type="button" class="btn btn-success btn-book-confirm">Bekræft Booking</button>
                             </form>
@@ -92,9 +98,9 @@
                             data: selectedAppointments,
                             success: function (response) {
                                 // Handle success
-                                console.log('Booking confirmed:', response);
                                 var id = response.id;
                                 showBookingConfirmation(id);
+                                console.log('Booking confirmed, ID:', id);
                             },
                             error: function (xhr, status, error) {
                                 // Handle error
@@ -132,6 +138,7 @@
                                                             <h4 class="mt-4">Booking Bekræftet!</h4>
                                                             <p>Din reservation er blevet bekræftet.</p>
                                                             <p>Dit Booking-ID er: ` + id + `</p>
+                                                            <a href="/Booking/Index" class="btn btn-success">Gå Tilbage</a>
                                                         </div>
                                                     </div>
                                                 </div>

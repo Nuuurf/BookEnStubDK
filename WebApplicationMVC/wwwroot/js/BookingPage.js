@@ -66,6 +66,15 @@ $('#selected-appointments').on('click', '.cancel-btn', function () {
 function processApiResponse(apiResponse) {
     $('#available-times').empty();
 
+    console.log(apiResponse);
+    if (apiResponse.error !== undefined) {
+        var errorItem = $('<li>', {
+            class: 'list-group-item d-flex justify-content-between align-items-center',
+            html: '<div class="">'+"Ugyldig dato eller dato er før i dag"+'</div>'
+        });
+        $('#available-times').append(errorItem);
+        return;
+    }
     // Iterate through the apiResponse array and append each element to the ul as li items
     $.each(apiResponse, function (index, item) {
         var startTime = formatTime(item.timeStart);
@@ -73,11 +82,17 @@ function processApiResponse(apiResponse) {
         var date = formatDate(item.timeStart);
         var availableStubs = item.availableStubs;
 
+        var todaysDate = new Date();
+        var [hours, minutes] = startTime.split('.');
+        var [year, month, day] = date.split('/');
+        var specificDate = new Date(year, month - 1, day);
+        specificDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
         var buttonClass = 'btn btn-primary btn-sm book-btn';
         var buttonText = 'Book';
 
         // Check if availableStubs is 0, then disable the button and change its color to danger
-        if (availableStubs === 0) {
+        if (availableStubs === 0 || specificDate < todaysDate) {
             buttonClass = 'btn btn-danger btn-sm book-btn disabled';
             buttonText = 'Booket';
         }
@@ -132,9 +147,9 @@ function saveAppointmentsToLocalStorage() {
 
 // Initialize datepicker
 $('.datepicker').datepicker({
-    format: 'dd/mm/yyyy',
-    todayBtn: true,
-    todayHighlight: true,
-    weekStart: 1,
-    autoclose: true,
-}); //.datepicker("setDate", "0")
+    "format": 'dd/mm/yyyy',
+    "todayHighlight": true,
+    "weekStart": 1,
+    "autoclose": true,
+    "calendarWeeks": true
+}).datepicker("setDate", 'now');

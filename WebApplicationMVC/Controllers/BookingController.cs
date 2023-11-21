@@ -51,7 +51,6 @@ namespace WebApplicationMVC.Controllers {
             } else {
                 return BadRequest("Error occured or booking timeslot is full");
             }
-
         }
 
         public async Task<(bool success, int id)> SendBooking(string appointments, string apiUrl) {
