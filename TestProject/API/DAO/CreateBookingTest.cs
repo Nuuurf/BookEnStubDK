@@ -83,7 +83,7 @@ public class CreateBookingTest
                 using (var transaction = conn.BeginTransaction())
                 {
                     int bookingOrderID = await _dbBooking.CreateNewBookingOrder(conn, transaction);
-                    int stubCount = await _dbBooking.GetMaxStubs(conn, transaction);
+                    int stubCount = new Utilities().GetMaxDBStubs();
                     for (int i = 0; i < stubCount; i++)
                     {
                         await _dbBooking.CreateBooking(conn, overlappingBooking, bookingOrderID, transaction);

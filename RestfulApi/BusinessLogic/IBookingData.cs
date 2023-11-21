@@ -2,8 +2,6 @@
 
 namespace RestfulApi.BusinessLogic {
     public interface IBookingData {
-
-        public Task<int> CreateMultipleBookings(List<Booking> bookings);
         
         public Task<int> CreateBooking(List<Booking> booking);
         

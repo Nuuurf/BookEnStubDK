@@ -129,30 +129,6 @@ namespace RestfulApi.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("/Booking/Multiple")]
-        public async Task<IActionResult> CreateMultipleBooking([FromBody] List<Booking>? bookings = null) {
-            if (bookings != null) {
-                try {
-
-                    int generatedBookingOrderId= await _bookingdata.CreateMultipleBookings(bookings);
-
-                    if (generatedBookingOrderId > 0) {
-                        return Ok(generatedBookingOrderId);
-                    }
-                    else {
-                        return UnprocessableEntity("DA: kunne ikke oprette bookinger, kapasitet oversteget med en eller flere bookinger");
-                    }
-                }
-                catch (Exception ex) {
-                    return StatusCode(500, $"Internal Server Error: {ex.Message}");
-                }
-            }
-            else {
-                return BadRequest("No JSON objects were transmitted with request");
-            }
-        }
-
         /*
                 // URL: api/booking
                 [HttpDelete("{id}")]

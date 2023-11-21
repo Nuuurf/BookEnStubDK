@@ -22,7 +22,7 @@ namespace TestProject.API.DAO
 IDBBooking booking = new DBBooking();
             int expectedAvailbleBookingCount = 130;
             int expectedTimeSlots = 14;
-            int stubCount = await booking.GetMaxStubs(conn);
+            int stubCount = new Utilities().GetMaxDBStubs();
             DateTime date = new DateTime(2023, 11, 10);
             TestContext.WriteLine($"Testing Date {date}");
 
