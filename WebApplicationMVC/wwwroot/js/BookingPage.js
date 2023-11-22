@@ -66,7 +66,6 @@ $('#selected-appointments').on('click', '.cancel-btn', function () {
 function processApiResponse(apiResponse) {
     $('#available-times').empty();
 
-    console.log(apiResponse);
     if (apiResponse.error !== undefined) {
         var errorItem = $('<li>', {
             class: 'list-group-item d-flex justify-content-between align-items-center',

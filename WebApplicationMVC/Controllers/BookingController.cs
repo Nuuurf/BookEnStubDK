@@ -20,11 +20,12 @@ namespace WebApplicationMVC.Controllers {
         [HttpPost]
         public async Task<IActionResult> BookAppointment([FromBody] List<TempBooking> data) {
             List<NewBooking> bookingList = new List<NewBooking>();
-            NewBooking booking = new NewBooking();
+            //NewBooking booking = new NewBooking();
             int id = -1;
 
             //Convert to correct Class
             foreach (TempBooking item in data) {
+                NewBooking booking = new NewBooking();
                 string[] timeParts = item.Time.Split('-');
                 string startTime = timeParts[0].Trim();
                 string endTime = timeParts[1].Trim();
@@ -41,22 +42,19 @@ namespace WebApplicationMVC.Controllers {
                 bookingList.Add(booking);
             }
 
-            string jsonString = JsonConvert.SerializeObject(bookingList).ToString();
-            string jsonStringWithoutBackslashes = jsonString.Replace("\\", "");
-
             try {
-                id = await SendBooking(jsonStringWithoutBackslashes);
-            } catch (Exception) {
-                throw;
+                id = await SendBooking(bookingList);
+            } catch (Exception ex) {
+                Response.StatusCode = 500;
+                return Json(new { error = ex.Message });
             }
             return Ok(new { ID = id });
         }
 
-        public async Task<int> SendBooking(string appointments) {
+        public async Task<int> SendBooking(List<NewBooking> appointments) {
             int id = -1;
-            string camelCaseJson = ConvertJSONToCamelCase(appointments);
-
-            HttpContent content = new StringContent(camelCaseJson, Encoding.UTF8, "application/json");
+            var jsonContent = System.Text.Json.JsonSerializer.Serialize(appointments);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             using (HttpClient client = new HttpClient()) {
                 try {
@@ -70,19 +68,22 @@ namespace WebApplicationMVC.Controllers {
                         int.TryParse(responseData, out id);
                     } else {
                         // Handle unsuccessful response
-                        throw new Exception(response.Content.ToString());
+                        string errorMessage = await response.Content.ReadAsStringAsync();
+                        string[] errorParts = errorMessage.Split(':'); // Splitting by ':' character
+                        string actualErrorMessage = errorParts.Length > 1 ? errorParts[1].Trim() : errorMessage;
+
+                        throw new Exception(actualErrorMessage);
                     }
                 } catch (Exception ex) {
                     // Handle exception
                     throw;
                 }
             }
-            return (id);
+            return id;
         }
 
         private string ConvertJSONToCamelCase(string jsonString) {
             List<Dictionary<string, object>> data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonString);
-
 
             var settings = new JsonSerializerSettings {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
