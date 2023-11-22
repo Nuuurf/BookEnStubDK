@@ -76,7 +76,6 @@ public class CreateBookingTest
             };
 
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
-            AsyncTestDelegate result;
             // Act & Assert
             try
             {
@@ -97,7 +96,7 @@ public class CreateBookingTest
             }
             catch (SqlException ex)
             {
-                Assert.AreEqual("No available stubs for timeslot: Nov 10 2020  9:00AM/Nov 10 2020 10:00AM", ex.Message);
+                Assert.That(ex.Message, Is.EqualTo("No available stubs for timeslot: Nov 10 2020  9:00AM/Nov 10 2020 10:00AM"));
             }
         }
 
