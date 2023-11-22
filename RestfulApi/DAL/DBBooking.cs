@@ -38,8 +38,8 @@ namespace RestfulApi.DAL {
                 throw;
             }
             return newBookingId;
-
         }
+
         // Not implemented
         public async Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, DateTime start, DateTime end, IDbTransaction transaction = null)
         {
