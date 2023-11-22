@@ -28,10 +28,10 @@ function formatDate(dateTimeString) {
 $(document).on('click', '.book-btn', function () {
     var selectedTime = $(this).data('time');
     var hiddenDate = $(this).closest('.list-group-item').find('.hidden-date').text();
-
+    var fullDateTimeValue = $(this).closest('.list-group-item').data('datetime');
     // Add the selected appointment to the "Selected Appointments" list
     $('#selected-appointments').append(
-        '<li class="list-group-item">' + hiddenDate + ' - ' + selectedTime +
+        '<li class="list-group-item" data-datetime="' + fullDateTimeValue + '">' + hiddenDate + ' - ' + selectedTime +
         ' <button class="btn btn-danger btn-sm cancel-btn"><i class="fas fa-times"></i> Fjern</button></li>'
     );
 
@@ -81,6 +81,8 @@ function processApiResponse(apiResponse) {
         var date = formatDate(item.timeStart);
         var availableStubs = item.availableStubs;
 
+        console.log(item.timeStart);
+
         var todaysDate = new Date();
         var [hours, minutes] = startTime.split('.');
         var [year, month, day] = date.split('/');
@@ -105,7 +107,8 @@ function processApiResponse(apiResponse) {
                 '</div>' +
                 '<button class="' + buttonClass + '" data-time="' + startTime + ' - ' + endTime + '">' +
                 '<i class="fas fa-plus"></i> ' + buttonText +
-                '</button>'
+                '</button>',
+            'data-datetime': item.timeStart
         });
 
         $('#available-times').append(listItem);
@@ -130,12 +133,16 @@ function saveAppointmentsToLocalStorage() {
         var hiddenDate = appointmentText.substr(0, firstHyphenIndex).trim();
         var selectedTime = appointmentText.substr(firstHyphenIndex + 1).trim();
 
+        console.log($(this));
+        var dateTime = $(this).data('datetime');
+        console.log(dateTime);
         // Create an object for each appointment
         var appointment = {
             date: hiddenDate,
-            time: selectedTime
+            time: selectedTime,
+            datetime: dateTime
         };
-
+        
         // Push the appointment object to the array
         appointments.push(appointment);
     });

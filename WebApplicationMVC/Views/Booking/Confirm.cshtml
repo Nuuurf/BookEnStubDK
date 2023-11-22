@@ -88,15 +88,24 @@
                     var selectedAppointments = localStorage.getItem('selectedAppointments');
 
                     if (selectedAppointments) {
+                        // Parse the stored string back into an object
+                        var appointments = JSON.parse(selectedAppointments);
+
+                        // Extract only the datetime values from the appointments
+                        var datetimeValues = appointments.map(function (appointment) {
+                            return appointment.datetime; 
+                        });
+
                         // Prepare the JSON object for the POST request
-                        var postData = JSON.stringify({ appointments: selectedAppointments });
+                        var postData = JSON.stringify(datetimeValues);
                         loadingButtonIcon(true);
+
                         // Make the POST request
                         $.ajax({
                             url: '@Url.Action("BookAppointment", "Booking")',
                             type: 'POST',
                             contentType: 'application/json',
-                            data: selectedAppointments,
+                            data: postData,
                             success: function (response) {
                                 // Handle success
                                 var id = response.id;

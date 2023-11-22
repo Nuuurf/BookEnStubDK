@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json.Nodes;
 using Newtonsoft.Json.Serialization;
+using System;
 
 namespace WebApplicationMVC.Controllers {
     public class BookingController : Controller {
@@ -20,29 +21,27 @@ namespace WebApplicationMVC.Controllers {
 
         // API URL: /Booking/ConfirmBoooking/
         [HttpPost]
-        public async Task<IActionResult> BookAppointment([FromBody] List<TempBooking> data) {
+        public async Task<IActionResult> BookAppointment([FromBody] List<string> dateTimes) {
             List<NewBooking> bookingList = new List<NewBooking>();
             int id = -1;
-
-            //Convert to correct Class
-            foreach (TempBooking item in data) {
-                NewBooking booking = new NewBooking();
-                string[] timeParts = item.Time.Split('-');
-                string startTime = timeParts[0].Trim();
-                string endTime = timeParts[1].Trim();
-                DateTime date = DateTime.ParseExact(item.Date, "yyyy/MM/dd", CultureInfo.InvariantCulture);
-                TimeSpan.TryParseExact(startTime, "hh\\.mm", CultureInfo.InvariantCulture, out TimeSpan timeStart);
-                TimeSpan.TryParseExact(endTime, "hh\\.mm", CultureInfo.InvariantCulture, out TimeSpan timeEnd);
-
-                DateTime combinedDateTimeStart = date.Date + timeStart;
-                DateTime combinedDateTimeEnd = date.Date + timeEnd;
-
-                booking.TimeStart = combinedDateTimeStart.ToUniversalTime(); //Convert time
-                booking.TimeEnd = combinedDateTimeEnd.ToUniversalTime();
-                booking.Notes = "";
-                bookingList.Add(booking);
+            
+            foreach (var dateTimeString in dateTimes)
+            {
+                if (DateTime.TryParse(dateTimeString, out DateTime parsedDateTime))
+                {
+                    // Add to the list if the parsing is successful
+                    bookingList.Add(new NewBooking()
+                    {
+                        TimeStart = parsedDateTime,
+                        TimeEnd = parsedDateTime.AddHours(1)
+                    });
+                }
+                else
+                {
+                    return BadRequest("Invalid datetime format");
+                }
             }
-
+            
             try {
                 id = await SendBooking(bookingList);
             } catch (Exception ex) {
