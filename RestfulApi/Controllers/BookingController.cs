@@ -99,14 +99,16 @@ namespace RestfulApi.Controllers
 
         // URL: api/booking
         [HttpPost]
-        public async Task<IActionResult> CreateBooking([FromBody] List<Booking>? booking = null)
+        public async Task<IActionResult> CreateBooking(BookingRequest? booking = null)
         {
+            Console.WriteLine(booking.Customer.FullName.ToString());
+            // Handle Customer association with BookingOrder here
             if (booking != null)
             {
                 try
                 {
 
-                    int newBookingId = await _bookingdata.CreateBooking(booking);
+                    int newBookingId = await _bookingdata.CreateBooking(booking.Appointments);
 
                     if (newBookingId != 0)
                     {

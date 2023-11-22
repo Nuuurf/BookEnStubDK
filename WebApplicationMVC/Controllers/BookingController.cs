@@ -21,42 +21,48 @@ namespace WebApplicationMVC.Controllers {
 
         // API URL: /Booking/ConfirmBoooking/
         [HttpPost]
-        public async Task<IActionResult> BookAppointment([FromBody] List<string> dateTimes) {
+        public async Task<IActionResult> BookAppointment(string fullName, string email, string phoneNumber, string? notes, string jsonString) {
             List<NewBooking> bookingList = new List<NewBooking>();
             int id = -1;
-            
-            foreach (var dateTimeString in dateTimes)
-            {
-                if (DateTime.TryParse(dateTimeString, out DateTime parsedDateTime))
-                {
+            List<string> dateTimes = JsonConvert.DeserializeObject<List<string>>(jsonString);
+
+            foreach (var dateTimeString in dateTimes) {
+                if (DateTime.TryParse(dateTimeString, out DateTime parsedDateTime)) {
                     // Add to the list if the parsing is successful
-                    bookingList.Add(new NewBooking()
-                    {
+                    bookingList.Add(new NewBooking() {
                         TimeStart = parsedDateTime,
-                        TimeEnd = parsedDateTime.AddHours(1)
+                        TimeEnd = parsedDateTime.AddHours(1),
+                        Notes = notes
                     });
-                }
-                else
-                {
+                } else {
                     return BadRequest("Invalid DateTime format");
                 }
             }
-            
+
             try {
-                id = await SendBooking(bookingList);
+                Customer customer = new Customer {
+                    FullName = fullName,
+                    Email = email,
+                    Phone = phoneNumber
+                };
+                id = await SendBooking(bookingList, customer);
             } catch (Exception ex) {
                 Response.StatusCode = 500;
-                return Json(new { error = ex.Message });
+                return View("BookingError", ex.Message);
+                //return Json(new { error = ex.Message });
             }
-            return Ok(new { ID = id });
+            return View("BookingConfirmed", id);
         }
 
         // Send Booking to API Backend
-        // URL Booking being sent to: "https://localhost:7021/Booking/"
-        public async Task<int> SendBooking(List<NewBooking> appointments) {
+        public async Task<int> SendBooking(List<NewBooking> appointments, Customer customer) {
             int id = -1;
-            var jsonContent = System.Text.Json.JsonSerializer.Serialize(appointments);
-            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var data = new {
+                Appointments = appointments,
+                Customer = customer
+            };
+            string json = JsonConvert.SerializeObject(data);
+            HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
             using (HttpClient client = new HttpClient()) {
                 try {
@@ -80,6 +86,10 @@ namespace WebApplicationMVC.Controllers {
                     throw;
                 }
             }
+            var viewModel = new {
+                View = View("BookingConfirmed"),
+                ID = id
+            };
             return id;
         }
 

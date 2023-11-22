@@ -69,7 +69,7 @@ function processApiResponse(apiResponse) {
     if (apiResponse.error !== undefined) {
         var errorItem = $('<li>', {
             class: 'list-group-item d-flex justify-content-between align-items-center',
-            html: '<div class="">'+"Ugyldig dato eller dato er før i dag"+'</div>'
+            html: '<div class="">' + "Ugyldig dato eller dato er før i dag" + '</div>'
         });
         $('#available-times').append(errorItem);
         return;
@@ -138,7 +138,7 @@ function saveAppointmentsToLocalStorage() {
             time: selectedTime,
             datetime: dateTime
         };
-        
+
         // Push the appointment object to the array
         appointments.push(appointment);
     });
