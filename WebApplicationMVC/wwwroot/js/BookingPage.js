@@ -81,8 +81,6 @@ function processApiResponse(apiResponse) {
         var date = formatDate(item.timeStart);
         var availableStubs = item.availableStubs;
 
-        console.log(item.timeStart);
-
         var todaysDate = new Date();
         var [hours, minutes] = startTime.split('.');
         var [year, month, day] = date.split('/');
@@ -133,9 +131,7 @@ function saveAppointmentsToLocalStorage() {
         var hiddenDate = appointmentText.substr(0, firstHyphenIndex).trim();
         var selectedTime = appointmentText.substr(firstHyphenIndex + 1).trim();
 
-        console.log($(this));
         var dateTime = $(this).data('datetime');
-        console.log(dateTime);
         // Create an object for each appointment
         var appointment = {
             date: hiddenDate,

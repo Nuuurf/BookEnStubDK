@@ -38,7 +38,7 @@ namespace WebApplicationMVC.Controllers {
                 }
                 else
                 {
-                    return BadRequest("Invalid datetime format");
+                    return BadRequest("Invalid DateTime format");
                 }
             }
             
