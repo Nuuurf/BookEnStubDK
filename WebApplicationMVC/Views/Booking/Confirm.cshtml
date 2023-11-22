@@ -90,7 +90,7 @@
                     if (selectedAppointments) {
                         // Prepare the JSON object for the POST request
                         var postData = JSON.stringify({ appointments: selectedAppointments });
-                        errorUpdateButton(true);
+                        loadingButtonIcon(true);
                         // Make the POST request
                         $.ajax({
                             url: '@Url.Action("BookAppointment", "Booking")',
@@ -108,7 +108,7 @@
                                 var errorMessage = JSON.parse(xhr.responseText).error;
                                 console.log(errorMessage);
                                 $('#errorTextBox').text(errorMessage);
-                                errorUpdateButton(false);
+                                loadingButtonIcon(false);
                             }
                         });
                     } else {
