@@ -12,6 +12,8 @@ using Newtonsoft.Json.Serialization;
 
 namespace WebApplicationMVC.Controllers {
     public class BookingController : Controller {
+
+        //API URL: /Booking/Index/
         public IActionResult Index() {
             return View();
         }
@@ -20,7 +22,6 @@ namespace WebApplicationMVC.Controllers {
         [HttpPost]
         public async Task<IActionResult> BookAppointment([FromBody] List<TempBooking> data) {
             List<NewBooking> bookingList = new List<NewBooking>();
-            //NewBooking booking = new NewBooking();
             int id = -1;
 
             //Convert to correct Class
@@ -51,6 +52,8 @@ namespace WebApplicationMVC.Controllers {
             return Ok(new { ID = id });
         }
 
+        // Send Booking to API Backend
+        // URL Booking being sent to: "https://localhost:7021/Booking/"
         public async Task<int> SendBooking(List<NewBooking> appointments) {
             int id = -1;
             var jsonContent = System.Text.Json.JsonSerializer.Serialize(appointments);
@@ -71,10 +74,9 @@ namespace WebApplicationMVC.Controllers {
                         string errorMessage = await response.Content.ReadAsStringAsync();
                         string[] errorParts = errorMessage.Split(':'); // Splitting by ':' character
                         string actualErrorMessage = errorParts.Length > 1 ? errorParts[1].Trim() : errorMessage;
-
                         throw new Exception(actualErrorMessage);
                     }
-                } catch (Exception ex) {
+                } catch (Exception) {
                     // Handle exception
                     throw;
                 }
@@ -82,19 +84,8 @@ namespace WebApplicationMVC.Controllers {
             return id;
         }
 
-        private string ConvertJSONToCamelCase(string jsonString) {
-            List<Dictionary<string, object>> data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonString);
-
-            var settings = new JsonSerializerSettings {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-            string camelCaseJson = JsonConvert.SerializeObject(data, settings);
-
-            return camelCaseJson;
-        }
-
         // API URL: /Booking/Confirm
-        // Added to prevent Error page and force user to specific page
+        // Added to prevent error page and force user to "Index" page
         [HttpGet]
         public IActionResult Confirm() {
             return RedirectToAction("Index");
