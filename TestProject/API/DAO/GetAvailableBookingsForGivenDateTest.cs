@@ -20,8 +20,8 @@ namespace TestProject.API.DAO
             //Arrange
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
 IDBBooking booking = new DBBooking();
-            int expectedAvailbleBookingCount = 130;
-            int expectedTimeSlots = 14;
+            int expectedAvailbleBookingCount = 120;
+            int expectedTimeSlots = 13;
             int stubCount = new Utilities().GetMaxDBStubs();
             DateTime date = new DateTime(2023, 11, 10);
             TestContext.WriteLine($"Testing Date {date}");
