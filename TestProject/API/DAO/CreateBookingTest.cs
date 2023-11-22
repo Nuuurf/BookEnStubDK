@@ -20,7 +20,7 @@ public class CreateBookingTest
             TimeEnd = new DateTime(2023, 11, 10, 10, 0, 0),
             Notes = "Some generic notes",
             StubId = 1
-            //CustomerID = 1,
+            //CustomerId = 1,
             //StubID = 1,
         };
 
@@ -30,7 +30,7 @@ public class CreateBookingTest
             TimeEnd = new DateTime(2023, 11, 10, 11, 0, 0),
             Notes = "Some generic notes",
             StubId = 2
-            //CustomerID = 2,
+            //CustomerId = 2,
             //StubID = 1,
         };
 
@@ -40,7 +40,7 @@ public class CreateBookingTest
             TimeEnd = new DateTime(2023, 11, 10, 12, 0, 0),
             Notes = "Some generic notes",
             StubId = 3
-            //CustomerID = 3,
+            //CustomerId = 3,
             //StubID = 2,
         };
         public static IEnumerable<Booking> TestBookings
