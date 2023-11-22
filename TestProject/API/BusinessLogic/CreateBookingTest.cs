@@ -53,7 +53,7 @@ namespace TestProject.API.BusinessLogic
             var result = await controller.CreateBooking(booking);
 
             // Assert
-            Assert.AreEqual(1, result);
+            Assert.That(result, Is.EqualTo(1));
 
             mockDbTransaction.Verify(trans => trans.Commit(), Times.Once);
             mockDbTransaction.Verify(trans => trans.Rollback(), Times.Never);
@@ -61,7 +61,7 @@ namespace TestProject.API.BusinessLogic
 
 
         [Test]
-        public async Task CreateBooking_ThrowsArgumentException_WithPriorDate()
+        public Task CreateBooking_ThrowsArgumentException_WithPriorDate()
         {
             //Arrange
             var mockDBBokking = new Mock<IDBBooking>();
@@ -75,37 +75,41 @@ namespace TestProject.API.BusinessLogic
                 .ReturnsAsync(1);
 
 
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!);
 
             //Act   
             AsyncTestDelegate result = () => controller.CreateBooking(booking);
 
             //Assert
             Assert.ThrowsAsync<ArgumentException>(result);
+
+            return Task.CompletedTask;
         }
 
         [Test]
-        public async Task CreateBooking_ThrowsArgumentNullException_WithNullBooking()
+        public Task CreateBooking_ThrowsArgumentNullException_WithNullBooking()
         {
             //Arrange
-            var mockDBBokking = new Mock<IDBBooking>();
-            List<Booking> booking = null;
-            mockDBBokking.Setup(repo => repo.CreateBooking(
+            var mockDbBokking = new Mock<IDBBooking>();
+            List<Booking> booking = null!;
+            mockDbBokking.Setup(repo => repo.CreateBooking(
                     It.IsAny<IDbConnection>(),
                     It.IsAny<Booking>(),
                     It.IsAny<int>(), It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(1);
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
+            BookingDataControl controller = new BookingDataControl(mockDbBokking.Object, null!);
 
             //Act   
-            AsyncTestDelegate result = () => controller.CreateBooking(booking);
+            AsyncTestDelegate result = () => controller.CreateBooking(booking!);
 
             //Assert
             Assert.ThrowsAsync<ArgumentNullException>(result);
+
+            return Task.CompletedTask;
         }
 
         [Test]
-        public async Task CreateBooking_ThrowsArgumentException_WithEndDateEarlierThanStart()
+        public Task CreateBooking_ThrowsArgumentException_WithEndDateEarlierThanStart()
         {
             //Arrange
             var mockDBBokking = new Mock<IDBBooking>();
@@ -116,17 +120,19 @@ namespace TestProject.API.BusinessLogic
                     It.IsAny<int>(),
                     It.IsAny<IDbTransaction>()))
                 .ReturnsAsync(1);
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!);
 
             //Act   
             AsyncTestDelegate result = () => controller.CreateBooking(booking);
 
             //Assert
             Assert.ThrowsAsync<ArgumentException>(result);
+
+            return Task.CompletedTask;
         }
 
 [Test]        
-        public async Task CreateBooking_ThrowsException_WithNoAvailbableStubsForBooking()
+        public Task CreateBooking_ThrowsException_WithNoAvailbableStubsForBooking()
         {
             //Arrange
             var mockDBBooking = new Mock<IDBBooking>();
@@ -156,10 +162,12 @@ namespace TestProject.API.BusinessLogic
             Assert.ThrowsAsync<Exception>(result);
             mockDbTransaction.Verify(trans => trans.Commit(), Times.Never);
             mockDbTransaction.Verify(trans => trans.Rollback(), Times.Once);
+
+            return Task.CompletedTask;
         }
 
         [Test]
-        public async Task CreateBooking_DatabaseThrowsException()
+        public Task CreateBooking_DatabaseThrowsException()
         {
             //Arrange
             var mockDBBooking = new Mock<IDBBooking>();
@@ -189,6 +197,8 @@ namespace TestProject.API.BusinessLogic
 
             //Assert
             Assert.ThrowsAsync<Exception>(result);
+
+            return Task.CompletedTask;
         }
 
     }

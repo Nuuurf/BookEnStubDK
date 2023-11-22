@@ -57,8 +57,8 @@ namespace TestProject.API.Controller
 
             //Assert
             Assert.NotNull(result);
-            Assert.AreEqual(bookings, result.Value);
-            Assert.AreEqual(200, result.StatusCode);
+            Assert.That(result.Value, Is.EqualTo(bookings));
+            Assert.That(result.StatusCode, Is.EqualTo(200));
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace TestProject.API.Controller
             //Arrange
             var mockDBBokking = new Mock<IBookingData>();
 
-            List<Booking> nullList = null;
+            List<Booking> nullList = null!;
             mockDBBokking.Setup(repo => repo.GetBookingsInTimeslot(It.IsAny<DateTime>(), It.IsAny<DateTime>())).ReturnsAsync(nullList);
 
             BookingController controller = new BookingController(mockDBBokking.Object);
@@ -103,7 +103,7 @@ namespace TestProject.API.Controller
             //Assert
             if (result is ObjectResult objectResult)
             {
-                Assert.AreEqual(500, objectResult.StatusCode);
+                Assert.That(objectResult.StatusCode, Is.EqualTo(500));
             }
             Assert.IsInstanceOf<ObjectResult>(result);
         }

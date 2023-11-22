@@ -31,7 +31,7 @@ namespace TestProject.API.Controller
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(200, result.StatusCode);
+            Assert.That(result.StatusCode, Is.EqualTo(200));
         }
 
         [TestCase("Test", TestName = "Parse word as date")]
@@ -55,7 +55,7 @@ namespace TestProject.API.Controller
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(400, result.StatusCode);
+            Assert.That(result.StatusCode, Is.EqualTo(400));
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace TestProject.API.Controller
             DateTime priorDay = DateTime.Now.Date.AddDays(-1);
             var mockDBBokking = new Mock<IBookingData>();
 
-            List<AvailableBookingsForTimeframe> nullList = null;
+            List<AvailableBookingsForTimeframe> nullList = null!;
             mockDBBokking.Setup(repo => repo.GetAvailableBookingsForGivenDate(priorDay)).ReturnsAsync(nullList);
 
             BookingController controller = new BookingController(mockDBBokking.Object);
@@ -78,19 +78,19 @@ namespace TestProject.API.Controller
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(400, result.StatusCode);
+            Assert.That(result.StatusCode, Is.EqualTo(400));
         }
 
         [Test]
         public async Task GetBookingForGivenDate_ThrowsException_InternalError()
         {
             //Arrange
-            var mockDBBokking = new Mock<IBookingData>();
+            var mockDbBokking = new Mock<IBookingData>();
             DateTime date = DateTime.Now.Date.AddDays(1);
-            mockDBBokking.Setup(repo => repo.GetAvailableBookingsForGivenDate(It.IsAny<DateTime>()))
+            mockDbBokking.Setup(repo => repo.GetAvailableBookingsForGivenDate(It.IsAny<DateTime>()))
                 .Throws(new Exception());
 
-            BookingController controller = new BookingController(mockDBBokking.Object);
+            BookingController controller = new BookingController(mockDbBokking.Object);
             string stringDate = date.ToString("yyyy-MM-dd");
             //Act
 
@@ -100,7 +100,7 @@ namespace TestProject.API.Controller
             //Assert
             if (result is ObjectResult objectResult)
             {
-                Assert.AreEqual(500, objectResult.StatusCode);
+                Assert.That(objectResult.StatusCode, Is.EqualTo(500));
             }
             Assert.IsInstanceOf<ObjectResult>(result);
         }
