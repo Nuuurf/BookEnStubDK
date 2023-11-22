@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using RestfulApi.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 
@@ -48,17 +49,17 @@ namespace RestfulApi.DAL {
         }
 
         //Persists customer information in database.
-        public async Task<int> CreateCustomer(IDbConnection conn, string cname, string cphone, string cemail, IDbTransaction trans = null) {
+        public async Task<int> CreateCustomer(IDbConnection conn, Customer customer, IDbTransaction trans = null) {
             int result = -1; // Default fail value
             string scriptIfExists = "SELECT Id FROM customer WHERE phone = @phone AND email = @email";
             string scriptInsertCustomer = "INSERT INTO customer (name, phone, email) OUTPUT INSERTED.Id VALUES (@name, @phone, @email)";
 
             try {
-                var parameters = new { phone = cphone, email = cemail };
+                var parameters = new { phone = customer.Phone, email = customer.Email};
                 result = await conn.QueryFirstOrDefaultAsync<int>(scriptIfExists, parameters, transaction: trans);
 
                 if (result == 0) {
-                    var parametersCreateNew = new { name = cname, phone = cphone, email = cemail };
+                    var parametersCreateNew = new { name = customer.FirstName, phone = customer.Phone, email = customer.Email };
                     result = (int)await conn.ExecuteScalarAsync(scriptInsertCustomer, parametersCreateNew, transaction: trans);
                 }
             }

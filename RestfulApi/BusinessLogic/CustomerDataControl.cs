@@ -1,5 +1,6 @@
 ﻿
 using RestfulApi.DAL;
+using RestfulApi.Models;
 using System.Data;
 
 namespace RestfulApi.BusinessLogic {
@@ -16,11 +17,11 @@ namespace RestfulApi.BusinessLogic {
             throw new NotImplementedException();
         }
 
-        public async Task<int> CreateCustomer(IDbConnection conn, string cname, string cphone, string cemail, IDbTransaction trans = null) {
+        public async Task<int> CreateCustomer(IDbConnection conn, Customer customer, IDbTransaction trans = null) {
             int result = -1;
             //we assume that inputs are sanitiezed somewhere before here
             try {
-                result = await _dbCustomer.CreateCustomer(conn, cname, cphone, cemail, trans);
+                result = await _dbCustomer.CreateCustomer(conn, customer, trans);
                 //Extra precaution
                 if(result <= 0) {
                     throw new Exception("IDBCusomter returned invalid customer id. Id: " + result);

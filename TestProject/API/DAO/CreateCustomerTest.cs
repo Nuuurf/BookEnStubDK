@@ -28,12 +28,18 @@ namespace TestProject.API.DAO {
             string name = "Lars";
             string phone = "88888888";
             string email = "Lars@lortemail.dk";
+
+            Customer customer = new Customer {
+                FirstName = name,
+                Phone = phone,
+                Email = email
+            };
             int result = -1;
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
 
             //Act
             using (IDbTransaction trans = conn.BeginTransaction()) {
-                result = await _DbCustomer.CreateCustomer(conn, name, phone, email, trans);
+                result = await _DbCustomer.CreateCustomer(conn, customer, trans);
                 trans.Rollback();
             }
 
@@ -48,6 +54,13 @@ namespace TestProject.API.DAO {
             string name = "Lars";
             string phone = "88888887";
             string email = "Lars2@lortemail.dk";
+
+            Customer customer = new Customer {
+                FirstName = name,
+                Phone = phone,
+                Email = email
+            };
+
             int resultCompare = -2;
             int result = -1;
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
@@ -57,10 +70,10 @@ namespace TestProject.API.DAO {
             //Act 
             using (IDbTransaction trans = conn.BeginTransaction(System.Data.IsolationLevel.Serializable)) {
                 //insert customer first time retrieve unique id.
-                resultCompare = await _DbCustomer.CreateCustomer(conn, name, phone, email, trans);
+                resultCompare = await _DbCustomer.CreateCustomer(conn, customer, trans);
 
                 //insert same customer information again, retrieve same id as first time.
-                result = await _DbCustomer.CreateCustomer(conn, name, phone, email, trans);
+                result = await _DbCustomer.CreateCustomer(conn, customer, trans);
 
                 trans.Rollback();
             }
