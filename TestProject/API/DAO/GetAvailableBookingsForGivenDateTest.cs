@@ -15,7 +15,7 @@ namespace TestProject.API.DAO
     public class GetAvailableBookingsForGivenDateTest
     {
         [Test]
-        public async Task GetAvailableBookingsForGivenDate_ShouldReturn133AvailableBookings_WithValidDate()
+        public async Task GetAvailableBookingsForGivenDate_ShouldReturn120AvailableBookings_WithValidDate()
         {
             //Arrange
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();

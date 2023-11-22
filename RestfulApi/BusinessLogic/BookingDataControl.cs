@@ -82,7 +82,11 @@ namespace RestfulApi.BusinessLogic {
         private bool ValidateBookingDates(Booking booking) {
             bool validDates = false;
 
-            if (booking.TimeStart >= DateTime.Now.ToUniversalTime().AddMinutes(-1) && booking.TimeEnd > DateTime.Now.ToUniversalTime()) {
+            if(booking.TimeStart.Hour < 9 || booking.TimeStart.Hour > 21 || booking.TimeEnd.Hour < 10 || booking.TimeEnd.Hour > 22)
+            {
+                new ArgumentException("Bookings are outside of current opening hours");
+            }
+            else if (booking.TimeStart >= DateTime.Now.ToUniversalTime().AddMinutes(-1) && booking.TimeEnd > DateTime.Now.ToUniversalTime()) {
                 if (booking.TimeStart < booking.TimeEnd) {
                     validDates = true;
                 }
