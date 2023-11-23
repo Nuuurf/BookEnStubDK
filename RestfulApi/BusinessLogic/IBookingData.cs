@@ -3,7 +3,7 @@
 namespace RestfulApi.BusinessLogic {
     public interface IBookingData {
         
-        public Task<int> CreateBooking(List<Booking> booking);
+        public Task<int> CreateBooking(List<Booking> booking, Customer customer);
         
         public Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(DateTime date);
         

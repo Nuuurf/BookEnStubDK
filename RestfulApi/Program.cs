@@ -15,8 +15,9 @@ builder.Services.AddScoped<IDbConnection>(provider =>
     return connection;
 });
 
-
 builder.Services.AddScoped<IBookingData, BookingDataControl>();
+builder.Services.AddScoped<ICustomerData, CustomerDataControl>();
+builder.Services.AddScoped<IDBCustomer, DBCustomer>();
 builder.Services.AddScoped<IDBBooking, DBBooking>();
 //builder.Services.AddScoped<IDBBooking>(serviceProvider => {
 //    var connection = serviceProvider.GetRequiredService<SqlConnection>(); // Assuming you have a SqlConnection registered

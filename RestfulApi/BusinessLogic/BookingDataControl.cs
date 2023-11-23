@@ -11,14 +11,16 @@ namespace RestfulApi.BusinessLogic {
 
         private readonly IDBBooking _dBBooking;
         private readonly IDbConnection _connection;
+        private readonly ICustomerData _customerData;
         //Ready for dependency injection
-        public BookingDataControl(IDBBooking dbBooking, IDbConnection connection) {
+        public BookingDataControl(IDBBooking dbBooking, ICustomerData customerControl ,IDbConnection connection) {
             //Needs to change with injection
             _dBBooking = dbBooking;
             _connection = connection;
+            _customerData = customerControl;
         }
 
-        public async Task<int> CreateBooking(List<Booking> bookings) {
+        public async Task<int> CreateBooking(List<Booking> bookings, Customer customer) {
             //If null return exception
             if (bookings == null) {
                 throw new ArgumentNullException("Booking is null");
@@ -29,14 +31,28 @@ namespace RestfulApi.BusinessLogic {
                 throw new ArgumentException("Booking date format exception. Booking start date exceeds bookings end date");
             }
 
-            //Assign id to default error value
+            //Assign id to default error values
             int newBookingOrderId = -1;
+            int customerId = -1;
+
+            //check if some error is not caught 
+            bool wasAssociated = false;
 
             using (var transaction = _connection.BeginTransaction(System.Data.IsolationLevel.Serializable)) {
                 try {
 
-                    //Checks specific to existing data, made in DB through stored procedure.
+                    //Create a new booking order and retrieve its id
                     newBookingOrderId = await _dBBooking.CreateNewBookingOrder(_connection, transaction);
+
+                    //create or retrieve customer id
+                    customerId = await _customerData.CreateCustomer(_connection, customer, transaction);
+
+                    //associate customer id with booking order
+                    wasAssociated = await _customerData.AssociateCustomerWithBookingOrder(_connection, customerId, newBookingOrderId, transaction);
+
+                    if(!wasAssociated) {
+                        throw new Exception("An error occured while associating customer with booking order. Customer id: " + customerId + ". BookingOrderId: " + newBookingOrderId);
+                    }
 
                     //Persist each booking from input
                     foreach (Booking b in bookings) {

@@ -24,6 +24,9 @@ namespace WebApplicationMVC.Controllers {
         public async Task<IActionResult> BookAppointment(string fullName, string email, string phoneNumber, string? notes, string jsonString) {
             List<NewBooking> bookingList = new List<NewBooking>();
             int id = -1;
+            //fix for exception if notes are null :)
+            if (notes == null) { notes = String.Empty; }
+
             List<string> dateTimes = JsonConvert.DeserializeObject<List<string>>(jsonString);
 
             foreach (var dateTimeString in dateTimes) {

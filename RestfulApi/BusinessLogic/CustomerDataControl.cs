@@ -13,8 +13,16 @@ namespace RestfulApi.BusinessLogic {
             _connection = connection;
         }
 
-        public Task<bool> AssociateCustomerWithBookingOrder(IDbConnection conn, int inBookingOrderId, int inCustomerId, IDbTransaction trans = null) {
-            throw new NotImplementedException();
+        // TODO : Write simple test for fail and success
+        public async Task<bool> AssociateCustomerWithBookingOrder(IDbConnection conn, int customerId, int orderId, IDbTransaction trans = null) {
+            bool result = false;
+            try {
+                result = await _dbCustomer.AssociateCustomerWithBookingOrder(conn, orderId, customerId, trans);
+            }
+            catch {
+                throw;
+            }
+            return result;
         }
 
         public async Task<int> CreateCustomer(IDbConnection conn, Customer customer, IDbTransaction trans = null) {

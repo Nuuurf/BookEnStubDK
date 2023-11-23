@@ -1,6 +1,8 @@
-﻿namespace RestfulApi.Models {
+﻿using RestfulApi.DTOs;
+
+namespace RestfulApi.Models {
     public class BookingRequest {
-        public List<Booking> Appointments { get; set; }
-        public Customer Customer { get; set; }
+        public List<DTONewBooking> Appointments { get; set; }
+        public DTOCustomer Customer { get; set; }
     }
 }

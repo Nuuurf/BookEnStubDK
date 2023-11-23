@@ -4,6 +4,8 @@ using RestfulApi.DAL;
 using RestfulApi.Models;
 using System.Data.SqlClient;
 using System.Globalization;
+using RestfulApi.DTOs;
+using System.ComponentModel.DataAnnotations;
 
 namespace RestfulApi.Controllers
 {
@@ -101,14 +103,28 @@ namespace RestfulApi.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBooking(BookingRequest? booking = null)
         {
-            Console.WriteLine(booking.Customer.FullName.ToString());
+            //Console.WriteLine(booking.Customer.FullName.ToString());
             // Handle Customer association with BookingOrder here
             if (booking != null)
             {
+                List<DTONewBooking> dtos = booking.Appointments;
+                List<Booking> bookings = dtos.Select(itemA => new Booking {
+                    // Map properties from ObjectTypeA to ObjectTypeB
+                    TimeStart = itemA.TimeStart,
+                    TimeEnd = itemA.TimeEnd,
+                    Notes = itemA.Notes,
+                }).ToList();
+
+                Customer customer = new Customer {
+                    FirstName = booking.Customer.FullName,
+                    Phone = booking.Customer.Phone,
+                    Email = booking.Customer.Email
+                };
+
                 try
                 {
 
-                    int newBookingId = await _bookingdata.CreateBooking(booking.Appointments);
+                    int newBookingId = await _bookingdata.CreateBooking(bookings, customer);
 
                     if (newBookingId != 0)
                     {
