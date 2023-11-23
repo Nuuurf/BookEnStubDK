@@ -32,7 +32,7 @@
                                 <input type="text" class="form-control datepicker" id="dateInput">
                                 <div class="input-group-append">
                                     <button class="input-group-text" id="date-search-btn">
-                                       <strong class="pr-2">Søg </strong><i class="fa fa-calendar"></i>
+                                        <strong class="pr-2">Søg </strong><i class="fa fa-calendar"></i>
                                     </button>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@
                     });
                 });
             });
-
+            // Runs a POST request to send over bookings
             $(document).ready(function () {
                 $('.confirm-booking-btn').on('click', function () {
                     saveAppointmentsToLocalStorage();
@@ -121,7 +121,7 @@
                     if (selectedAppointments != null) {
                         $.ajax({
                             url: '@Url.Action("Confirm", "Booking")',
-                            type: 'POST', // Change the type to POST
+                            type: 'POST',
                             contentType: 'application/json', // Set content type to specify JSON data
                             data: JSON.stringify("Confirm"),
                             success: function (response) {
@@ -134,7 +134,7 @@
                             }
                         });
                     } else {
-                        Console.log("No appointments for booking added")
+                        console.log("No appointments for booking added")
                     }
                 });
             });

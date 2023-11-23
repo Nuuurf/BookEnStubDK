@@ -4,7 +4,7 @@
     {
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public string Notes { get; set; }
-        public int CustomerID { get; set; }
+        public string? Notes { get; set; }
+        public int CustomerId { get; set; }
     }
 }

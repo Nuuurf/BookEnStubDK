@@ -9,54 +9,60 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json.Nodes;
 using Newtonsoft.Json.Serialization;
+using System;
 
 namespace WebApplicationMVC.Controllers {
     public class BookingController : Controller {
+
+        //API URL: /Booking/Index/
         public IActionResult Index() {
             return View();
         }
 
         // API URL: /Booking/ConfirmBoooking/
         [HttpPost]
-        public async Task<IActionResult> BookAppointment([FromBody] List<TempBooking> data) {
+        public async Task<IActionResult> BookAppointment(string fullName, string email, string phoneNumber, string? notes, string jsonString) {
             List<NewBooking> bookingList = new List<NewBooking>();
-            NewBooking booking = new NewBooking();
             int id = -1;
+            List<string> dateTimes = JsonConvert.DeserializeObject<List<string>>(jsonString);
 
-            //Convert to correct Class
-            foreach (TempBooking item in data) {
-                string[] timeParts = item.Time.Split('-');
-                string startTime = timeParts[0].Trim();
-                string endTime = timeParts[1].Trim();
-                DateTime date = DateTime.ParseExact(item.Date, "yyyy/MM/dd", CultureInfo.InvariantCulture);
-                TimeSpan.TryParseExact(startTime, "hh\\.mm", CultureInfo.InvariantCulture, out TimeSpan timeStart);
-                TimeSpan.TryParseExact(endTime, "hh\\.mm", CultureInfo.InvariantCulture, out TimeSpan timeEnd);
-
-                DateTime combinedDateTimeStart = date.Date + timeStart;
-                DateTime combinedDateTimeEnd = date.Date + timeEnd;
-
-                booking.TimeStart = combinedDateTimeStart.ToUniversalTime(); //Convert time
-                booking.TimeEnd = combinedDateTimeEnd.ToUniversalTime();
-                booking.Notes = "";
-                bookingList.Add(booking);
+            foreach (var dateTimeString in dateTimes) {
+                if (DateTime.TryParse(dateTimeString, out DateTime parsedDateTime)) {
+                    // Add to the list if the parsing is successful
+                    bookingList.Add(new NewBooking() {
+                        TimeStart = parsedDateTime,
+                        TimeEnd = parsedDateTime.AddHours(1),
+                        Notes = notes
+                    });
+                } else {
+                    return BadRequest("Invalid DateTime format");
+                }
             }
-
-            string jsonString = JsonConvert.SerializeObject(bookingList).ToString();
-            string jsonStringWithoutBackslashes = jsonString.Replace("\\", "");
 
             try {
-                id = await SendBooking(jsonStringWithoutBackslashes);
-            } catch (Exception) {
-                throw;
+                Customer customer = new Customer {
+                    FullName = fullName,
+                    Email = email,
+                    Phone = phoneNumber
+                };
+                id = await SendBooking(bookingList, customer);
+            } catch (Exception ex) {
+                Response.StatusCode = 500;
+                return View("BookingError", ex.Message);
+                //return Json(new { error = ex.Message });
             }
-            return Ok(new { ID = id });
+            return View("BookingConfirmed", id);
         }
 
-        public async Task<int> SendBooking(string appointments) {
+        // Send Booking to API Backend
+        public async Task<int> SendBooking(List<NewBooking> appointments, Customer customer) {
             int id = -1;
-            string camelCaseJson = ConvertJSONToCamelCase(appointments);
-
-            HttpContent content = new StringContent(camelCaseJson, Encoding.UTF8, "application/json");
+            var data = new {
+                Appointments = appointments,
+                Customer = customer
+            };
+            string json = JsonConvert.SerializeObject(data);
+            HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
             using (HttpClient client = new HttpClient()) {
                 try {
@@ -70,30 +76,25 @@ namespace WebApplicationMVC.Controllers {
                         int.TryParse(responseData, out id);
                     } else {
                         // Handle unsuccessful response
-                        throw new Exception(response.Content.ToString());
+                        string errorMessage = await response.Content.ReadAsStringAsync();
+                        string[] errorParts = errorMessage.Split(':'); // Splitting by ':' character
+                        string actualErrorMessage = errorParts.Length > 1 ? errorParts[1].Trim() : errorMessage;
+                        throw new Exception(actualErrorMessage);
                     }
-                } catch (Exception ex) {
+                } catch (Exception) {
                     // Handle exception
                     throw;
                 }
             }
-            return (id);
-        }
-
-        private string ConvertJSONToCamelCase(string jsonString) {
-            List<Dictionary<string, object>> data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonString);
-
-
-            var settings = new JsonSerializerSettings {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            var viewModel = new {
+                View = View("BookingConfirmed"),
+                ID = id
             };
-            string camelCaseJson = JsonConvert.SerializeObject(data, settings);
-
-            return camelCaseJson;
+            return id;
         }
 
         // API URL: /Booking/Confirm
-        // Added to prevent Error page and force user to specific page
+        // Added to prevent error page and force user to "Index" page
         [HttpGet]
         public IActionResult Confirm() {
             return RedirectToAction("Index");

@@ -46,7 +46,7 @@ namespace RestfulApi.BusinessLogic {
                     //If no exceptions have been thrown, every thing went right. Commit
                     transaction.Commit();
                 }
-                catch (Exception ex) {
+                catch{
                     //Something went wrong. Rollback
                     transaction.Rollback();
 
@@ -59,13 +59,11 @@ namespace RestfulApi.BusinessLogic {
             }
         }
 
-
-
         public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(DateTime date) {
             DateTime currentDate = DateTime.Now.Date;
 
             if (date < currentDate) {
-                return null;
+                return null!;
             }
             List<AvailableBookingsForTimeframe> availableBookings = await _dBBooking.GetAvailableBookingsForGivenDate(_connection, date);
 
@@ -74,7 +72,7 @@ namespace RestfulApi.BusinessLogic {
 
         public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end) {
             if (start > end) {
-                return null;
+                return null!;
             }
             List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(_connection, start, end);
 
@@ -84,7 +82,11 @@ namespace RestfulApi.BusinessLogic {
         private bool ValidateBookingDates(Booking booking) {
             bool validDates = false;
 
-            if (booking.TimeStart >= DateTime.Now.ToUniversalTime().AddMinutes(-1) && booking.TimeEnd > DateTime.Now.ToUniversalTime()) {
+            if(booking.TimeStart.Hour < 9 || booking.TimeStart.Hour > 21 || booking.TimeEnd.Hour < 10 || booking.TimeEnd.Hour > 22)
+            {
+                new ArgumentException("Bookings are outside of current opening hours");
+            }
+            else if (booking.TimeStart >= DateTime.Now.ToUniversalTime().AddMinutes(-1) && booking.TimeEnd > DateTime.Now.ToUniversalTime()) {
                 if (booking.TimeStart < booking.TimeEnd) {
                     validDates = true;
                 }

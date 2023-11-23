@@ -57,7 +57,7 @@ namespace TestProject.API.Control {
         }
 
         [Test]
-        public async Task CreateBooking_ShouldThrowArgumentException()
+        public Task CreateBooking_ShouldThrowArgumentException()
         {
             //Arrange
             BookingDataControl bdc = new BookingDataControl(new DBBooking(), _connection);
@@ -78,6 +78,8 @@ namespace TestProject.API.Control {
 
             //Assert
             Assert.ThrowsAsync<ArgumentException>(act);
+
+            return Task.CompletedTask;
         }
     }
 }

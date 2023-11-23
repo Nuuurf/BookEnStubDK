@@ -2,11 +2,7 @@
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
-using Microsoft.VisualBasic;
-using System.Data;
-using System.Linq.Expressions;
-using System.Transactions;
-using System.Data.Common;
+
 
 namespace RestfulApi.DAL {
     public class DBBooking : IDBBooking {
@@ -22,7 +18,7 @@ namespace RestfulApi.DAL {
         /// <param name="booking"> the booking object that needs to be persisted</param>
         /// <param name="transaction"></param>
         /// <returns>A boolean indicading where the action was successful or not</returns>
-        public async Task<int> CreateBooking(IDbConnection conn, Booking booking, int bookingOrderID, IDbTransaction transaction = null)
+        public async Task<int> CreateBooking(IDbConnection conn, Booking booking, int bookingOrderID, IDbTransaction transaction = null!)
         {
             string script = "InsertBooking";
             int newBookingId = 0;
@@ -33,7 +29,7 @@ namespace RestfulApi.DAL {
 
                 newBookingId = result;
             }
-            catch(Exception ex)
+            catch
             {
                 throw;
             }
@@ -41,7 +37,7 @@ namespace RestfulApi.DAL {
         }
 
         // Not implemented
-        public async Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, DateTime start, DateTime end, IDbTransaction transaction = null)
+        public async Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, DateTime start, DateTime end, IDbTransaction transaction = null!)
         {
             string script = "SELECT id, TimeStart, TimeEnd, Notes, StubId FROM Booking WHERE TimeStart < @TimeEnd AND TimeEnd > @TimeStart";
 
@@ -53,12 +49,12 @@ namespace RestfulApi.DAL {
             }
             catch {
                 //if it fails send null for error handling in blc
-                bookings = null;
+                bookings = null!;
             }
 
             return bookings.ToList();
         }
-        public async Task<int> CreateNewBookingOrder(IDbConnection conn, IDbTransaction trans = null)
+        public async Task<int> CreateNewBookingOrder(IDbConnection conn, IDbTransaction trans = null!)
         {
             const string insertBookingOrderQuery = "INSERT INTO BookingOrder DEFAULT VALUES; SELECT SCOPE_IDENTITY();";
             int bookingOrderId = -1;
@@ -80,7 +76,7 @@ namespace RestfulApi.DAL {
         }
         
 
-        public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null) {
+        public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null!) {
             string script = "dbo.GetAvailableBookingsForDate";
 
             try {

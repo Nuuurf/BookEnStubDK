@@ -4,7 +4,7 @@ using RestfulApi.Models;
 namespace RestfulApi.DAL {
     public interface IDBBooking {
 
-        public Task<int> CreateBooking(IDbConnection conn, Booking booking, int bookingOrderID, IDbTransaction transaction = null);
+        public Task<int> CreateBooking(IDbConnection conn, Booking booking, int bookingOrderID, IDbTransaction transaction = null!);
 
         public Task<int> CreateNewBookingOrder(IDbConnection conn, IDbTransaction trans);
 
@@ -12,9 +12,9 @@ namespace RestfulApi.DAL {
 
         //bool UpdateBooking(int bookingID, Booking booking);
 
-        public Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, DateTime start, DateTime end, IDbTransaction transaction = null);
+        public Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, DateTime start, DateTime end, IDbTransaction transaction = null!);
 
-        public Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null);
+        public Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null!);
 
     }
 }

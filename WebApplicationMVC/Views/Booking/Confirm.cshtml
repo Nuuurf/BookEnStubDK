@@ -38,34 +38,39 @@
                             <h5 class="mb-0">Booking oplysninger</h5>
                         </div>
                         <div class="card-body">
-                            <form>
+                            <form asp-controller="Booking" asp-action="BookAppointment" method="post">
                                 <!-- Full Name -->
                                 <div class="mb-3">
                                     <label for="fullName" class="form-label">Fulde Navn</label>
-                                    <input type="text" class="form-control" id="fullName" placeholder="Ex: Lars Larsen">
+                                    <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Ex: Lars Larsen" required>
                                 </div>
 
                                 <!-- Email -->
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" placeholder="Ex: lars@email.dk">
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="Ex: lars@email.dk" required>
                                 </div>
 
                                 <!-- Phone Number -->
                                 <div class="mb-3">
                                     <label for="phoneNumber" class="form-label">Telefonnummer</label>
-                                    <input type="tel" class="form-control" id="phoneNumber" placeholder="Ex: +45 88 88 88 88">
+                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Ex: +45 88 88 88 88" required>
                                 </div>
 
                                 <!-- Notes -->
                                 <div class="mb-3">
                                     <label for="notes" class="form-label">Kommentar</label>
-                                    <input type="text" class="form-control" id="notes" placeholder="Ex: Fødselsdag, kan vi få flag?">
+                                    <input type="text" class="form-control" id="notes" name="notes" placeholder="Ex: Fødselsdag, kan vi få flag?">
                                 </div>
 
+                                <!-- Hidden field for JSON -->
+                                <input type="hidden" class="form-control" id="jsonString" name="jsonString" />
+
                                 <!-- Submit Button -->
-                                <button type="button" class="btn btn-success btn-book-confirm">Bekræft Booking</button>
+                                <button type="submit" class="btn btn-success btn-book-confirm">Bekræft Booking </button>
+                                <p class="text-danger font-italic text-center" id="errorTextBox"></p>
                             </form>
+
                         </div>
                     </div>
                 </div>
@@ -87,15 +92,35 @@
                     var selectedAppointments = localStorage.getItem('selectedAppointments');
 
                     if (selectedAppointments) {
-                        // Prepare the JSON object for the POST request
-                        var postData = JSON.stringify({ appointments: selectedAppointments });
+                        // Parse the stored string back into an object
+                        var appointments = JSON.parse(selectedAppointments);
 
+                        // Extract only the datetime values from the appointments
+                        var datetimeValues = appointments.map(function (appointment) {
+                            return appointment.datetime;
+                        });
+
+                        // Prepare the JSON object for the POST request
+                        var postData = JSON.stringify(datetimeValues);
+
+                        if (selectedAppointments !== null) {
+                            // Update the value of the hidden field
+                            $('#jsonString').val(postData);
+                        }
+
+                        //
+                        //
+                        //
+                        // <summary DEPRECATED <summary>
+                        //
+                        //
+                        /*
                         // Make the POST request
                         $.ajax({
                             url: '@Url.Action("BookAppointment", "Booking")',
                             type: 'POST',
                             contentType: 'application/json',
-                            data: selectedAppointments,
+                            data: postData,
                             success: function (response) {
                                 // Handle success
                                 var id = response.id;
@@ -103,52 +128,68 @@
                                 console.log('Booking confirmed, ID:', id);
                             },
                             error: function (xhr, status, error) {
-                                // Handle error
-                                console.error('Error confirming booking:', error);
-                                errorUpdateButton();
+                                // Handle error, since it can be in two different formats
+                                try {
+                                    var parsedResponse = $.parseJSON(xhr.responseText);
+
+                                    if (parsedResponse && parsedResponse.error) {
+                                        var errorMessage = parsedResponse.error;
+                                        console.log('Error message:', errorMessage);
+                                        $('#errorTextBox').text(errorMessage);
+                                    }
+                                } catch (parseError) {
+                                    var errorMessage = xhr.responseText;
+                                    $('#errorTextBox').text(errorMessage);
+                                }
+                                loadingButtonIcon(false);
                             }
-                        });
+                        });*/
                     } else {
                         console.log('No appointments found in local storage');
                     }
                 });
             });
 
-            function errorUpdateButton() {
-                $('.btn-book-confirm').text('Fejl Opstod!').removeClass('btn-success').addClass('btn-danger');
+            function loadingButtonIcon(enabled) {
+                if (enabled) {
+                    $('.btn-book-confirm').append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+                } else {
+                    $('.btn-book-confirm').find('span.spinner-border').remove();
+                }
             }
 
             function showBookingConfirmation(id) {
                 // Create a confirmation modal using Bootstrap classes
                 var confirmationModal = `
-                                    <div class="container mt-5">
-                                        <div class="row justify-content-center">
-                                            <div class="col-md-6">
-                                                <div class="card">
-                                                    <div class="card-header">
-                                                        <h5 class="mb-0">Booking Information</h5>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="text-center">
-                                                            <div class="icon-box">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-check-circle-fill text-success" viewBox="0 0 16 16">
-                                                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                                                                </svg>
-                                                            </div>
-                                                            <h4 class="mt-4">Booking Bekræftet!</h4>
-                                                            <p>Din reservation er blevet bekræftet.</p>
-                                                            <p>Dit Booking-ID er: ` + id + `</p>
-                                                            <a href="/Booking/Index" class="btn btn-success">Gå Tilbage</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                                                                                                                                                                            <div class="container mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Booking Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <div class="icon-box">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-check-circle-fill text-success" viewBox="0 0 16 16">
+                                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                            </svg>
                                         </div>
-                                    </div>`;
+                                        <h4 class="mt-4">Booking Bekræftet!</h4>
+                                        <p>Din reservation er blevet bekræftet.</p>
+                                        <p>Dit Booking-ID er: ` + id + `</p>
+                                        <a href="/Booking/Index" class="btn btn-success">Gå Tilbage</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
 
                 // Replace the entire body with the modal content
                 $('body').html(confirmationModal);
             }
+                     
         </script>
     </body>
     </html>

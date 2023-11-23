@@ -22,16 +22,16 @@ namespace TestProject.API.BusinessLogic
 
             DateTime date = DateTime.Now.Date;
             List<AvailableBookingsForTimeframe> availableBookings = new List<AvailableBookingsForTimeframe>();
-            mockDBBokking.Setup(repo => repo.GetAvailableBookingsForGivenDate( null, date, null)).ReturnsAsync(availableBookings);
+            mockDBBokking.Setup(repo => repo.GetAvailableBookingsForGivenDate( null!, date, null!)).ReturnsAsync(availableBookings);
 
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!);
 
             //Act   
             var result = await controller.GetAvailableBookingsForGivenDate(date);
 
             //Assert
             Assert.NotNull(result);
-            Assert.AreEqual(availableBookings, result);
+            Assert.That(result, Is.EqualTo(availableBookings));
         }
 
         [Test]
@@ -43,9 +43,9 @@ namespace TestProject.API.BusinessLogic
             var mockDBBokking = new Mock<IDBBooking>();
 
             List<AvailableBookingsForTimeframe> availableBookings = new List<AvailableBookingsForTimeframe>();
-            mockDBBokking.Setup(repo => repo.GetAvailableBookingsForGivenDate(null, priorDay, null)).ReturnsAsync(availableBookings);
+            mockDBBokking.Setup(repo => repo.GetAvailableBookingsForGivenDate(null!, priorDay, null!)).ReturnsAsync(availableBookings);
 
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null);
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!);
 
             //Act   
             var result = await controller.GetAvailableBookingsForGivenDate(priorDay);

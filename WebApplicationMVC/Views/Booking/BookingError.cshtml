@@ -1,0 +1,26 @@
+﻿@model string
+@{
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Booking Fejl!</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <div class="icon-box">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-x-circle-fill text-danger" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
+                            </svg>
+                        </div>
+                        <h4 class="mt-4">Booking Fejl!</h4>
+                        <p>Der opstod en fejl under oprettelsen af din booking. Den er derfor ikke blevet bekræftet.</p>
+                        <p>Vi beklager meget fejlen. Opret venligst din booking på ny.</p>
+                        <p><strong>Fejlen er følgende: </strong>@Model</p>
+                        <a href="/Booking/Index" class="btn btn-danger">Gå Tilbage</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
