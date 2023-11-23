@@ -9,6 +9,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TestProject.API.Utilities;
 
 namespace TestProject.API.BusinessLogic {
     public class CreateCustomerTest {
@@ -26,8 +27,7 @@ namespace TestProject.API.BusinessLogic {
             };
 
             var mockDBCustomer = new Mock<IDBCustomer>();
-            var mockDBConnection = new Mock<IDbConnection>();
-            var mockDbTransaction = new Mock<IDbTransaction>();
+            var (mockDBConnection, mockDbTransaction) = PredefinedMocks.ConnectionMocks(); ;
             //setup with parameters that would match real parameters
             mockDBCustomer.Setup(s => s.CreateCustomer(
                 It.IsAny<IDbConnection>(),
@@ -35,13 +35,7 @@ namespace TestProject.API.BusinessLogic {
                 It.IsAny<IDbTransaction>()
                 )).ReturnsAsync(1);
 
-                // Setup mock transaction behavior
-            mockDBConnection.Setup(conn => conn.BeginTransaction(It.IsAny<IsolationLevel>()))
-                .Returns(mockDbTransaction.Object);
-            mockDbTransaction.Setup(trans => trans.Commit());
-            mockDbTransaction.Setup(trans => trans.Rollback());
-
-            ICustomerData controller = new CustomerDataControl(mockDBCustomer.Object, mockDBConnection.Object);
+                ICustomerData controller = new CustomerDataControl(mockDBCustomer.Object, mockDBConnection.Object);
 
             //Act
             result = await controller.CreateCustomer(mockDBConnection.Object, customer, mockDbTransaction.Object);
@@ -63,20 +57,13 @@ namespace TestProject.API.BusinessLogic {
             };
             
             var mockDBCustomer = new Mock<IDBCustomer>();
-            var mockDBConnection = new Mock<IDbConnection>();
-            var mockDbTransaction = new Mock<IDbTransaction>();
+            var (mockDBConnection, mockDbTransaction) = PredefinedMocks.ConnectionMocks();
             //setup with parameters that would match real parameters
             mockDBCustomer.Setup(s => s.CreateCustomer(
                 It.IsAny<IDbConnection>(),
                 It.IsAny<Customer>(),
                 It.IsAny<IDbTransaction>()
                 )).ReturnsAsync(-1);
-
-            // Setup mock transaction behavior
-            mockDBConnection.Setup(conn => conn.BeginTransaction(It.IsAny<IsolationLevel>()))
-                .Returns(mockDbTransaction.Object);
-            mockDbTransaction.Setup(trans => trans.Commit());
-            mockDbTransaction.Setup(trans => trans.Rollback());
 
             ICustomerData controller = new CustomerDataControl(mockDBCustomer.Object, mockDBConnection.Object);
 

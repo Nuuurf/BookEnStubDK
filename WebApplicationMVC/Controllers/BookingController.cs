@@ -27,7 +27,7 @@ namespace WebApplicationMVC.Controllers {
             //fix for exception if notes are null :)
             if (notes == null) { notes = String.Empty; }
 
-            List<string> dateTimes = JsonConvert.DeserializeObject<List<string>>(jsonString);
+            List<string> dateTimes = JsonConvert.DeserializeObject<List<string>>(jsonString)!;
 
             foreach (var dateTimeString in dateTimes) {
                 if (DateTime.TryParse(dateTimeString, out DateTime parsedDateTime)) {

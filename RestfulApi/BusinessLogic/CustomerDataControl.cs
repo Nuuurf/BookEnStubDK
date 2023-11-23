@@ -14,7 +14,7 @@ namespace RestfulApi.BusinessLogic {
         }
 
         // TODO : Write simple test for fail and success
-        public async Task<bool> AssociateCustomerWithBookingOrder(IDbConnection conn, int customerId, int orderId, IDbTransaction trans = null) {
+        public async Task<bool> AssociateCustomerWithBookingOrder(IDbConnection conn, int customerId, int orderId, IDbTransaction trans = null!) {
             bool result = false;
             try {
                 result = await _dbCustomer.AssociateCustomerWithBookingOrder(conn, orderId, customerId, trans);
@@ -25,7 +25,7 @@ namespace RestfulApi.BusinessLogic {
             return result;
         }
 
-        public async Task<int> CreateCustomer(IDbConnection conn, Customer customer, IDbTransaction trans = null) {
+        public async Task<int> CreateCustomer(IDbConnection conn, Customer customer, IDbTransaction trans = null!) {
             int result = -1;
             //we assume that inputs are sanitiezed somewhere before here
             try {

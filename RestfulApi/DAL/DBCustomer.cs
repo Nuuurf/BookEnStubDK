@@ -7,7 +7,7 @@ namespace RestfulApi.DAL {
     public class DBCustomer : IDBCustomer {
 
         //associates customer with bookingOrder using ids for both
-        public async Task<bool> AssociateCustomerWithBookingOrder(IDbConnection conn, int inBookingOrderId, int inCustomerId, IDbTransaction trans = null) {
+        public async Task<bool> AssociateCustomerWithBookingOrder(IDbConnection conn, int inBookingOrderId, int inCustomerId, IDbTransaction trans = null!) {
             bool result = false;
             int[] rawResult = new int[2];
 
@@ -25,7 +25,7 @@ namespace RestfulApi.DAL {
                 }
                 catch (Exception ex) { throw new Exception("Some kind of convertion error occured while parsing from query" + ex.Message); }
 
-                if (rawResult != null && rawResult.Length == 2) {
+                if (rawResult.Length == 2) {
                     if (rawResult[0] == 0) {
                         throw new Exception("The BookingOrderId does not match any existing BookingOrders in the database");
                     }
@@ -49,7 +49,7 @@ namespace RestfulApi.DAL {
         }
 
         //Persists customer information in database.
-        public async Task<int> CreateCustomer(IDbConnection conn, Customer customer, IDbTransaction trans = null) {
+        public async Task<int> CreateCustomer(IDbConnection conn, Customer customer, IDbTransaction trans = null!) {
             int result = -1; // Default fail value
             string scriptIfExists = "SELECT Id FROM customer WHERE phone = @phone AND email = @email";
             string scriptInsertCustomer = "INSERT INTO customer (name, phone, email) OUTPUT INSERTED.Id VALUES (@name, @phone, @email)";
@@ -60,7 +60,7 @@ namespace RestfulApi.DAL {
 
                 if (result == 0) {
                     var parametersCreateNew = new { name = customer.FirstName, phone = customer.Phone, email = customer.Email };
-                    result = (int)await conn.ExecuteScalarAsync(scriptInsertCustomer, parametersCreateNew, transaction: trans);
+                    result = (int)(await conn.ExecuteScalarAsync(scriptInsertCustomer, parametersCreateNew, transaction: trans))!;
                 }
             }
             catch (Exception ex) {

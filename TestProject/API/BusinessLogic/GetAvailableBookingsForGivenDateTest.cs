@@ -24,7 +24,7 @@ namespace TestProject.API.BusinessLogic
             List<AvailableBookingsForTimeframe> availableBookings = new List<AvailableBookingsForTimeframe>();
             mockDBBokking.Setup(repo => repo.GetAvailableBookingsForGivenDate( null!, date, null!)).ReturnsAsync(availableBookings);
 
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!);
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!, null!);
 
             //Act   
             var result = await controller.GetAvailableBookingsForGivenDate(date);
@@ -45,7 +45,7 @@ namespace TestProject.API.BusinessLogic
             List<AvailableBookingsForTimeframe> availableBookings = new List<AvailableBookingsForTimeframe>();
             mockDBBokking.Setup(repo => repo.GetAvailableBookingsForGivenDate(null!, priorDay, null!)).ReturnsAsync(availableBookings);
 
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!);
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!, null!);
 
             //Act   
             var result = await controller.GetAvailableBookingsForGivenDate(priorDay);

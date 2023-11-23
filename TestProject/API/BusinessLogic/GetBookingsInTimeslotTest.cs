@@ -28,7 +28,7 @@ namespace TestProject.API.BusinessLogic
 
             mockDBBokking.Setup(repo => repo.GetBookingsInTimeslot(null!, It.IsAny<DateTime>(), It.IsAny<DateTime>(), null!)).ReturnsAsync(bookings);
 
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!); 
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!, null!); 
 
             //Act
             DateTime start = DateTime.Now;
@@ -50,7 +50,7 @@ namespace TestProject.API.BusinessLogic
 
             mockDBBokking.Setup(repo => repo.GetBookingsInTimeslot(null!, It.IsAny<DateTime>(), It.IsAny<DateTime>(), null!)).ReturnsAsync(bookings);
 
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!);
+            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!, null!);
 
             //Act
             DateTime start = DateTime.Now;

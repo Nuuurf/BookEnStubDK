@@ -37,7 +37,7 @@ namespace TestProject.API.Control {
         public async Task CreateBooking_ShouldBePassValue()
         {
             //Arrange
-            BookingDataControl bdc = new BookingDataControl(new DBBooking(), _connection);
+            BookingDataControl bdc = new BookingDataControl(new DBBooking(),new CustomerDataControl(new DBCustomer(),_connection), _connection);
 
             List<Booking> booking = new List<Booking>
             { //booking to test with
@@ -46,10 +46,11 @@ namespace TestProject.API.Control {
                     TimeEnd = DateTime.Now.AddHours(2),}
                 };
 
+            Customer customer = new Customer { FirstName = "First Name", Email = "Fake Email", Phone = "1234567890", };
             int createReturn = 0;
 
             //Act
-            createReturn = await bdc.CreateBooking(booking);
+            createReturn = await bdc.CreateBooking(booking, customer);
 
 
             //Assert
@@ -60,7 +61,7 @@ namespace TestProject.API.Control {
         public Task CreateBooking_ShouldThrowArgumentException()
         {
             //Arrange
-            BookingDataControl bdc = new BookingDataControl(new DBBooking(), _connection);
+            BookingDataControl bdc = new BookingDataControl(new DBBooking(), new CustomerDataControl(new DBCustomer(), _connection), _connection);
 
             List<Booking> booking = new List<Booking>
             { //booking to test with
@@ -72,9 +73,9 @@ namespace TestProject.API.Control {
                     TimeEnd = DateTime.Now.AddHours(-1),
                 }
                 };
-
+            Customer customer = new Customer { FirstName = "First Name", Email = "Fake Email", Phone = "1234567890", };
             //Act
-            AsyncTestDelegate act = () => bdc.CreateBooking(booking);
+            AsyncTestDelegate act = () => bdc.CreateBooking(booking, customer);
 
             //Assert
             Assert.ThrowsAsync<ArgumentException>(act);
