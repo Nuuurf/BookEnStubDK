@@ -26,6 +26,10 @@ public class CreateBookingTest
 
         return mockCustomerControl;
     }
+
+    private TimeSpan ts = new TimeSpan(15, 0, 0);
+
+
     [Test]
     public async Task CreateBooking_ReturnsNewBookingId_WithNewBooking()
     {
@@ -50,7 +54,7 @@ public class CreateBookingTest
         BookingDataControl controller
             = new BookingDataControl(mockDBBooking.Object, mockCustomerControl.Object, mockDBConnection.Object);
 
-        DateTime bookingStart = DateTime.Now.AddDays(1).AddHours(1);
+        DateTime bookingStart = DateTime.Now.Date + ts;
         DateTime bookingEnd = bookingStart.AddHours(1);
         var booking = new List<Booking> { new Booking { TimeStart = bookingStart, TimeEnd = bookingEnd } };
         Customer customer = new Customer();
@@ -122,10 +126,11 @@ Customer customer = new Customer();
     {
         //Arrange
         var mockDBBokking = new Mock<IDBBooking>();
-
+        DateTime bookingStart = DateTime.Now.Date + ts;
+        DateTime bookingEnd = bookingStart.AddDays(-1);
         var booking = new List<Booking>
         {
-            new Booking { TimeStart = DateTime.Now.AddDays(2), TimeEnd = DateTime.Now.AddDays(1) }
+            new Booking { TimeStart = bookingStart, TimeEnd = bookingEnd }
         };
 
         mockDBBokking.Setup(repo => repo.CreateBooking(
@@ -153,9 +158,10 @@ Customer customer = new Customer();
         var mockDBBooking = new Mock<IDBBooking>();
         var (mockDBConnection, mockDbTransaction) = PredefinedMocks.ConnectionMocks();
         var mockCustomerControl = MockCustomerControl();
+
         var booking = new List<Booking>
         {
-            new Booking { TimeStart = DateTime.Now.AddDays(1).AddHours(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(2) }
+            new Booking { TimeStart = DateTime.Now.AddDays(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(2) }
         };
 
         Customer customer = new Customer();
@@ -187,9 +193,11 @@ Customer customer = new Customer();
         var mockDBBooking = new Mock<IDBBooking>();
         var (mockDBConnection, mockDbTransaction) = PredefinedMocks.ConnectionMocks();
         var mockCustomerControl = MockCustomerControl();
+        DateTime bookingStart = DateTime.Now.Date + ts;
+        DateTime bookingEnd = bookingStart.AddHours(1);
         var booking = new List<Booking>
         {
-            new Booking { TimeStart = DateTime.Now.AddDays(1).AddHours(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(2) }
+            new Booking { TimeStart = bookingStart, TimeEnd = bookingEnd }
         };
 
         Customer customer = new Customer();
