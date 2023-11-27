@@ -47,7 +47,6 @@
             dtp_EndDate = new DateTimePicker();
             dtp_StartDate = new DateTimePicker();
             chkBox_Today = new CheckBox();
-            label1 = new Label();
             panel1.SuspendLayout();
             pnl_Tabel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
@@ -177,7 +176,6 @@
             pnl_Filter.Controls.Add(dtp_EndDate);
             pnl_Filter.Controls.Add(dtp_StartDate);
             pnl_Filter.Controls.Add(chkBox_Today);
-            pnl_Filter.Controls.Add(label1);
             pnl_Filter.Dock = DockStyle.Top;
             pnl_Filter.Location = new Point(0, 0);
             pnl_Filter.Name = "pnl_Filter";
@@ -187,7 +185,7 @@
             // lbl_EndDate
             // 
             lbl_EndDate.AutoSize = true;
-            lbl_EndDate.Location = new Point(123, 68);
+            lbl_EndDate.Location = new Point(2, 71);
             lbl_EndDate.Name = "lbl_EndDate";
             lbl_EndDate.Size = new Size(53, 15);
             lbl_EndDate.TabIndex = 5;
@@ -196,7 +194,7 @@
             // lbl_StartDate
             // 
             lbl_StartDate.AutoSize = true;
-            lbl_StartDate.Location = new Point(123, 40);
+            lbl_StartDate.Location = new Point(2, 43);
             lbl_StartDate.Name = "lbl_StartDate";
             lbl_StartDate.Size = new Size(57, 15);
             lbl_StartDate.TabIndex = 4;
@@ -205,7 +203,7 @@
             // dtp_EndDate
             // 
             dtp_EndDate.Enabled = false;
-            dtp_EndDate.Location = new Point(182, 60);
+            dtp_EndDate.Location = new Point(61, 63);
             dtp_EndDate.Name = "dtp_EndDate";
             dtp_EndDate.Size = new Size(200, 23);
             dtp_EndDate.TabIndex = 3;
@@ -213,7 +211,7 @@
             // dtp_StartDate
             // 
             dtp_StartDate.Enabled = false;
-            dtp_StartDate.Location = new Point(182, 34);
+            dtp_StartDate.Location = new Point(61, 37);
             dtp_StartDate.Name = "dtp_StartDate";
             dtp_StartDate.Size = new Size(200, 23);
             dtp_StartDate.TabIndex = 2;
@@ -223,23 +221,13 @@
             chkBox_Today.AutoSize = true;
             chkBox_Today.Checked = true;
             chkBox_Today.CheckState = CheckState.Checked;
-            chkBox_Today.Location = new Point(124, 9);
+            chkBox_Today.Location = new Point(3, 12);
             chkBox_Today.Name = "chkBox_Today";
             chkBox_Today.Size = new Size(57, 19);
             chkBox_Today.TabIndex = 1;
             chkBox_Today.Text = "Today";
             chkBox_Today.UseVisualStyleBackColor = true;
             chkBox_Today.CheckedChanged += chkBox_Today_CheckedChanged;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 20.25F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(12, 9);
-            label1.Name = "label1";
-            label1.Size = new Size(84, 37);
-            label1.TabIndex = 0;
-            label1.Text = "Filter";
             // 
             // BookingTableForm
             // 
@@ -267,7 +255,6 @@
         private Panel pnl_Buttons;
         private Panel pnl_Filter;
         private DataGridView dataGridView1;
-        private Label label1;
         private Label lbl_EndDate;
         private Label lbl_StartDate;
         private DateTimePicker dtp_EndDate;

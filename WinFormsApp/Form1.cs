@@ -1,14 +1,15 @@
 namespace WinFormsApp
 {
-    public partial class Form1 : Form
+    public partial class MainWindow : Form
     {
-        public Form1()
+        public MainWindow()
         {
             InitializeComponent();
         }
 
         private void btn_bookings_Click(object sender, EventArgs e)
         {
+            this.Text = "Bookings";
             BookingTableForm bookingView = new BookingTableForm();
             bookingView.TopLevel = false;
             pnl_MainView.Controls.Clear();

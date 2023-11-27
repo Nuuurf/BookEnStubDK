@@ -1,6 +1,6 @@
 ﻿namespace WinFormsApp
 {
-    partial class Form1
+    partial class MainWindow
     {
         /// <summary>
         ///  Required designer variable.
@@ -29,16 +29,13 @@
         private void InitializeComponent()
         {
             pictureBox1 = new PictureBox();
-            label1 = new Label();
             panel1 = new Panel();
             btn_bookings = new Button();
             pnl_Main = new Panel();
             pnl_MainView = new Panel();
-            panel2 = new Panel();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             panel1.SuspendLayout();
             pnl_Main.SuspendLayout();
-            panel2.SuspendLayout();
             SuspendLayout();
             // 
             // pictureBox1
@@ -50,16 +47,6 @@
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 42F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(146, 11);
-            label1.Name = "label1";
-            label1.Size = new Size(357, 74);
-            label1.TabIndex = 1;
-            label1.Text = "Book en stub";
             // 
             // panel1
             // 
@@ -86,7 +73,6 @@
             pnl_Main.AutoSize = true;
             pnl_Main.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             pnl_Main.Controls.Add(pnl_MainView);
-            pnl_Main.Controls.Add(panel2);
             pnl_Main.Controls.Add(panel1);
             pnl_Main.Dock = DockStyle.Fill;
             pnl_Main.Location = new Point(0, 0);
@@ -97,35 +83,24 @@
             // pnl_MainView
             // 
             pnl_MainView.Dock = DockStyle.Fill;
-            pnl_MainView.Location = new Point(126, 100);
+            pnl_MainView.Location = new Point(126, 0);
             pnl_MainView.Name = "pnl_MainView";
-            pnl_MainView.Size = new Size(798, 461);
+            pnl_MainView.Size = new Size(798, 561);
             pnl_MainView.TabIndex = 4;
             // 
-            // panel2
-            // 
-            panel2.Controls.Add(label1);
-            panel2.Dock = DockStyle.Top;
-            panel2.Location = new Point(126, 0);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(798, 100);
-            panel2.TabIndex = 3;
-            // 
-            // Form1
+            // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(924, 561);
             Controls.Add(pnl_Main);
             MinimumSize = new Size(940, 600);
-            Name = "Form1";
+            Name = "MainWindow";
             Text = "Book en stub";
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             panel1.ResumeLayout(false);
             pnl_Main.ResumeLayout(false);
-            panel2.ResumeLayout(false);
-            panel2.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -133,11 +108,9 @@
         #endregion
 
         private PictureBox pictureBox1;
-        private Label label1;
         private Panel panel1;
         private Button btn_bookings;
         private Panel pnl_Main;
         private Panel pnl_MainView;
-        private Panel panel2;
     }
 }
