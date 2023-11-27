@@ -50,7 +50,7 @@ public class CreateBookingTest
         BookingDataControl controller
             = new BookingDataControl(mockDBBooking.Object, mockCustomerControl.Object, mockDBConnection.Object);
 
-        DateTime bookingStart = DateTime.Now.AddDays(1);
+        DateTime bookingStart = DateTime.Now.AddDays(1).AddHours(1);
         DateTime bookingEnd = bookingStart.AddHours(1);
         var booking = new List<Booking> { new Booking { TimeStart = bookingStart, TimeEnd = bookingEnd } };
         Customer customer = new Customer();
@@ -155,7 +155,7 @@ Customer customer = new Customer();
         var mockCustomerControl = MockCustomerControl();
         var booking = new List<Booking>
         {
-            new Booking { TimeStart = DateTime.Now.AddDays(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(1) }
+            new Booking { TimeStart = DateTime.Now.AddDays(1).AddHours(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(2) }
         };
 
         Customer customer = new Customer();
@@ -189,7 +189,7 @@ Customer customer = new Customer();
         var mockCustomerControl = MockCustomerControl();
         var booking = new List<Booking>
         {
-            new Booking { TimeStart = DateTime.Now.AddDays(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(1) }
+            new Booking { TimeStart = DateTime.Now.AddDays(1).AddHours(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(2) }
         };
 
         Customer customer = new Customer();
