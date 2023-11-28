@@ -7,13 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinFormsApp.Controllers;
+using WinFormsApp.Models;
 
 namespace WinFormsApp
 {
     public partial class BookingTableForm : Form
     {
+        BookingController _bookingController;
+        List<Booking> bookings;
         public BookingTableForm()
         {
+            _bookingController = new BookingController();
+            bookings = new List<Booking>();
+
             InitializeComponent();
         }
 
@@ -31,9 +38,10 @@ namespace WinFormsApp
             }
         }
 
-        private void btn_Add_Click(object sender, EventArgs e)
+        private async void btn_Add_Click(object sender, EventArgs e)
         {
             MessageBox.Show("This function is not implemented", "Not implemented");
+            bookings = await _bookingController.getBookingsFromAPI(null,null,false);
         }
     }
 }
