@@ -113,7 +113,7 @@ namespace WebApplicationMVC.Controllers {
         [HttpGet]
         public async Task<ActionResult> GetAvailableTimes(string date) {
             // Simulated URL for fetching data (replace this with your actual API endpoint)
-            string apiUrl = $"https://localhost:7021/{date}";
+            string apiUrl = $"https://localhost:7021/Booking?start={date}&showAvailable=true";
 
             using (HttpClient client = new HttpClient()) {
                 try {

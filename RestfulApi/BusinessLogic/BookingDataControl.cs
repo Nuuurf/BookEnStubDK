@@ -26,6 +26,11 @@ namespace RestfulApi.BusinessLogic {
                 throw new ArgumentNullException("Booking is null");
             }
 
+            if (customer == null)
+            {
+                throw new ArgumentNullException("Customer is null");
+            }
+
             //Validate booking dates are in the right format and time
             if (!bookings.All(ValidateBookingDates)) {
                 throw new ArgumentException("Booking date format exception. Booking start date exceeds bookings end date");
@@ -87,7 +92,7 @@ namespace RestfulApi.BusinessLogic {
         }
 
         public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end) {
-            if (start > end) {
+            if (start >= end) {
                 return null!;
             }
             List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(_connection, start, end);

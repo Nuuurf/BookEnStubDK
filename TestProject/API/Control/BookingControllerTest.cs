@@ -9,9 +9,10 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TestProject.API.DAO;
+using TestProject.API.Utilities;
 
-namespace TestProject.API.Control {
+namespace TestProject.API.Control
+{
 
     public class BookingControllerTest {
 

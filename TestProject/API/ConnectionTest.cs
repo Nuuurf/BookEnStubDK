@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RestfulApi.DAL;
-using TestProject.API.DAO;
+using TestProject.API.Utilities;
 
-namespace TestProject.API {
+namespace TestProject.API
+{
     public class ConnectionTest {
 
         [Test]

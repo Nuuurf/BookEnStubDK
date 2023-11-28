@@ -9,6 +9,9 @@ namespace TestProject.API.BusinessLogic;
 
 public class CreateBookingTest
 {
+
+    private TimeSpan ts = new TimeSpan(15, 0, 0);
+
     private Mock<ICustomerData> MockCustomerControl()
     {
         var mockCustomerControl = new Mock<ICustomerData>();
@@ -27,40 +30,35 @@ public class CreateBookingTest
         return mockCustomerControl;
     }
 
-    private TimeSpan ts = new TimeSpan(15, 0, 0);
-
-
     [Test]
     public async Task CreateBooking_ReturnsNewBookingId_WithNewBooking()
     {
         // Arrange
+        DateTime bookingStart = DateTime.Now.Date.AddDays(1) + ts;
+        DateTime bookingEnd = bookingStart.AddHours(1);
+        Booking booking = new Booking { TimeStart = bookingStart, TimeEnd = bookingEnd };
+        List<Booking> bookingList = new List<Booking> { booking };
+        Customer customer = new Customer();
+
+        //Setting Mocks
         var mockDBBooking = new Mock<IDBBooking>();
         var (mockDBConnection, mockDbTransaction) = PredefinedMocks.ConnectionMocks();
         var mockCustomerControl = MockCustomerControl();
 
         //Setting up Database Booking Mock
         mockDBBooking.Setup(repo => repo.CreateBooking(
-                It.IsAny<IDbConnection>(),
-                It.IsAny<Booking>(),
-                It.IsAny<int>(),
-                It.IsAny<IDbTransaction>()))
+                mockDBConnection.Object, booking, 1, mockDbTransaction.Object))
             .ReturnsAsync(1);
 
         mockDBBooking.Setup(repo =>
-                repo.CreateNewBookingOrder(It.IsAny<IDbConnection>(),
-                    It.IsAny<IDbTransaction>()))
+                repo.CreateNewBookingOrder(mockDBConnection.Object, mockDbTransaction.Object))
             .ReturnsAsync(1);
 
         BookingDataControl controller
             = new BookingDataControl(mockDBBooking.Object, mockCustomerControl.Object, mockDBConnection.Object);
 
-        DateTime bookingStart = DateTime.Now.Date + ts;
-        DateTime bookingEnd = bookingStart.AddHours(1);
-        var booking = new List<Booking> { new Booking { TimeStart = bookingStart, TimeEnd = bookingEnd } };
-        Customer customer = new Customer();
-
         // Act
-        int result = await controller.CreateBooking(booking, customer);
+        int result = await controller.CreateBooking(bookingList, customer);
 
         // Assert
         Assert.That(result, Is.EqualTo(1));
@@ -73,19 +71,11 @@ public class CreateBookingTest
     public Task CreateBooking_ThrowsArgumentException_WithPriorDate()
     {
         //Arrange
-        var mockDBBokking = new Mock<IDBBooking>();
         DateTime bookingDate = DateTime.Now.AddDays(-1);
         List<Booking> booking = new List<Booking> { new Booking { TimeStart = bookingDate } };
 Customer customer = new Customer();
-        mockDBBokking.Setup(repo => repo.CreateBooking(
-                It.IsAny<IDbConnection>(),
-                It.IsAny<Booking>(),
-                It.IsAny<int>(),
-                It.IsAny<IDbTransaction>()))
-            .ReturnsAsync(1);
-
-
-        BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null, null!);
+        
+        BookingDataControl controller = new BookingDataControl(null!, null!, null!);
 
         //Act   
         AsyncTestDelegate result = () => controller.CreateBooking(booking, customer);
@@ -100,17 +90,25 @@ Customer customer = new Customer();
     public Task CreateBooking_ThrowsArgumentNullException_WithNullBooking()
     {
         //Arrange
-        var mockDbBokking = new Mock<IDBBooking>();
         List<Booking> booking = null!;
 
-        mockDbBokking.Setup(repo => repo.CreateBooking(
-                It.IsAny<IDbConnection>(),
-                It.IsAny<Booking>(),
-                It.IsAny<int>(),
-                It.IsAny<IDbTransaction>()))
-            .ReturnsAsync(1);
+        BookingDataControl controller = new BookingDataControl(null!, null!, null!);
 
-        BookingDataControl controller = new BookingDataControl(mockDbBokking.Object, null!, null!);
+        //Act   
+        AsyncTestDelegate result = () => controller.CreateBooking(booking!, null!);
+
+        //Assert
+        Assert.ThrowsAsync<ArgumentNullException>(result);
+
+        return Task.CompletedTask;
+    }
+    [Test]
+    public Task CreateBooking_ThrowsArgumentNullException_WithNullCustomer()
+    {
+        //Arrange
+        List<Booking> booking = new List<Booking>();
+
+        BookingDataControl controller = new BookingDataControl(null!, null!, null!);
 
         //Act   
         AsyncTestDelegate result = () => controller.CreateBooking(booking!, null!);
@@ -125,25 +123,18 @@ Customer customer = new Customer();
     public Task CreateBooking_ThrowsArgumentException_WithEndDateEarlierThanStart()
     {
         //Arrange
-        var mockDBBokking = new Mock<IDBBooking>();
         DateTime bookingStart = DateTime.Now.Date + ts;
         DateTime bookingEnd = bookingStart.AddDays(-1);
-        var booking = new List<Booking>
+        List<Booking> booking = new List<Booking>
         {
             new Booking { TimeStart = bookingStart, TimeEnd = bookingEnd }
         };
+Customer customer = new Customer();
 
-        mockDBBokking.Setup(repo => repo.CreateBooking(
-                It.IsAny<IDbConnection>(),
-                It.IsAny<Booking>(),
-                It.IsAny<int>(),
-                It.IsAny<IDbTransaction>()))
-            .ReturnsAsync(1);
-
-        BookingDataControl controller = new BookingDataControl(mockDBBokking.Object,null!, null!);
+        BookingDataControl controller = new BookingDataControl(null!,null!, null!);
 
         //Act   
-        AsyncTestDelegate result = () => controller.CreateBooking(booking, null!);
+        AsyncTestDelegate result = () => controller.CreateBooking(booking, customer);
 
         //Assert
         Assert.ThrowsAsync<ArgumentException>(result);
@@ -155,28 +146,32 @@ Customer customer = new Customer();
     public Task CreateBooking_ThrowsException_WithNoAvailbableStubsForBooking()
     {
         //Arrange
+        DateTime bookingStart = DateTime.Now.Date.AddDays(1) + ts;
+        DateTime bookingEnd = bookingStart.AddHours(1);
+        Booking booking = new Booking
+        {
+            TimeStart = bookingStart,
+            TimeEnd = bookingEnd
+        };
+        List<Booking> bookingList = new List<Booking> { booking };
+        Customer customer = new Customer();
+
         var mockDBBooking = new Mock<IDBBooking>();
         var (mockDBConnection, mockDbTransaction) = PredefinedMocks.ConnectionMocks();
         var mockCustomerControl = MockCustomerControl();
 
-        var booking = new List<Booking>
-        {
-            new Booking { TimeStart = DateTime.Now.AddDays(1), TimeEnd = DateTime.Now.AddDays(1).AddHours(2) }
-        };
-
-        Customer customer = new Customer();
         mockDBBooking.Setup(repo => repo.CreateBooking(
-                It.IsAny<IDbConnection>(),
-                It.IsAny<Booking>(),
+                mockDBConnection.Object,
+                booking,
                 It.IsAny<int>(),
-                It.IsAny<IDbTransaction>()))
+                mockDbTransaction.Object))
             .Throws<Exception>();
 
 
         BookingDataControl controller = new BookingDataControl(mockDBBooking.Object,mockCustomerControl.Object, mockDBConnection.Object);
 
         //Act   
-        AsyncTestDelegate result = () => controller.CreateBooking(booking, customer);
+        AsyncTestDelegate result = () => controller.CreateBooking(bookingList, customer);
 
         //Assert
         Assert.ThrowsAsync<Exception>(result);
@@ -193,7 +188,7 @@ Customer customer = new Customer();
         var mockDBBooking = new Mock<IDBBooking>();
         var (mockDBConnection, mockDbTransaction) = PredefinedMocks.ConnectionMocks();
         var mockCustomerControl = MockCustomerControl();
-        DateTime bookingStart = DateTime.Now.Date + ts;
+        DateTime bookingStart = DateTime.Now.Date.AddDays(1) + ts;
         DateTime bookingEnd = bookingStart.AddHours(1);
         var booking = new List<Booking>
         {
@@ -202,10 +197,10 @@ Customer customer = new Customer();
 
         Customer customer = new Customer();
         mockDBBooking.Setup(repo => repo.CreateBooking(
-                It.IsAny<IDbConnection>(),
+                mockDBConnection.Object,
                 It.IsAny<Booking>(),
                 It.IsAny<int>(),
-                It.IsAny<IDbTransaction>()))
+                mockDbTransaction.Object))
             .ThrowsAsync(new Exception("Sql Exception"));
 
         BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, mockCustomerControl.Object, mockDBConnection.Object);
