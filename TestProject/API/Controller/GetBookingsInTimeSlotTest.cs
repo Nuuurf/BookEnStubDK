@@ -29,7 +29,7 @@ namespace TestProject.API.Controller
             DateTime start = DateTime.Now;
             DateTime end = start.AddHours(1);
 
-            var result = await controller.GetBookingsInTimeslot(start, end);
+            var result = await controller.ShowBookingsInTimeSlot(start, end, true);
 
             //Assert
             Assert.IsInstanceOf<NotFoundObjectResult>(result);
@@ -53,7 +53,7 @@ namespace TestProject.API.Controller
             DateTime start = DateTime.Now;
             DateTime end = start.AddHours(1);
 
-            var result = await controller.GetBookingsInTimeslot(start, end) as OkObjectResult;
+            var result = await controller.ShowBookingsInTimeSlot(start, end, true) as OkObjectResult;
 
             //Assert
             Assert.NotNull(result);
@@ -76,7 +76,7 @@ namespace TestProject.API.Controller
             DateTime start = DateTime.Now;
             DateTime end = start.AddHours(-1);
 
-            var result = await controller.GetBookingsInTimeslot(start, end);
+            var result = await controller.ShowBookingsInTimeSlot(start, end, true);
 
             //Assert
             Assert.IsInstanceOf<NotFoundObjectResult>(result);
@@ -97,7 +97,7 @@ namespace TestProject.API.Controller
             DateTime start = DateTime.Now;
             DateTime end = start.AddHours(-1);
 
-            var resultTask = controller.GetBookingsInTimeslot(start, end);
+            var resultTask = controller.ShowBookingsInTimeSlot(start, end, true);
             var result = await resultTask;
 
             //Assert

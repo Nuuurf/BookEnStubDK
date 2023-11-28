@@ -53,11 +53,37 @@ namespace RestfulApi.Controllers
 
         //URL: api/booking
         [HttpGet]
-        public async Task<IActionResult> GetBookingsInTimeslot(DateTime start, DateTime end)
+        public async Task<IActionResult> ShowBookingsInTimeSlot(DateTime? start, DateTime? end, bool showAvailable)
         {
+            if (start == null)
+            {
+                return BadRequest("Start date is required");
+            }
             try
             {
-                List<Booking> bookingList = await _bookingdata.GetBookingsInTimeslot(start, end);
+                if (showAvailable == true)
+                {
+                    DateTime dateFormatted = start.Value.Date;
+                    List<AvailableBookingsForTimeframe> availableList = await _bookingdata.GetAvailableBookingsForGivenDate(dateFormatted);
+
+                    if (availableList == null)
+                    {
+                        return BadRequest("Placed date is prior to today");
+                    }
+
+                    return Ok(availableList);
+                }
+
+                if (end == null)
+                {
+                    return BadRequest("Must provide an end date");
+                }
+                if (start >= end)
+                {
+                    return BadRequest("End date must be after start date.");
+                }
+
+                List<Booking> bookingList = await _bookingdata.GetBookingsInTimeslot(start.Value, end.Value);
                 if (bookingList == null || bookingList.Count == 0)
                 {
                     return NotFound("No bookings found.");
@@ -70,35 +96,7 @@ namespace RestfulApi.Controllers
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
-
-        [HttpGet("/{date}")]
-        public async Task<IActionResult> GetBookingsForGivenDate(string date)
-        {
-            DateTime dateFormatted;
-            bool isValidDate = DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateFormatted);
-            if (!isValidDate)
-            {
-                return BadRequest("Invalid date format. Please use YYYY-MM-DD format.");
-            }
-
-            try
-            {
-                List<AvailableBookingsForTimeframe> avaiableList = await _bookingdata.GetAvailableBookingsForGivenDate(dateFormatted);
-
-                if (avaiableList == null)
-                {
-                    return BadRequest("Placed date is prior to today");
-                }
-
-                return Ok(avaiableList);
-
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
-        }
-
+        
         // URL: api/booking
         [HttpPost]
         public async Task<IActionResult> CreateBooking(BookingRequest? booking = null)
