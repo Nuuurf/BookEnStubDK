@@ -89,10 +89,6 @@ namespace WebApplicationMVC.Controllers {
                     throw;
                 }
             }
-            var viewModel = new {
-                View = View("BookingConfirmed"),
-                ID = id
-            };
             return id;
         }
 
