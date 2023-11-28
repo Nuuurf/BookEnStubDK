@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using NuGet.Frameworks;
 using RestfulApi.DAL;
 using RestfulApi.Models;
+using TestProject.API.Utilities;
 
 namespace TestProject.API.DAO
 {
@@ -22,7 +23,7 @@ namespace TestProject.API.DAO
 IDBBooking booking = new DBBooking();
             int expectedAvailbleBookingCount = 120;
             int expectedTimeSlots = 13;
-            int stubCount = new Utilities().GetMaxDBStubs();
+            int stubCount = new GetMaxStubs().GetMaxDBStubs();
             DateTime date = new DateTime(2023, 11, 10);
             TestContext.WriteLine($"Testing Date {date}");
 
@@ -35,8 +36,8 @@ IDBBooking booking = new DBBooking();
             }
 
             //Assert
-            Assert.AreEqual(expectedAvailbleBookingCount, availableBookingsForDay);
-            Assert.AreEqual(expectedTimeSlots, bookings.Count);
+            Assert.That(availableBookingsForDay, Is.EqualTo(expectedAvailbleBookingCount));
+            Assert.That(bookings.Count, Is.EqualTo(expectedTimeSlots));
         }
     }
 }

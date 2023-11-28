@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 
-namespace TestProject.API.DAO
+namespace TestProject.API.Utilities
 {
     public sealed class DBConnection
     {

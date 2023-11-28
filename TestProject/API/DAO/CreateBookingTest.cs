@@ -8,10 +8,11 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TestProject.API.Utilities;
 
 namespace TestProject.API.DAO
 {
-public class CreateBookingTest
+    public class CreateBookingTest
     {
         private static IDBBooking _dbBooking = new DBBooking();
         private static Booking booking1 = new Booking
@@ -19,30 +20,21 @@ public class CreateBookingTest
             TimeStart = new DateTime(2023, 11, 10, 9, 0, 0),
             TimeEnd = new DateTime(2023, 11, 10, 10, 0, 0),
             Notes = "Some generic notes",
-            StubId = 1
-            //CustomerId = 1,
-            //StubID = 1,
-        };
+            };
 
         private static Booking booking2 = new Booking
         {
             TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
             TimeEnd = new DateTime(2023, 11, 10, 11, 0, 0),
             Notes = "Some generic notes",
-            StubId = 2
-            //CustomerId = 2,
-            //StubID = 1,
-        };
+            };
 
         private static Booking booking3 = new Booking
         {
             TimeStart = new DateTime(2023, 11, 10, 11, 0, 0),
             TimeEnd = new DateTime(2023, 11, 10, 12, 0, 0),
             Notes = "Some generic notes",
-            StubId = 3
-            //CustomerId = 3,
-            //StubID = 2,
-        };
+            };
         public static IEnumerable<Booking> TestBookings
         {
             get
@@ -82,7 +74,7 @@ public class CreateBookingTest
                 using (var transaction = conn.BeginTransaction())
                 {
                     int bookingOrderID = await _dbBooking.CreateNewBookingOrder(conn, transaction);
-                    int stubCount = new Utilities().GetMaxDBStubs();
+                    int stubCount = new GetMaxStubs().GetMaxDBStubs();
                     for (int i = 0; i < stubCount; i++)
                     {
                         await _dbBooking.CreateBooking(conn, overlappingBooking, bookingOrderID, transaction);

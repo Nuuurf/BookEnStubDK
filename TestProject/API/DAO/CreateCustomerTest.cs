@@ -9,31 +9,23 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using TestProject.API.Utilities;
 
-namespace TestProject.API.DAO {
+namespace TestProject.API.DAO
+{
     public class CreateCustomerTest {
 
         private DBCustomer _DbCustomer = new DBCustomer();
-
-        //[SetUp]
-        //public void Setup() {
-        //    using (IDbConnection con = DBConnection.Instance.GetOpenConnection()) {
-        //        string script = "INSERT INTO customer values(Testperson, 73277327, testperson@test.test;";
-        //    }
-        //}
+private static Customer customer = new Customer
+{
+    FirstName = "Lars",
+    Phone = "88888888",
+    Email = "Lars@Lars.dk"
+};
 
         [Test]
         public async Task CreateCustomer_ShouldReturnPassValue() {
             //Arrange
-            string name = "Lars";
-            string phone = "88888888";
-            string email = "Lars@lortemail.dk";
-
-            Customer customer = new Customer {
-                FirstName = name,
-                Phone = phone,
-                Email = email
-            };
             int result = -1;
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
 
@@ -51,21 +43,10 @@ namespace TestProject.API.DAO {
         [Test]
         public async Task CreateCustomer_ShouldReturnSameIdDueToExistingInformationInDatabase() {
             // Arrange
-            string name = "Lars";
-            string phone = "88888887";
-            string email = "Lars2@lortemail.dk";
-
-            Customer customer = new Customer {
-                FirstName = name,
-                Phone = phone,
-                Email = email
-            };
-
             int resultCompare = -2;
             int result = -1;
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
 
-            
 
             //Act 
             using (IDbTransaction trans = conn.BeginTransaction(System.Data.IsolationLevel.Serializable)) {
@@ -79,7 +60,7 @@ namespace TestProject.API.DAO {
             }
 
             //Assert
-            Assert.AreEqual(resultCompare, result);
+            Assert.That(result, Is.EqualTo(resultCompare));
         }
 
         [Test]

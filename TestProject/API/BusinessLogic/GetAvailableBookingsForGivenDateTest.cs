@@ -40,12 +40,7 @@ namespace TestProject.API.BusinessLogic
             //Arrange
             DateTime priorDay = DateTime.Now.Date.AddDays(-1);
 
-            var mockDBBokking = new Mock<IDBBooking>();
-
-            List<AvailableBookingsForTimeframe> availableBookings = new List<AvailableBookingsForTimeframe>();
-            mockDBBokking.Setup(repo => repo.GetAvailableBookingsForGivenDate(null!, priorDay, null!)).ReturnsAsync(availableBookings);
-
-            BookingDataControl controller = new BookingDataControl(mockDBBokking.Object, null!, null!);
+            BookingDataControl controller = new BookingDataControl(null!, null!, null!);
 
             //Act   
             var result = await controller.GetAvailableBookingsForGivenDate(priorDay);
@@ -53,5 +48,5 @@ namespace TestProject.API.BusinessLogic
             //Assert
             Assert.Null(result);
         }
-    }
+        }
 }

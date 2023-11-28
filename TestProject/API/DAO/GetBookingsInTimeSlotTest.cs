@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Moq;
+using TestProject.API.Utilities;
 
 namespace TestProject.API.DAO
 {
@@ -60,7 +61,7 @@ namespace TestProject.API.DAO
             }
 
             // Check if the number of bookings matches the expected count
-            Assert.AreEqual(expectedBookingCount, bookings.Count, "The number of bookings returned does not match the expected count");
+            Assert.That(bookings.Count, Is.EqualTo(expectedBookingCount), "The number of bookings returned does not match the expected count");
         }
         [Test]
         public async Task GetBookingWithinTimeslot_ShouldReturnEmptyListWhenNoBookings()

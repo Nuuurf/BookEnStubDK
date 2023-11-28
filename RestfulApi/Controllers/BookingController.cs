@@ -68,7 +68,7 @@ namespace RestfulApi.Controllers
 
                     if (availableList == null)
                     {
-                        return BadRequest("Placed date is prior to today");
+                        return NotFound("Placed date is prior to today");
                     }
 
                     return Ok(availableList);
@@ -78,13 +78,13 @@ namespace RestfulApi.Controllers
                 {
                     return BadRequest("Must provide an end date");
                 }
-                if (start >= end)
+                List<Booking> bookingList = await _bookingdata.GetBookingsInTimeslot(start.Value, end.Value);
+
+                if (bookingList == null)
                 {
                     return BadRequest("End date must be after start date.");
                 }
-
-                List<Booking> bookingList = await _bookingdata.GetBookingsInTimeslot(start.Value, end.Value);
-                if (bookingList == null || bookingList.Count == 0)
+                if(bookingList.Count == 0)
                 {
                     return NotFound("No bookings found.");
                 }

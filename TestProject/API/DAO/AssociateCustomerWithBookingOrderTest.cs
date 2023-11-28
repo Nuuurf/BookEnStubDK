@@ -7,8 +7,10 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TestProject.API.Utilities;
 
-namespace TestProject.API.DAO {
+namespace TestProject.API.DAO
+{
     public class AssociateCustomerWithBookingOrderTest {
 
         [Test]
@@ -20,7 +22,7 @@ namespace TestProject.API.DAO {
             IDBCustomer dBCustomer = new DBCustomer();
             //Act
             using (IDbTransaction trans = DBConnection.Instance.GetOpenConnection().BeginTransaction()) {
-                result = await dBCustomer.AssociateCustomerWithBookingOrder(trans.Connection, orderId, customerId, trans);
+                result = await dBCustomer.AssociateCustomerWithBookingOrder(trans.Connection!, orderId, customerId, trans);
 
                 trans.Rollback();
             }
@@ -29,7 +31,7 @@ namespace TestProject.API.DAO {
         }
 
         [Test]
-        public async Task AssociateCustomerWithBookingOrder_ShouldThrowException() {
+        public Task AssociateCustomerWithBookingOrder_ShouldThrowException() {
             //Arrange
             int orderId = 1; //We just assume that we haven't cleaned the test db, if it fuckes insert an order with default in setup
             int customerId = -1; //value which does not exist 
@@ -37,12 +39,14 @@ namespace TestProject.API.DAO {
             //Act & Assert
             using (IDbTransaction trans = DBConnection.Instance.GetOpenConnection().BeginTransaction()) {
                 AsyncTestDelegate testDelegate = async () =>
-                await dBCustomer.AssociateCustomerWithBookingOrder(trans.Connection, orderId, customerId, trans);
+                await dBCustomer.AssociateCustomerWithBookingOrder(trans.Connection!, orderId, customerId, trans!);
 
                 Assert.ThrowsAsync<Exception>(testDelegate);
 
                 trans.Rollback();
             }
+
+            return Task.CompletedTask;
         }
     }
 }

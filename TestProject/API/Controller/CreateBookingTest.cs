@@ -26,12 +26,12 @@ public class CreateBookingTest
     public async Task CreateBooking_ReturnsOK_WithNewBooking()
     {
         //Arrange
-        var mockDBBokking = new Mock<IBookingData>();
+        var mockBusinessBooking = new Mock<IBookingData>();
 
-        mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>(), It.IsAny<Customer>()))
+        mockBusinessBooking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>(), It.IsAny<Customer>()))
             .ReturnsAsync(1);
 
-        BookingController controller = new BookingController(mockDBBokking.Object);
+        BookingController controller = new BookingController(mockBusinessBooking.Object);
 
         
         //Act   
@@ -46,47 +46,41 @@ public class CreateBookingTest
     public async Task CreateBooking_ReturnBadRequest_WithNoBooking()
     {
         //Arrange
-        var mockDBBokking = new Mock<IBookingData>();
-        mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>(), It.IsAny<Customer>())).ReturnsAsync(0);
-
-        BookingController controller = new BookingController(mockDBBokking.Object);
+        BookingController controller = new BookingController(null!);
 
         //Act
-        BadRequestObjectResult? result = await controller.CreateBooking() as BadRequestObjectResult;
+        var result = await controller.CreateBooking();
 
         //Assert
-        Assert.NotNull(result);
-        Assert.AreEqual(400, result.StatusCode);
+        Assert.IsInstanceOf<BadRequestObjectResult>(result);
     }
 
     [Test]
     public async Task CreateBookingFailed_ReturnUnproccessableEntity_WithBooking()
     {
         //Arrange
-        var mockDBBokking = new Mock<IBookingData>();
-        mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>(), It.IsAny<Customer>())).ReturnsAsync(0);
+        var mockBusinessBooking = new Mock<IBookingData>();
+        mockBusinessBooking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>(), It.IsAny<Customer>())).ReturnsAsync(0);
 
-        BookingController controller = new BookingController(mockDBBokking.Object);
+        BookingController controller = new BookingController(mockBusinessBooking.Object);
 
         //Act   
-        UnprocessableEntityObjectResult? result
-            = await controller.CreateBooking(_bookingRequest) as UnprocessableEntityObjectResult;
+        var result = await controller.CreateBooking(_bookingRequest);
 
         //Assert
-        Assert.NotNull(result);
-        Assert.AreEqual(422, result.StatusCode);
+        Assert.IsInstanceOf<UnprocessableEntityObjectResult>(result);
     }
 
     [Test]
     public async Task CreateBookingFailed_ThrowsException_InternalError()
     {
         //Arrange
-        var mockDBBokking = new Mock<IBookingData>();
+        var mockBusinessBooking = new Mock<IBookingData>();
         
-        mockDBBokking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>(), It.IsAny<Customer>()))
+        mockBusinessBooking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>(), It.IsAny<Customer>()))
             .Throws(new Exception());
 
-        BookingController controller = new BookingController(mockDBBokking.Object);
+        BookingController controller = new BookingController(mockBusinessBooking.Object);
 
         //Act
 
@@ -96,7 +90,7 @@ public class CreateBookingTest
         //Assert
         if (result is ObjectResult objectResult)
         {
-            Assert.AreEqual(500, objectResult.StatusCode);
+            Assert.That(objectResult.StatusCode, Is.EqualTo(500));
         }
 
         Assert.IsInstanceOf<ObjectResult>(result);
