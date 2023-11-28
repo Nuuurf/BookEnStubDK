@@ -30,5 +30,10 @@ namespace WinFormsApp
                 dtp_EndDate.Enabled = true;
             }
         }
+
+        private void btn_Add_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This function is not implemented", "Not implemented");
+        }
     }
 }
