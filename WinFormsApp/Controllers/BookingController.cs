@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -12,50 +13,31 @@ namespace WinFormsApp.Controllers
     {
         ApiService _apiService;
 
-        public BookingController() { 
+        public BookingController()
+        {
             _apiService = new ApiService();
-        
+
         }
 
-        public async Task<List<Booking>> getBookingsFromAPI(DateTime? start, DateTime? end, bool showAvailable)
+        /// <summary>
+        /// This method gets a list of bookings for a range of dates
+        /// </summary>
+        /// <param name="timeStart"></param>
+        /// <param name="timeEnd"></param>
+        /// <param name="showAvailable"></param>
+        /// <returns></returns>
+
+        public async Task<List<Booking>> getBookingsFromAPI(DateTime timeStart, DateTime timeEnd, bool showAvailable)
         {
-            //https://localhost:7021/Booking?start=2024-08-11&end=2024-08-12&showAvailable=false
-
+            //A list to hold the bookings
             List<Booking> bookings = new List<Booking>();
-
-            string apiUrl = $"Booking?start=2024-08-11&end=2024-08-12&showAvailable=false";
-
+            //Constructs the URL that is to be used.
+            string apiUrl = $"Booking?start={timeStart.ToString("yyyy-MM-dd")}&end={timeEnd.ToString("yyyy-MM-dd")}&showAvailable={showAvailable}";
+            //Store the bookings that the method gets back from the API
             bookings = await _apiService.GetAsync<List<Booking>>(apiUrl);
+            //returns bookinglist
+            return bookings;
 
-            using (HttpClient client = new HttpClient())
-            {
-                try
-                {
-                    // Make the GET request to the API
-                    HttpResponseMessage response = await client.GetAsync(apiUrl);
-
-                    // Check if the request was successful
-                    if (response.IsSuccessStatusCode)
-                    {
-                        // Read and parse the response content
-                        string responseData = await response.Content.ReadAsStringAsync();
-
-                        // Assuming you want to return JSON
-                        //return Content(responseData, "application/json");
-                    }
-                    else
-                    {
-                        // Handle unsuccessful response
-                        //return Json(new { error = $"Error: {response}" });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Handle exception
-                    //return Json(new { error = $"Exception: {ex.Message}" });
-                }
-                return bookings;
-            }
         }
     }
 }

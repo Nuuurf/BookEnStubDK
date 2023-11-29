@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using WinFormsApp.Exceptions;
 
 namespace WinFormsApp.Controllers
 {
@@ -27,20 +29,20 @@ namespace WinFormsApp.Controllers
             return response;
         }
 
-        public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest content)
-        {
-            var jsonContent = JsonSerializer.Serialize(content);
-            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+        //public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest content)
+        //{
+        //    var jsonContent = JsonSerializer.Serialize(content);
+        //    var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _url + url)
-            {
-                Content = httpContent
-            };
+        //    var requestMessage = new HttpRequestMessage(HttpMethod.Post, _url + url)
+        //    {
+        //        Content = httpContent
+        //    };
 
-            var response = await SendRequestAsync<TResponse>(requestMessage);
+        //    var response = await SendRequestAsync<TResponse>(requestMessage);
 
-            return response;
-        }
+        //    return response;
+        //}
 
         private async Task<T> SendRequestAsync<T>(HttpRequestMessage requestMessage)
         {
@@ -48,13 +50,20 @@ namespace WinFormsApp.Controllers
 
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                MessageBox.Show($"Error code: {response.StatusCode}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                var JsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<T>(JsonResponse);
+                if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    throw new NoBookingException();
+                }
+                else
+                {
+                    throw new HttpRequestException();
+                }
+                
             }
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(jsonResponse);
+            string jsonResponse = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<T>(jsonResponse);
         }
     }
 }
