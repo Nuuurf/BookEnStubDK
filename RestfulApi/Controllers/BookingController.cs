@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Globalization;
 using RestfulApi.DTOs;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace RestfulApi.Controllers
 {
@@ -53,24 +54,19 @@ namespace RestfulApi.Controllers
 
         //URL: api/booking
         [HttpGet]
-        public async Task<IActionResult> ShowBookingsInTimeSlot(DateTime? start, DateTime? end, bool showAvailable)
+        public async Task<IActionResult> ShowBookingsInTimeSlot(DateTime start, DateTime? end, bool showAvailable, int? stubId = null, int? orderId = null, string? customerEmail = null, string? customerPhone = null, BookingSortOption sortOption = 0)
         {
-            if (start == null)
-            {
-                return BadRequest("Start date is required");
-            }
             try
             {
                 if (showAvailable == true)
                 {
-                    DateTime dateFormatted = start.Value.Date;
+                    DateTime dateFormatted = start.Date;
                     List<AvailableBookingsForTimeframe> availableList = await _bookingdata.GetAvailableBookingsForGivenDate(dateFormatted);
 
                     if (availableList == null)
                     {
-                        return NotFound("Placed date is prior to today");
+                        return BadRequest("Placed date is prior to today");
                     }
-
                     return Ok(availableList);
                 }
 
@@ -78,7 +74,9 @@ namespace RestfulApi.Controllers
                 {
                     return BadRequest("Must provide an end date");
                 }
-                List<Booking> bookingList = await _bookingdata.GetBookingsInTimeslot(start.Value, end.Value);
+
+                SearchBookingsFilters newSearch = new SearchBookingsFilters { StubId = stubId, OrderId = orderId, CustomerEmail = customerEmail, CustomerPhone = customerPhone, SortOption = sortOption};
+                List<Booking> bookingList = await _bookingdata.GetBookingsInTimeslot(start, end.Value, newSearch);
 
                 if (bookingList == null)
                 {

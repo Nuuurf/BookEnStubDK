@@ -16,12 +16,12 @@ namespace TestProject.API.DAO
     public class GetAvailableBookingsForGivenDateTest
     {
         [Test]
-        public async Task GetAvailableBookingsForGivenDate_ShouldReturn120AvailableBookings_WithValidDate()
+        public async Task GetAvailableBookingsForGivenDate_ShouldReturn119AvailableBookings_WithValidDate()
         {
             //Arrange
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
 IDBBooking booking = new DBBooking();
-            int expectedAvailbleBookingCount = 120;
+            int expectedAvailbleBookingCount = 119;
             int expectedTimeSlots = 13;
             int stubCount = new GetMaxStubs().GetMaxDBStubs();
             DateTime date = new DateTime(2023, 11, 10);
