@@ -42,11 +42,12 @@ namespace TestProject.API.DAO
             var start = inDates[0];
             var end = inDates[1];
             const int expectedBookingCount = 3; // Set your expected count here
+SearchBookingsFilters filters = new SearchBookingsFilters();
 
             TestContext.WriteLine($"Testing timeslot: Start - {start}, End - {end}");
 
             // Act
-            var bookings = await _dbBooking.GetBookingsInTimeslot(_dbConnection, start, end);
+            var bookings = await _dbBooking.GetBookingsInTimeslot(_dbConnection, start, end, filters);
 
             // Additional Information
             TestContext.WriteLine($"Number of bookings returned: {bookings.Count}");
@@ -71,10 +72,28 @@ namespace TestProject.API.DAO
             var end = new DateTime(8002, 11, 10, 16, 0, 0);
 
             // Act
-            var bookings = await _dbBooking.GetBookingsInTimeslot(_dbConnection, start, end);
+            var bookings = await _dbBooking.GetBookingsInTimeslot(_dbConnection, start, end, new SearchBookingsFilters());
 
             // Assert
             Assert.IsEmpty(bookings);
+        }
+        [Test]
+        public async Task GetBookingWithStubIdFilter_ShouldRetrieveCorrectBookings()
+        {
+            // Arrange
+            var start = new DateTime(2023, 11, 10, 9, 0, 0);
+            var end = new DateTime(2023, 11, 10, 12, 0, 0);
+            int expectedStubId = 1; // Example stub ID
+            SearchBookingsFilters filters = new SearchBookingsFilters { StubId = expectedStubId };
+
+            // Act
+            var bookings = await _dbBooking.GetBookingsInTimeslot(_dbConnection, start, end, filters);
+
+            // Assert
+            foreach (var booking in bookings)
+            {
+                Assert.That(booking.StubId, Is.EqualTo(expectedStubId), $"Booking ID {booking.Id} should have the stub ID {expectedStubId}");
+            }
         }
         }
 }

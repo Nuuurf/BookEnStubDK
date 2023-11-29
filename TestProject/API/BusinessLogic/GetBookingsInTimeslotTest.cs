@@ -27,12 +27,12 @@ namespace TestProject.API.BusinessLogic
                 new Booking {Id = 1, TimeStart = start, TimeEnd = start.AddHours(1), Notes = "Hello" },
                 new Booking {Id = 2, TimeStart = start, TimeEnd = start.AddHours(1), Notes = "Olleh" } };
 
-            mockDBBooking.Setup(repo => repo.GetBookingsInTimeslot(null!, start, end, null!)).ReturnsAsync(bookings);
+            mockDBBooking.Setup(repo => repo.GetBookingsInTimeslot(null!, start, end, null!, null!)).ReturnsAsync(bookings);
 
             BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, null!, null!); 
 
             //Act
-            var result = await controller.GetBookingsInTimeslot(start, end);
+            var result = await controller.GetBookingsInTimeslot(start, end, null!);
 
             //Assert
             Assert.That(result, Is.EqualTo(bookings));
@@ -49,7 +49,7 @@ namespace TestProject.API.BusinessLogic
             BookingDataControl controller = new BookingDataControl(null!, null!, null!);
 
             //Act
-            var result = await controller.GetBookingsInTimeslot(start, end);
+            var result = await controller.GetBookingsInTimeslot(start, end, null!);
 
             //Assert
             Assert.Null(result);
@@ -64,7 +64,7 @@ namespace TestProject.API.BusinessLogic
             BookingDataControl controller = new BookingDataControl(null!, null!, null!);
 
             //Act
-            var result = await controller.GetBookingsInTimeslot(start, start);
+            var result = await controller.GetBookingsInTimeslot(start, start, null!);
 
             //Assert
             Assert.Null(result);
