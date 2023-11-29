@@ -49,10 +49,13 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between">
                             <h5 class="mb-0">Valgte Tidspunkter</h5>
-                            <button class="btn btn-success btn-sm confirm-booking-btn" disabled>
+                            <form asp-controller="Booking" asp-action="Confirm" method="post" id="bookingForm">
+                            <input type="text" id="jsonDataInput" name="jsonDataInput" style="display: none;">
+                                <button class="btn btn-success btn-sm confirm-booking-btn" onclick="prepareAndSubmit()" disabled>
                                 <!--confirm-booking-btn to check button press-->
                                 Bestil Booking <i class="fas fa-check"></i>
                             </button>
+                            </form>
                         </div>
                         <div class="card-body">
                             <ul class="list-group" id="selected-appointments">
@@ -80,7 +83,7 @@
         <script src="~/js/BookingPage.js"></script>
 
         <script>
-            // Runs a GET request to fetch available times for entered date
+            // Makes a GET request to fetch available times for entered date
             $(document).ready(function () {
                 $('#date-search-btn').on('click', function (event) {
                     // Get the value from the input field
@@ -112,32 +115,14 @@
                     });
                 });
             });
-            // Runs a POST request to send over bookings
-            $(document).ready(function () {
-                $('.confirm-booking-btn').on('click', function () {
-                    saveAppointmentsToLocalStorage();
-                    var selectedAppointments = localStorage.getItem('selectedAppointments');
 
-                    if (selectedAppointments != null) {
-                        $.ajax({
-                            url: '@Url.Action("Confirm", "Booking")',
-                            type: 'POST',
-                            contentType: 'application/json', // Set content type to specify JSON data
-                            data: JSON.stringify("Confirm"),
-                            success: function (response) {
-                                // Handle the success response (if needed)
-                                $('body').html(response);
-                            },
-                            error: function (xhr, status, error) {
-                                // Handle errors
-                                console.error('Error:', error);
-                            }
-                        });
-                    } else {
-                        console.log("No appointments for booking added")
-                    }
-                });
-            });
+            // Submit timeslots and save appointments
+            function prepareAndSubmit() {
+                saveAppointmentsToLocalStorage();
+                var jsonData = "Confirm";
+                document.getElementById('jsonDataInput').value = jsonData;
+                document.getElementById('bookingForm').submit();
+            }
         </script>
     </body>
     </html>
