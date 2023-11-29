@@ -8,6 +8,8 @@ namespace RestfulApi.BusinessLogic {
         public Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(DateTime date);
         
         public Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end);
+
+        public Task<bool> DeleteBooking(int bookingId);
     
     }
 }

@@ -7,17 +7,14 @@ using System.Globalization;
 using RestfulApi.DTOs;
 using System.ComponentModel.DataAnnotations;
 
-namespace RestfulApi.Controllers
-{
+namespace RestfulApi.Controllers {
 
     [ApiController]
     [Route("[controller]")]
-    public class BookingController : ControllerBase
-    {
+    public class BookingController : ControllerBase {
         private readonly IBookingData _bookingdata;
 
-        public BookingController(IBookingData bookingData)
-        {
+        public BookingController(IBookingData bookingData) {
             _bookingdata = bookingData;
         }
 
@@ -53,58 +50,47 @@ namespace RestfulApi.Controllers
 
         //URL: api/booking
         [HttpGet]
-        public async Task<IActionResult> ShowBookingsInTimeSlot(DateTime? start, DateTime? end, bool showAvailable)
-        {
-            if (start == null)
-            {
+        public async Task<IActionResult> ShowBookingsInTimeSlot(DateTime? start, DateTime? end, bool showAvailable) {
+            if (start == null) {
                 return BadRequest("Start date is required");
             }
-            try
-            {
-                if (showAvailable == true)
-                {
+            try {
+                if (showAvailable == true) {
                     DateTime dateFormatted = start.Value.Date;
                     List<AvailableBookingsForTimeframe> availableList = await _bookingdata.GetAvailableBookingsForGivenDate(dateFormatted);
 
-                    if (availableList == null)
-                    {
+                    if (availableList == null) {
                         return NotFound("Placed date is prior to today");
                     }
 
                     return Ok(availableList);
                 }
 
-                if (end == null)
-                {
+                if (end == null) {
                     return BadRequest("Must provide an end date");
                 }
                 List<Booking> bookingList = await _bookingdata.GetBookingsInTimeslot(start.Value, end.Value);
 
-                if (bookingList == null)
-                {
+                if (bookingList == null) {
                     return BadRequest("End date must be after start date.");
                 }
-                if(bookingList.Count == 0)
-                {
+                if (bookingList.Count == 0) {
                     return NotFound("No bookings found.");
                 }
 
                 return Ok(bookingList);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
-        
+
         // URL: api/booking
         [HttpPost]
-        public async Task<IActionResult> CreateBooking(BookingRequest? booking = null)
-        {
+        public async Task<IActionResult> CreateBooking(BookingRequest? booking = null) {
             //Console.WriteLine(booking.Customer.FullName.ToString());
             // Handle Customer association with BookingOrder here
-            if (booking != null)
-            {
+            if (booking != null) {
                 List<DTONewBooking> dtos = booking.Appointments;
                 List<Booking> bookings = dtos.Select(itemA => new Booking {
                     // Map properties from ObjectTypeA to ObjectTypeB
@@ -119,24 +105,20 @@ namespace RestfulApi.Controllers
                     Email = booking.Customer.Email
                 };
 
-                try
-                {
+                try {
 
                     int newBookingId = await _bookingdata.CreateBooking(bookings, customer);
 
-                    if (newBookingId != 0)
-                    {
+                    if (newBookingId != 0) {
                         return Ok(newBookingId);
                     }
-                    else
-                    {
+                    else {
                         //No stubs are available, status might have changed from last opdate of UI
                         //Added translations for the lulz
                         return UnprocessableEntity("DA: Alle stubbe for denne tidsperiode er optaget \n EN: All stubs for this period are unavailable");
                     }
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     return StatusCode(500, $"Internal Server Error: {ex.Message}");
                 }
             }
@@ -145,19 +127,23 @@ namespace RestfulApi.Controllers
             }
         }
 
-        /*
-                // URL: api/booking
-                [HttpDelete("{id}")]
-                public IActionResult DeleteBooking(int id) {
-                    try {
-                        bool bookingSuccess = _DBBooking.DeleteBooking(id);
-                        if (bookingSuccess == false) {
-                            return NotFound("Booking not deleted");
-                        }
-                        return Ok(bookingSuccess);
-                    } catch (Exception ex) {
-                        return StatusCode(500, $"Internal Server Error: {ex.Message}");
-                    }
-                }*/
+
+        // URL: api/booking
+        [HttpDelete("{id}")]
+        public IActionResult DeleteBooking(int id) {
+            try {
+                bool bookingSuccess = _bookingdata.DeleteBooking(id).Result;
+                if(bookingSuccess) {
+                    return Ok(bookingSuccess);
+                }
+                else {
+                    //Could not find any booking with the id. Answer unprocessable entity
+                    return UnprocessableEntity("Could not find booking with that id");
+                }
+            }
+            catch (Exception ex) {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
     }
 }

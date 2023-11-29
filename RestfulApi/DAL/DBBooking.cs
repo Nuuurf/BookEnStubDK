@@ -89,7 +89,34 @@ namespace RestfulApi.DAL {
             catch {
                 return new List<AvailableBookingsForTimeframe>();
             }
+        }
 
+        public async Task<bool> DeleteBooking(IDbConnection conn, int bookingId, IDbTransaction trans = null) {
+            bool result = false;
+            string script = "Delete from Booking where Id = @id";
+
+            try {
+                var parameter = new { id = bookingId };
+
+                int affected = await conn.ExecuteAsync(script, parameter, transaction: trans);
+
+                //number of rows updated
+                if(affected == 1) {
+                    result = true;
+                }
+                else if(affected < 1) {
+                    //multiple deletions happened
+                    throw new Exception($"Unexpected number of deletions ({affected}) while trying to delete booking with id: {bookingId}");
+                }
+                else {
+                    throw new Exception("Unable to delete booking with id:" + bookingId);
+                }
+            }
+            catch (Exception ex) {
+                throw new Exception("Unexpect error happened while trying to delete booking \n" + ex.Message);
+            }
+
+            return result;
         }
         
     }
