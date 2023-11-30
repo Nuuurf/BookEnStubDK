@@ -49,7 +49,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(30, 199);
+            label1.Location = new Point(30, 237);
             label1.Name = "label1";
             label1.Size = new Size(95, 15);
             label1.TabIndex = 0;
@@ -58,7 +58,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(30, 236);
+            label2.Location = new Point(30, 274);
             label2.Name = "label2";
             label2.Size = new Size(96, 15);
             label2.TabIndex = 1;
@@ -67,7 +67,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(30, 274);
+            label3.Location = new Point(30, 193);
             label3.Name = "label3";
             label3.Size = new Size(122, 15);
             label3.TabIndex = 2;
@@ -84,37 +84,38 @@
             // 
             // txtBox_FullName
             // 
-            txtBox_FullName.Location = new Point(131, 194);
+            txtBox_FullName.Location = new Point(131, 232);
             txtBox_FullName.Margin = new Padding(3, 2, 3, 2);
             txtBox_FullName.Name = "txtBox_FullName";
-            txtBox_FullName.Size = new Size(309, 23);
+            txtBox_FullName.Size = new Size(321, 23);
             txtBox_FullName.TabIndex = 4;
             txtBox_FullName.TextChanged += txtBox_FullName_TextChanged;
             // 
             // txtBox_Email
             // 
-            txtBox_Email.Location = new Point(131, 230);
+            txtBox_Email.Location = new Point(131, 268);
             txtBox_Email.Margin = new Padding(3, 2, 3, 2);
             txtBox_Email.Name = "txtBox_Email";
-            txtBox_Email.Size = new Size(309, 23);
+            txtBox_Email.Size = new Size(321, 23);
             txtBox_Email.TabIndex = 5;
             txtBox_Email.TextChanged += txtBox_Email_TextChanged;
             // 
             // txtBox_PhoneNumber
             // 
-            txtBox_PhoneNumber.Location = new Point(131, 268);
+            txtBox_PhoneNumber.Location = new Point(131, 190);
             txtBox_PhoneNumber.Margin = new Padding(3, 2, 3, 2);
             txtBox_PhoneNumber.Name = "txtBox_PhoneNumber";
-            txtBox_PhoneNumber.Size = new Size(309, 23);
+            txtBox_PhoneNumber.Size = new Size(321, 23);
             txtBox_PhoneNumber.TabIndex = 6;
             txtBox_PhoneNumber.TextChanged += txtBox_PhoneNumber_TextChanged;
+            txtBox_PhoneNumber.Leave += txtBox_PhoneNumber_Leave;
             // 
             // txtBox_Notes
             // 
             txtBox_Notes.Location = new Point(131, 306);
             txtBox_Notes.Margin = new Padding(3, 2, 3, 2);
             txtBox_Notes.Name = "txtBox_Notes";
-            txtBox_Notes.Size = new Size(309, 23);
+            txtBox_Notes.Size = new Size(321, 23);
             txtBox_Notes.TabIndex = 7;
             // 
             // btn_OK

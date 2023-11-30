@@ -269,5 +269,31 @@ namespace WinFormsApp
 
             return bookingRequest;
         }
+
+        private void txtBox_PhoneNumber_Leave(object sender, EventArgs e)
+        {
+            updateCustomerFields(txtBox_PhoneNumber.Text);
+        }
+
+        private async void updateCustomerFields(string phone)
+        {
+            string url = $"Customer/{phone}";
+            try
+            {
+                DTOCustomer customer = await _apiService.GetAsync<DTOCustomer>(url);
+                if (customer == null)
+                {
+                    txtBox_Email.Text = "";
+                    txtBox_FullName.Text = "";
+                    throw new Exception("Customer didnt exist");
+                }
+                txtBox_Email.Text = customer.Email;
+                txtBox_FullName.Text = customer.FullName;
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
     }
 }
