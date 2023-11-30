@@ -37,9 +37,9 @@ namespace WinFormsApp
             _bookings = new List<Booking>();
 
             SetToday();
-            getData();
             InitializeComponent();
             initializeDatepickers();
+            getData();
         }
 
         /// <summary>
@@ -75,10 +75,23 @@ namespace WinFormsApp
             //Do to possbile errors, try/catch needed.
             try
             {
+                dataGridView1.AutoGenerateColumns = true;
                 //Tries to get bookings from API.
                 _bookings = await _bookingController.getBookingsFromAPI(_start, _end.AddDays(1), false);
                 //Displays the list of bookings in the table.
                 dataGridView1.DataSource = _bookings;
+                foreach (DataGridViewColumn column in dataGridView1.Columns)
+                {
+                    if(column.Name == "Notes")
+                    {
+                        column.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    }
+                    else
+                    {
+                        column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    }
+                    
+                }
             }
             catch (HttpRequestException e)
             {
