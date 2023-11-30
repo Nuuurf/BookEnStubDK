@@ -139,7 +139,11 @@ namespace WinFormsApp
         /// <param name="e"></param>
         private async void btn_Add_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("This function is not implemented", "Not implemented");
+
+            AddBookingForm frm = new AddBookingForm();
+            frm.Show();
+
+            //MessageBox.Show("This function is not implemented", "Not implemented");
         }
 
         /// <summary>
