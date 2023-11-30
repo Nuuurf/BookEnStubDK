@@ -1,9 +1,9 @@
 ﻿namespace RestfulApi.Models
 {
-    public class AvailableBookingsForTimeframe
+    public class AvailableStubsForHour
     {
         public DateTime TimeStart { get; set; }
         public DateTime TimeEnd { get; set; }
-        public int AvailableStubs { get; set; }
+        public List<int> AvailableStubIds { get; set; }
     }
 }

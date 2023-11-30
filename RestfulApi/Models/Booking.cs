@@ -7,7 +7,7 @@
         public DateTime TimeStart { get; set; }
         public DateTime TimeEnd { get; set; }
         public string? Notes { get; set; }
-        public int StubId { get; set; }
+        public int? StubId { get; set; }
         public Customer? Customer { get; set; }
     }
 }

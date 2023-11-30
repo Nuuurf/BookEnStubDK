@@ -12,9 +12,12 @@ namespace RestfulApi.DAL {
 
         //bool UpdateBooking(int bookingID, Booking booking);
 
-        public Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, DateTime start, DateTime end, SearchBookingsFilters filters, IDbTransaction transaction = null!);
+        public Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, BookingRequestFilter req, IDbTransaction transaction = null!);
 
-        public Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(IDbConnection conn, DateTime date, IDbTransaction transaction = null!);
+        public Task<List<int>> GetBookedStubsForHour(IDbConnection conn, DateTime hour, IDbTransaction transaction = null!);
+
+        public Task<List<int>> GetAllStubs(IDbConnection conn, IDbTransaction transaction = null!);
+
 
     }
 }

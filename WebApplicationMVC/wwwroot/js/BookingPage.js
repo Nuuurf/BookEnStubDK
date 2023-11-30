@@ -79,8 +79,7 @@ function processApiResponse(apiResponse) {
         var startTime = formatTime(item.timeStart);
         var endTime = formatTime(item.timeEnd);
         var date = formatDate(item.timeStart);
-        var availableStubs = item.availableStubs;
-
+        var availableStubs = item.availableStubIds.length;
         var todaysDate = new Date();
         var [hours, minutes] = startTime.split('.');
         var [year, month, day] = date.split('/');

@@ -4,6 +4,7 @@ using RestfulApi.Models;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Transactions;
 
 namespace RestfulApi.BusinessLogic {
@@ -60,7 +61,14 @@ namespace RestfulApi.BusinessLogic {
                     }
 
                     //Persist each booking from input
-                    foreach (Booking b in bookings) {
+                    foreach (Booking b in bookings)
+                    {
+                        b.StubId = await GetAvailableOrRandomStub(_connection, b.StubId, b.TimeStart, transaction);
+
+                        if (b.StubId == null)
+                        {
+                            throw new Exception($"No Available stubs for {b.TimeStart}");
+                        }
                         await _dBBooking.CreateBooking(_connection, b, newBookingOrderId, transaction);
                     }
 
@@ -79,7 +87,6 @@ namespace RestfulApi.BusinessLogic {
                 return newBookingOrderId;
             }
         }
-
         public async Task<bool> DeleteBooking(int bookingId) {
             bool result = false;
             try {
@@ -94,23 +101,53 @@ namespace RestfulApi.BusinessLogic {
             }
             return result;
         }
-
-        public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(DateTime date) {
-            DateTime currentDate = DateTime.Now.Date;
-
-            if (date < currentDate) {
-                return null!;
+        public async Task<List<AvailableStubsForHour>> GetAvailableStubsForGivenTimeFrame(DateTime start, DateTime end)
+        {
+            if (start > end)
+            {
+                return null;
             }
-            List<AvailableBookingsForTimeframe> availableBookings = await _dBBooking.GetAvailableBookingsForGivenDate(_connection, date);
 
-            return availableBookings;
+            List<AvailableStubsForHour> availabilityList = new List<AvailableStubsForHour>();
+
+            // Fetch all stubs
+            List<int> allStubs = await _dBBooking.GetAllStubs(_connection);
+
+            // Fetch all bookings in the specified time frame in a single query
+            BookingRequestFilter req = new BookingRequestFilter { Start = start, End = end };
+            List<Booking> allBookingsInRange = await _dBBooking.GetBookingsInTimeslot(_connection, req);
+
+            for (DateTime date = start; date <= end; date = date.AddHours(1))
+            {
+                if (date.Hour < 9 || date.Hour >= 22) continue;
+
+                List<int> bookedStubsForHour = allBookingsInRange
+                    .Where(booking => booking.TimeStart >= date && booking.TimeStart < date.AddHours(1))
+                    .Select(booking => booking.StubId)
+                    .Where(stubId => stubId.HasValue) // Filter out null values
+                    .Select(stubId => stubId.Value)
+                    .Distinct()
+                    .ToList();
+
+                // Use Except with both collections being List<int>
+                List<int> availableStubs = allStubs.Except(bookedStubsForHour).ToList();
+
+                availabilityList.Add(new AvailableStubsForHour
+                {
+                    TimeStart = date,
+                    TimeEnd = date.AddHours(1),
+                    AvailableStubIds = availableStubs
+                });
+            }
+
+            return availabilityList;
         }
 
-        public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end, SearchBookingsFilters filters) {
-            if (start >= end) {
+        public async Task<List<Booking>> GetBookingsInTimeslot(BookingRequestFilter req) {
+            if (req.Start >= req.End) {
                 return null!;
             }
-            List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(_connection, start, end, filters);
+            List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(_connection, req);
 
             return bookings;
         }
@@ -134,6 +171,34 @@ namespace RestfulApi.BusinessLogic {
             }
 
             return validDates;
+        }
+        private async Task<int?> GetAvailableOrRandomStub(IDbConnection conn, int? desiredStubId, DateTime startTime, IDbTransaction transaction = null)
+        {
+            // Get all stubs
+            List<int> allStubs = await _dBBooking.GetAllStubs(conn, transaction);
+
+            var bookedStubs = await _dBBooking.GetBookedStubsForHour(conn, startTime, transaction);
+            if (desiredStubId != null || desiredStubId >= 1 || desiredStubId <= allStubs.Count)
+            {
+
+                // Check if the desired stub is available
+                if (!bookedStubs.Contains(desiredStubId.Value))
+                {
+                    return desiredStubId;
+                }
+            }
+            
+            // Exclude booked stubs
+            var availableStubs = allStubs.Except(bookedStubs).ToList();
+
+            // Select a random stub if any are available
+            if (availableStubs.Any())
+            {
+                Random random = new Random();
+                return availableStubs[random.Next(availableStubs.Count)];
+            }
+
+            return null; // No stubs available
         }
 
     }

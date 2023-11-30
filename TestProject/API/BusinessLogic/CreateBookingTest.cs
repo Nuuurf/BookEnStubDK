@@ -53,6 +53,13 @@ public class CreateBookingTest
         mockDBBooking.Setup(repo =>
                 repo.CreateNewBookingOrder(mockDBConnection.Object, mockDbTransaction.Object))
             .ReturnsAsync(1);
+        mockDBBooking.Setup(repo => repo.GetAllStubs(mockDBConnection.Object, mockDbTransaction.Object))
+            .ReturnsAsync(new List<int>{1});
+
+        mockDBBooking
+            .Setup(repo =>
+                repo.GetBookedStubsForHour(mockDBConnection.Object, It.IsAny<DateTime>(), mockDbTransaction.Object))
+            .ReturnsAsync(new List<int>());
 
         BookingDataControl controller
             = new BookingDataControl(mockDBBooking.Object, mockCustomerControl.Object, mockDBConnection.Object);
@@ -159,7 +166,13 @@ Customer customer = new Customer();
         var mockDBBooking = new Mock<IDBBooking>();
         var (mockDBConnection, mockDbTransaction) = PredefinedMocks.ConnectionMocks();
         var mockCustomerControl = MockCustomerControl();
+        mockDBBooking.Setup(repo => repo.GetAllStubs(mockDBConnection.Object, mockDbTransaction.Object))
+            .ReturnsAsync(new List<int>());
 
+        mockDBBooking
+            .Setup(repo =>
+                repo.GetBookedStubsForHour(mockDBConnection.Object, It.IsAny<DateTime>(), mockDbTransaction.Object))
+            .ReturnsAsync(new List<int>());
         mockDBBooking.Setup(repo => repo.CreateBooking(
                 mockDBConnection.Object,
                 booking,
@@ -196,6 +209,14 @@ Customer customer = new Customer();
         };
 
         Customer customer = new Customer();
+
+        mockDBBooking.Setup(repo => repo.GetAllStubs(mockDBConnection.Object, mockDbTransaction.Object))
+            .ReturnsAsync(new List<int>());
+
+        mockDBBooking
+            .Setup(repo =>
+                repo.GetBookedStubsForHour(mockDBConnection.Object, It.IsAny<DateTime>(), mockDbTransaction.Object))
+            .ReturnsAsync(new List<int>());
         mockDBBooking.Setup(repo => repo.CreateBooking(
                 mockDBConnection.Object,
                 It.IsAny<Booking>(),

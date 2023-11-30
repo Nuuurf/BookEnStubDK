@@ -42,12 +42,12 @@ namespace TestProject.API.DAO
             var start = inDates[0];
             var end = inDates[1];
             const int expectedBookingCount = 3; // Set your expected count here
-SearchBookingsFilters filters = new SearchBookingsFilters();
+            BookingRequestFilter filter = new BookingRequestFilter { Start = start, End = end };
 
             TestContext.WriteLine($"Testing timeslot: Start - {start}, End - {end}");
 
             // Act
-            var bookings = await _dbBooking.GetBookingsInTimeslot(_dbConnection, start, end, filters);
+            var bookings = await _dbBooking.GetBookingsInTimeslot(_dbConnection, filter);
 
             // Additional Information
             TestContext.WriteLine($"Number of bookings returned: {bookings.Count}");
@@ -70,9 +70,9 @@ SearchBookingsFilters filters = new SearchBookingsFilters();
             // Arrange for a timeslot where you're sure there are no bookings
             var start = new DateTime(8002, 11, 10, 15, 0, 0);
             var end = new DateTime(8002, 11, 10, 16, 0, 0);
-
+            BookingRequestFilter filter = new BookingRequestFilter { Start = start, End = end };
             // Act
-            var bookings = await _dbBooking.GetBookingsInTimeslot(_dbConnection, start, end, new SearchBookingsFilters());
+            var bookings = await _dbBooking.GetBookingsInTimeslot(_dbConnection, filter);
 
             // Assert
             Assert.IsEmpty(bookings);
@@ -84,10 +84,10 @@ SearchBookingsFilters filters = new SearchBookingsFilters();
             var start = new DateTime(2023, 11, 10, 9, 0, 0);
             var end = new DateTime(2023, 11, 10, 12, 0, 0);
             int expectedStubId = 1; // Example stub ID
-            SearchBookingsFilters filters = new SearchBookingsFilters { StubId = expectedStubId };
-
+            BookingRequestFilter filter = new BookingRequestFilter { Start = start, End = end, StubId = expectedStubId};
+            
             // Act
-            var bookings = await _dbBooking.GetBookingsInTimeslot(_dbConnection, start, end, filters);
+            var bookings = await _dbBooking.GetBookingsInTimeslot(_dbConnection, filter);
 
             // Assert
             foreach (var booking in bookings)
