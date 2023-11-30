@@ -82,7 +82,7 @@ namespace WinFormsApp
                 dataGridView1.DataSource = _bookings;
                 foreach (DataGridViewColumn column in dataGridView1.Columns)
                 {
-                    if(column.Name == "Notes")
+                    if (column.Name == "Notes")
                     {
                         column.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     }
@@ -90,7 +90,7 @@ namespace WinFormsApp
                     {
                         column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                     }
-                    
+
                 }
             }
             catch (HttpRequestException e)
@@ -220,6 +220,33 @@ namespace WinFormsApp
                     break;
             }
             dataGridView1.DataSource = sortedData;
+        }
+
+        private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            MessageBox.Show("This should open the details tab on the selected row ", "Not implemented");
+        }
+
+        private void dataGridView1_RowEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            btn_Edit.Enabled = true;
+            btn_Delete.Enabled = true;
+            btn_Details.Enabled = true;
+        }
+
+        private void btn_Details_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This should open the details tab on the selected row ", "Not implemented");
+        }
+
+        private void btn_Edit_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This should open the Edit tab on the selected row ", "Not implemented");
+        }
+
+        private void btn_Delete_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This should open the Delete box on the selected row ", "Not implemented");
         }
     }
 }
