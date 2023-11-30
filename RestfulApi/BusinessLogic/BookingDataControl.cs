@@ -106,6 +106,8 @@ namespace RestfulApi.BusinessLogic {
             if (start > end)
             {
                 return null;
+            }
+
             List<AvailableStubsForHour> availabilityList = new List<AvailableStubsForHour>();
 
             // Fetch all stubs

@@ -16,15 +16,15 @@ namespace WinFormsApp
     {
 
         private ApiService _apiService;
-        private List<AvailableBookingsForTimeframe> _availableBookingsList;
-        private List<AvailableBookingsForTimeframe> _selectedTimeSlot;
+        private List<AvailableStubsForHour> _availableBookingsList;
+        private List<AvailableStubsForHour> _selectedTimeSlot;
 
 
         public AddBookingForm()
         {
             _apiService = new ApiService();
-            _availableBookingsList = new List<AvailableBookingsForTimeframe>();
-            _selectedTimeSlot = new List<AvailableBookingsForTimeframe>();
+            _availableBookingsList = new List<AvailableStubsForHour>();
+            _selectedTimeSlot = new List<AvailableStubsForHour>();
             InitializeComponent();
 
             initializeDatePicker();
@@ -52,11 +52,11 @@ namespace WinFormsApp
             await getAviableTimeSlotsFromAPI();
 
 
-            foreach (AvailableBookingsForTimeframe availableBookings in _availableBookingsList)
+            foreach (AvailableStubsForHour availableBookings in _availableBookingsList)
             {
 
                 string builder = availableBookings.TimeStart.Hour + " - " + availableBookings.TimeEnd.Hour + ", Stubs: " +
-                    availableBookings.AvailableStubs;
+                    availableBookings.AvailableStubIds.Count;
 
 
                 cmb_AvailableTimeSlot.Items.Add(builder);
@@ -68,7 +68,7 @@ namespace WinFormsApp
         {
             string date = dtp_BookingDate.Value.ToString("yyyy-MM-dd");
             string url = $"Booking?start={date}&showAvailable=true&sortOption=0";
-            _availableBookingsList = await _apiService.GetAsync<List<AvailableBookingsForTimeframe>>(url);
+            _availableBookingsList = await _apiService.GetAsync<List<AvailableStubsForHour>>(url);
 
             // https://localhost:7021/Booking?start=2023-11-30&showAvailable=true&sortOption=0
 
@@ -86,9 +86,9 @@ namespace WinFormsApp
 
         private void cmb_AvailableTimeSlot_SelectedIndexChanged(object sender, EventArgs e)
         {
-            AvailableBookingsForTimeframe selectedTimeSlot = _availableBookingsList[cmb_AvailableTimeSlot.SelectedIndex];
+            AvailableStubsForHour selectedTimeSlot = _availableBookingsList[cmb_AvailableTimeSlot.SelectedIndex];
 
-            if (selectedTimeSlot.AvailableStubs > 0)
+            if (selectedTimeSlot.AvailableStubIds.Count > 0)
             {
                 btn_Add.Enabled = true;
             }
@@ -100,7 +100,7 @@ namespace WinFormsApp
 
         private void btn_Add_Click(object sender, EventArgs e)
         {
-            AvailableBookingsForTimeframe selectedTimeSlot = _availableBookingsList[cmb_AvailableTimeSlot.SelectedIndex];
+            AvailableStubsForHour selectedTimeSlot = _availableBookingsList[cmb_AvailableTimeSlot.SelectedIndex];
 
             _selectedTimeSlot.Add(selectedTimeSlot);
 
@@ -119,7 +119,7 @@ namespace WinFormsApp
             lbo_SelectedTime.Items.Clear();
 
             // Iterate through each selected time slot and add a formatted string representation to the ListBox
-            foreach (AvailableBookingsForTimeframe selectedTimeSlot in _selectedTimeSlot)
+            foreach (AvailableStubsForHour selectedTimeSlot in _selectedTimeSlot)
             {
                 // Format the selected time slot information
                 string formattedTimeSlot = $"{selectedTimeSlot.TimeStart.Date.ToString("dd-MM-yyyy")}: " +
@@ -151,7 +151,7 @@ namespace WinFormsApp
         private void btn_Remove_Click(object sender, EventArgs e)
         {
             // Get the selected time slot from the list box
-            AvailableBookingsForTimeframe selectedTimeSlot = _selectedTimeSlot[lbo_SelectedTime.SelectedIndex];
+            AvailableStubsForHour selectedTimeSlot = _selectedTimeSlot[lbo_SelectedTime.SelectedIndex];
 
             // Remove the selected time slot from the list of selected time slots
             _selectedTimeSlot.Remove(selectedTimeSlot);
@@ -197,7 +197,7 @@ namespace WinFormsApp
         /// <param name="e"></param>
         private void lbo_SelectedTime_EnabledChanged(object sender, EventArgs e)
         {
-            updateButtonOk();
+            UpdateButtonOk();
         }
         /// <summary>
         /// Every time the text in the textbox named: txtBox_FullName changes this event will be called
@@ -206,7 +206,7 @@ namespace WinFormsApp
         /// <param name="e"></param>
         private void txtBox_FullName_TextChanged(object sender, EventArgs e)
         {
-            updateButtonOk();
+            UpdateButtonOk();
         }
         /// <summary>
         /// Every time the text in the textbox named: txtBox_Email changes this event will be called
@@ -215,7 +215,7 @@ namespace WinFormsApp
         /// <param name="e"></param>
         private void txtBox_Email_TextChanged(object sender, EventArgs e)
         {
-            updateButtonOk();
+            UpdateButtonOk();
         }
         /// <summary>
         /// Every time the text in the textbox named: txtBox_PhoneNumber changes this event will be called
@@ -224,7 +224,7 @@ namespace WinFormsApp
         /// <param name="e"></param>
         private void txtBox_PhoneNumber_TextChanged(object sender, EventArgs e)
         {
-            updateButtonOk();
+            UpdateButtonOk();
         }
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace WinFormsApp
             BookingRequest bookingRequest = new BookingRequest();
             DTOCustomer customer = new DTOCustomer() { FullName = txtBox_FullName.Text, Email = txtBox_Email.Text, Phone = txtBox_PhoneNumber.Text };
 
-            foreach (AvailableBookingsForTimeframe selectedBookings in _selectedTimeSlot)
+            foreach (AvailableStubsForHour selectedBookings in _selectedTimeSlot)
             {
                 bookingRequest.Appointments.Add(new NewBooking() { TimeStart = selectedBookings.TimeStart, TimeEnd = selectedBookings.TimeEnd, Notes = txtBox_Notes.Text });
 
