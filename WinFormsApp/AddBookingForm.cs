@@ -142,7 +142,7 @@ namespace WinFormsApp
             btn_Remove.Enabled = false;
         }
 
-      
+
 
         private void updateButtonOk()
         {
@@ -178,6 +178,22 @@ namespace WinFormsApp
         private void txtBox_PhoneNumber_TextChanged(object sender, EventArgs e)
         {
             updateButtonOk();
+        }
+
+        private async void btn_OK_Click(object sender, EventArgs e)
+        {
+            string url = "Booking";
+            BookingRequest bookingRequest = new BookingRequest();
+            DTOCustomer customer = new DTOCustomer() { FullName = txtBox_FullName.Text, Email = txtBox_Email.Text, Phone = txtBox_PhoneNumber.Text};
+
+            foreach(AvailableBookingsForTimeframe selectedBookings in _selectedTimeSlot)
+            {
+                bookingRequest.Appointments.Add(new NewBooking() { TimeStart = selectedBookings.TimeStart, TimeEnd = selectedBookings.TimeEnd, Notes = txtBox_Notes.Text });
+
+            }
+            bookingRequest.Customer = customer;
+
+            int a = await _apiService.PostAsync<BookingRequest, int>(url, bookingRequest);
         }
     }
 }

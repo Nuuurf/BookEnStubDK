@@ -29,20 +29,20 @@ namespace WinFormsApp.Controllers
             return response;
         }
 
-        //public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest content)
-        //{
-        //    var jsonContent = JsonSerializer.Serialize(content);
-        //    var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+        public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest content)
+        {
+            var jsonContent = JsonConvert.SerializeObject(content);
+            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-        //    var requestMessage = new HttpRequestMessage(HttpMethod.Post, _url + url)
-        //    {
-        //        Content = httpContent
-        //    };
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _url + url)
+            {
+                Content = httpContent
+            };
 
-        //    var response = await SendRequestAsync<TResponse>(requestMessage);
+            var response = await SendRequestAsync<TResponse>(requestMessage);
 
-        //    return response;
-        //}
+            return response;
+        }
 
         private async Task<T> SendRequestAsync<T>(HttpRequestMessage requestMessage)
         {
