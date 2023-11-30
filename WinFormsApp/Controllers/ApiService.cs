@@ -44,6 +44,12 @@ namespace WinFormsApp.Controllers
             return response;
         }
 
+        public async Task DeleteAsync(string url)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, _url + url);
+            await SendRequestAsync<object>(requestMessage);
+        }
+
         private async Task<T> SendRequestAsync<T>(HttpRequestMessage requestMessage)
         {
             var response = await _httpClient.SendAsync(requestMessage);

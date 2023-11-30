@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.Design;
 using WinFormsApp.Controllers;
 using WinFormsApp.Exceptions;
 using WinFormsApp.Models;
@@ -19,6 +20,7 @@ namespace WinFormsApp
     public partial class BookingTableForm : Form
     {
         BookingController _bookingController;
+        ApiService _apiService;
         List<Booking> _bookings;
 
         /// <summary>
@@ -34,6 +36,7 @@ namespace WinFormsApp
         public BookingTableForm()
         {
             _bookingController = new BookingController();
+            _apiService = new ApiService();
             _bookings = new List<Booking>();
 
             SetToday();
@@ -248,9 +251,33 @@ namespace WinFormsApp
             MessageBox.Show("This should open the Edit tab on the selected row ", "Not implemented");
         }
 
-        private void btn_Delete_Click(object sender, EventArgs e)
+        private async void btn_Delete_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("This should open the Delete box on the selected row ", "Not implemented");
+            Booking? selectedBooking = new Booking();
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                selectedBooking = dataGridView1.SelectedRows[0].DataBoundItem as Booking;
+            }
+            if(selectedBooking != null)
+            {
+                // Display a confirmation dialog
+                DialogResult result = MessageBox.Show($"Are you sure you want to delete booking {selectedBooking.Id}?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                // Check the user's response
+                if (result == DialogResult.Yes)
+                {
+                    await _apiService.DeleteAsync($"Booking/{selectedBooking.Id}");
+
+                    getData();
+                }
+                else
+                {
+                    // User canceled the deletion
+                    // You can add additional logic or simply do nothing
+                }
+            }
+            
+            //MessageBox.Show("This should open the Delete box on the selected row ", "Not implemented");
         }
     }
 }
