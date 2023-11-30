@@ -94,19 +94,12 @@ namespace RestfulApi.Controllers {
             //Console.WriteLine(booking.Customer.FullName.ToString());
             // Handle Customer association with BookingOrder here
             if (booking != null) {
-                List<DTONewBooking> dtos = booking.Appointments;
-                List<Booking> bookings = dtos.Select(itemA => new Booking {
-                    // Map properties from ObjectTypeA to ObjectTypeB
-                    TimeStart = itemA.TimeStart,
-                    TimeEnd = itemA.TimeEnd,
-                    Notes = itemA.Notes,
-                }).ToList();
+                
+                //Convert from dto to internal model class
+                List<Booking> bookings = DTO.ConvertToBookingList(booking.Appointments);
 
-                Customer customer = new Customer {
-                    FirstName = booking.Customer.FullName,
-                    Phone = booking.Customer.Phone,
-                    Email = booking.Customer.Email
-                };
+                Customer customer = DTO.ConvertToCustomer(booking.Customer);
+                
 
                 try {
 
