@@ -7,6 +7,7 @@ using System.Globalization;
 using RestfulApi.DTOs;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using RestfulApi.Exceptions;
 
 namespace RestfulApi.Controllers {
 
@@ -109,14 +110,10 @@ namespace RestfulApi.Controllers {
 
                     int newBookingId = await _bookingdata.CreateBooking(bookings, customer);
 
-                    if (newBookingId != 0) {
-                        return Ok(newBookingId);
-                    }
-                    else {
-                        //No stubs are available, status might have changed from last opdate of UI
-                        //Added translations for the lulz
-                        return UnprocessableEntity("DA: Alle stubbe for denne tidsperiode er optaget \n EN: All stubs for this period are unavailable");
-                    }
+                    return Ok(newBookingId);
+                }
+                catch (OverBookingException ex) {
+                    return UnprocessableEntity("DA: Alle stubbe for denne tidsperiode er optaget \n EN: All stubs for this period are unavailable");
                 }
                 catch (Exception ex) {
                     return StatusCode(500, $"Internal Server Error: {ex.Message}");

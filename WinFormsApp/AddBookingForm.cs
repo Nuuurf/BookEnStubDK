@@ -292,7 +292,8 @@ namespace WinFormsApp
             }
             catch (Exception ex)
             {
-
+                txtBox_Email.Text = "";
+                txtBox_FullName.Text = "";
             }
         }
     }

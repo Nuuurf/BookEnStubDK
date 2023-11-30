@@ -60,6 +60,10 @@ namespace WinFormsApp.Controllers
                 {
                     throw new NoBookingException();
                 }
+                else if(response.StatusCode == System.Net.HttpStatusCode.UnprocessableEntity)
+                {
+                    throw new OverBookingException(await response.Content.ReadAsStringAsync());
+                }
                 else
                 {
                     throw new HttpRequestException();

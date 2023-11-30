@@ -1,5 +1,6 @@
 ﻿using RestfulApi;
 using RestfulApi.DAL;
+using RestfulApi.Exceptions;
 using RestfulApi.Models;
 using System.Data;
 using System.Data.Common;
@@ -67,7 +68,7 @@ namespace RestfulApi.BusinessLogic {
 
                         if (b.StubId == null)
                         {
-                            throw new Exception($"No Available stubs for {b.TimeStart}");
+                            throw new OverBookingException($"No Available stubs for {b.TimeStart}");
                         }
                         await _dBBooking.CreateBooking(_connection, b, newBookingOrderId, transaction);
                     }
