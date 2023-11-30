@@ -106,11 +106,11 @@ namespace RestfulApi.BusinessLogic {
             return availableBookings;
         }
 
-        public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end) {
+        public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end, SearchBookingsFilters filters) {
             if (start >= end) {
                 return null!;
             }
-            List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(_connection, start, end);
+            List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(_connection, start, end, filters);
 
             return bookings;
         }

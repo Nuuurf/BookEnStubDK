@@ -67,7 +67,7 @@ private static Customer customer = new Customer
         public async Task AssociateCustomerWithBookingOrder_ShouldReturnTrue() {
             //Arrange
             //Make sure that there is a booking order with id 1 and customer with id 1 in test database
-            int bookingOrderId = 1;
+            int bookingOrderId = 12;
             int customerId = 21; //for some reason
             bool result = false;
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
@@ -84,7 +84,7 @@ private static Customer customer = new Customer
         [Test]
         public async Task AssociateCustomerWithBookingOrder_ShouldThrowException() {
             // Arrange
-            int bookingOrderId = 1;
+            int bookingOrderId = 12;
             int customerId = 1;
             IDbConnection conn = DBConnection.Instance.GetOpenConnection();
 

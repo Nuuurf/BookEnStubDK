@@ -16,7 +16,7 @@ namespace TestProject.API.DAO
         [Test]
         public async Task AssociateCustomerWithBookingOrder_ShouldReturnTrue() {
             //Arrange
-            int orderId = 1; //We just assume that we haven't cleaned the test db, if it fuckes insert an order with default in setup
+            int orderId = 12; //We just assume that we haven't cleaned the test db, if it fuckes insert an order with default in setup
             int customerId = 21; //Just the value inside the test database
             bool result = false;
             IDBCustomer dBCustomer = new DBCustomer();
@@ -33,7 +33,7 @@ namespace TestProject.API.DAO
         [Test]
         public Task AssociateCustomerWithBookingOrder_ShouldThrowException() {
             //Arrange
-            int orderId = 1; //We just assume that we haven't cleaned the test db, if it fuckes insert an order with default in setup
+            int orderId = 12; //We just assume that we haven't cleaned the test db, if it fuckes insert an order with default in setup
             int customerId = -1; //value which does not exist 
             IDBCustomer dBCustomer = new DBCustomer();
             //Act & Assert
