@@ -87,13 +87,25 @@ namespace RestfulApi.BusinessLogic {
                 return newBookingOrderId;
             }
         }
+        public async Task<bool> DeleteBooking(int bookingId) {
+            bool result = false;
+            try {
+                result = await _dBBooking.DeleteBooking(_connection, bookingId);
+
+                //if (result == false) {
+                //    throw new Exception($"Deletion of booking with id: {bookingId} resulted in unexpected result");
+                //}
+            }
+            catch {
+                throw;
+            }
+            return result;
+        }
         public async Task<List<AvailableStubsForHour>> GetAvailableStubsForGivenTimeFrame(DateTime start, DateTime end)
         {
             if (start > end)
             {
                 return null;
-            }
-            
             List<AvailableStubsForHour> availabilityList = new List<AvailableStubsForHour>();
 
             // Fetch all stubs

@@ -6,8 +6,7 @@ using RestfulApi.Models;
 
 namespace RestfulApi.DAL;
 
-public class DBBooking : IDBBooking
-{
+public class DBBooking : IDBBooking {
     /// <summary>
     ///     Inserts a new booking with its values into the database.
     /// </summary>
@@ -77,20 +76,17 @@ public class DBBooking : IDBBooking
 
         List<Booking> bookings;
 
-        try
-        {
+        try {
             var query = script.ToString();
             bookings = (await conn.QueryAsync<Booking, Customer, Booking>(
                 query,
-                (booking, customer) =>
-                {
+                (booking, customer) => {
                     booking.Customer = customer; // Map the customer to the booking
                     return booking;
                 },
                 parameters, transaction, splitOn: "FirstName")).ToList();
         }
-        catch
-        {
+        catch {
             throw;
 
         }
@@ -99,19 +95,16 @@ public class DBBooking : IDBBooking
     }
 
 
-    public async Task<int> CreateNewBookingOrder(IDbConnection conn, IDbTransaction trans = null!)
-    {
+    public async Task<int> CreateNewBookingOrder(IDbConnection conn, IDbTransaction trans = null!) {
         const string insertBookingOrderQuery = "INSERT INTO BookingOrder DEFAULT VALUES; SELECT SCOPE_IDENTITY();";
         int bookingOrderId = -1;
 
-        try
-        {
+        try {
             // Create a new BookingOrder
             CommandDefinition commandDefinition = new CommandDefinition(insertBookingOrderQuery, transaction: trans);
             bookingOrderId = await conn.ExecuteScalarAsync<int>(commandDefinition);
         }
-        catch
-        {
+        catch {
             // Return fail value if failed to create BookingOrder
             return -1;
         }
@@ -130,11 +123,40 @@ public class DBBooking : IDBBooking
         var result = await conn.QueryAsync<int>(query, new { HourStart = hourStart, HourEnd = hourEnd }, transaction : transaction);
         return result.ToList();
     }
+
     public async Task<List<int>> GetAllStubs(IDbConnection conn, IDbTransaction transaction = null!)
     {
         string query = "SELECT Id FROM Stub";
         var stubs = await conn.QueryAsync<int>(query, transaction : transaction);
 
         return stubs.ToList();
+    }
+    
+    public async Task<bool> DeleteBooking(IDbConnection conn, int bookingId, IDbTransaction trans = null) {
+        bool result = false;
+        string script = "Delete from Booking where Id = @id";
+
+        try {
+            var parameter = new { id = bookingId };
+
+            int affected = await conn.ExecuteAsync(script, parameter, transaction: trans);
+
+            //number of rows updated
+            if (affected == 1) {
+                result = true;
+            }
+            else if (affected < 1) {
+                //multiple deletions happened
+                throw new Exception($"Unexpected number of deletions ({affected}) while trying to delete booking with id: {bookingId}");
+            }
+            else {
+                throw new Exception("Unable to delete booking with id:" + bookingId);
+            }
+        }
+        catch (Exception ex) {
+            throw new Exception("Unexpect error happened while trying to delete booking \n" + ex.Message);
+        }
+
+        return result;
     }
 }

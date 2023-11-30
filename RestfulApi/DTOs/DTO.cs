@@ -19,5 +19,21 @@ namespace RestfulApi.DTOs {
                 Notes = itemA.Notes,
             }).ToList();
         }
+
+        public static List<DTONewBooking> ConvertToDTONewBooking(List<Booking> bookingToConvert) {
+            return bookingToConvert.Select(itemA => new DTONewBooking {
+                TimeStart = itemA.TimeStart,
+                TimeEnd = itemA.TimeEnd,
+                Notes = itemA.Notes,
+            }).ToList();
+        }
+
+        public static DTOCustomer ConvertToDTOCustomer(Customer customerToConvert) {
+            return new DTOCustomer {
+                FullName = customerToConvert.FirstName,
+                Phone = customerToConvert.Phone,
+                Email = customerToConvert.Email
+            };
+        }
     }
 }
