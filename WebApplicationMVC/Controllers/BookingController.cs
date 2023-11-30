@@ -14,45 +14,49 @@ using System;
 namespace WebApplicationMVC.Controllers {
     public class BookingController : Controller {
 
-        //API URL: /Booking/Index/
+        // URL: /Booking/Index/
         public IActionResult Index() {
             return View();
         }
 
-        // API URL: /Booking/ConfirmBoooking/
+        // URL: /Booking/ConfirmBooking/
         [HttpPost]
         public async Task<IActionResult> BookAppointment(string fullName, string email, string phoneNumber, string? notes, string jsonString) {
             List<NewBooking> bookingList = new List<NewBooking>();
             int id = -1;
-            //fix for exception if notes are null :)
-            if (notes == null) { notes = String.Empty; }
+            // Check if booking string is empty
+            if (string.IsNullOrEmpty(jsonString) || jsonString == "[]") {
+                return RedirectToAction("Index");
+            } else {
+                // Fix for exception if notes are null :)
+                if (notes == null) { notes = String.Empty; }
 
-            List<string> dateTimes = JsonConvert.DeserializeObject<List<string>>(jsonString)!;
+                List<string> dateTimes = JsonConvert.DeserializeObject<List<string>>(jsonString)!;
 
-            foreach (var dateTimeString in dateTimes) {
-                if (DateTime.TryParse(dateTimeString, out DateTime parsedDateTime)) {
-                    // Add to the list if the parsing is successful
-                    bookingList.Add(new NewBooking() {
-                        TimeStart = parsedDateTime,
-                        TimeEnd = parsedDateTime.AddHours(1),
-                        Notes = notes
-                    });
-                } else {
-                    return BadRequest("Invalid DateTime format");
+                foreach (var dateTimeString in dateTimes) {
+                    if (DateTime.TryParse(dateTimeString, out DateTime parsedDateTime)) {
+                        // Add to the list if the parsing is successful
+                        bookingList.Add(new NewBooking() {
+                            TimeStart = parsedDateTime,
+                            TimeEnd = parsedDateTime.AddHours(1),
+                            Notes = notes
+                        });
+                    } else {
+                        return BadRequest("Invalid DateTime format");
+                    }
                 }
-            }
 
-            try {
-                Customer customer = new Customer {
-                    FullName = fullName,
-                    Email = email,
-                    Phone = phoneNumber
-                };
-                id = await SendBooking(bookingList, customer);
-            } catch (Exception ex) {
-                Response.StatusCode = 500;
-                return View("BookingError", ex.Message);
-                //return Json(new { error = ex.Message });
+                try {
+                    Customer customer = new Customer {
+                        FullName = fullName,
+                        Email = email,
+                        Phone = phoneNumber
+                    };
+                    id = await SendBooking(bookingList, customer);
+                } catch (Exception ex) {
+                    Response.StatusCode = 500;
+                    return View("BookingError", ex.Message);
+                }
             }
             return View("BookingConfirmed", id);
         }
@@ -89,14 +93,10 @@ namespace WebApplicationMVC.Controllers {
                     throw;
                 }
             }
-            var viewModel = new {
-                View = View("BookingConfirmed"),
-                ID = id
-            };
             return id;
         }
 
-        // API URL: /Booking/Confirm
+        // URL: /Booking/Confirm
         // Added to prevent error page and force user to "Index" page
         [HttpGet]
         public IActionResult Confirm() {
@@ -105,15 +105,16 @@ namespace WebApplicationMVC.Controllers {
 
         // API URL: /Booking/Confirm
         [HttpPost]
-        public IActionResult Confirm([FromBody] string data) {
-            if (data == "Confirm") {
+        public IActionResult Confirm(string jsonDataInput) {
+            Console.WriteLine(jsonDataInput);
+            if (jsonDataInput == "Confirm") {
                 return View();
             } else {
-                return BadRequest("Invalid booking data");
+                return RedirectToAction("Index");
             }
         }
 
-        // API URL: /Booking/GetAvailaibleTimes/{date}
+        // URL: /Booking/GetAvailaibleTimes/{date}
         [HttpGet]
         public async Task<ActionResult> GetAvailableTimes(string date) {
             // Simulated URL for fetching data (replace this with your actual API endpoint)

@@ -107,89 +107,11 @@
                             // Update the value of the hidden field
                             $('#jsonString').val(postData);
                         }
-
-                        //
-                        //
-                        //
-                        // <summary DEPRECATED <summary>
-                        //
-                        //
-                        /*
-                        // Make the POST request
-                        $.ajax({
-                            url: '@Url.Action("BookAppointment", "Booking")',
-                            type: 'POST',
-                            contentType: 'application/json',
-                            data: postData,
-                            success: function (response) {
-                                // Handle success
-                                var id = response.id;
-                                showBookingConfirmation(id);
-                                console.log('Booking confirmed, ID:', id);
-                            },
-                            error: function (xhr, status, error) {
-                                // Handle error, since it can be in two different formats
-                                try {
-                                    var parsedResponse = $.parseJSON(xhr.responseText);
-
-                                    if (parsedResponse && parsedResponse.error) {
-                                        var errorMessage = parsedResponse.error;
-                                        console.log('Error message:', errorMessage);
-                                        $('#errorTextBox').text(errorMessage);
-                                    }
-                                } catch (parseError) {
-                                    var errorMessage = xhr.responseText;
-                                    $('#errorTextBox').text(errorMessage);
-                                }
-                                loadingButtonIcon(false);
-                            }
-                        });*/
                     } else {
                         console.log('No appointments found in local storage');
                     }
                 });
             });
-
-            function loadingButtonIcon(enabled) {
-                if (enabled) {
-                    $('.btn-book-confirm').append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
-                } else {
-                    $('.btn-book-confirm').find('span.spinner-border').remove();
-                }
-            }
-
-            function showBookingConfirmation(id) {
-                // Create a confirmation modal using Bootstrap classes
-                var confirmationModal = `
-                                                                                                                                                                                                            <div class="container mt-5">
-                    <div class="row justify-content-center">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Booking Information</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="text-center">
-                                        <div class="icon-box">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-check-circle-fill text-success" viewBox="0 0 16 16">
-                                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                                            </svg>
-                                        </div>
-                                        <h4 class="mt-4">Booking Bekræftet!</h4>
-                                        <p>Din reservation er blevet bekræftet.</p>
-                                        <p>Dit Booking-ID er: ` + id + `</p>
-                                        <a href="/Booking/Index" class="btn btn-success">Gå Tilbage</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-
-                // Replace the entire body with the modal content
-                $('body').html(confirmationModal);
-            }
-                     
         </script>
     </body>
     </html>
