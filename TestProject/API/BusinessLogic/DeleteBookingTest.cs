@@ -32,21 +32,21 @@ namespace TestProject.API.BusinessLogic {
 
 
         [Test]
-        public async Task DeleteBooking_shouldThrowException() {
+        public async Task DeleteBooking_shouldReturnFalse() {
             //Arrange
             Mock<IDBBooking> mockDBBooking = new Mock<IDBBooking>();
             var (mockConnection, mockTransaction) = PredefinedMocks.ConnectionMocks();
             int bookingId = -1;
+            bool result = true;
 
             //set up mock
             mockDBBooking.Setup(m => m.DeleteBooking(mockConnection.Object, bookingId, mockTransaction.Object)).ReturnsAsync(false);
             BookingDataControl bdc = new BookingDataControl(mockDBBooking.Object, null, mockConnection.Object);
             //Act
-            AsyncTestDelegate testDelegate = async () => 
-            await bdc.DeleteBooking(bookingId);
+            result = await bdc.DeleteBooking(bookingId);
 
             //Assert
-            Assert.ThrowsAsync<Exception>(testDelegate);
+            Assert.False(result);
         }
     }
 }
