@@ -193,7 +193,14 @@ namespace WinFormsApp
             }
             bookingRequest.Customer = customer;
 
-            int a = await _apiService.PostAsync<BookingRequest, int>(url, bookingRequest);
+            try{
+                int a = await _apiService.PostAsync<BookingRequest, int>(url, bookingRequest);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
+            
         }
     }
 }
