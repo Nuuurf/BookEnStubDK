@@ -12,7 +12,9 @@ namespace TestProject.API.Utilities {
             return new Booking {
                 TimeStart = DateTime.Now,
                 TimeEnd = DateTime.Now.AddHours(1),
-                Notes = "Delete me please"
+                Notes = "Delete me please",
+                StubId = 1
+
             };
         }
 
@@ -20,7 +22,8 @@ namespace TestProject.API.Utilities {
             return new Booking {
                 TimeStart = DateTime.Now.AddYears(-1000),
                 TimeEnd = DateTime.Now.AddHours(1).AddYears(-1000),
-                Notes = "Delete me please"
+                Notes = "Delete me please",
+                StubId = 1
             };
         }
     }
