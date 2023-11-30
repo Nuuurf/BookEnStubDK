@@ -195,6 +195,7 @@ namespace WinFormsApp
 
             try{
                 int a = await _apiService.PostAsync<BookingRequest, int>(url, bookingRequest);
+                this.Dispose();
             }
             catch(Exception ex)
             {
