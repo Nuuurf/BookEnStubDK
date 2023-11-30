@@ -80,6 +80,21 @@ namespace RestfulApi.BusinessLogic {
             }
         }
 
+        public async Task<bool> DeleteBooking(int bookingId) {
+            bool result = false;
+            try {
+                result = await _dBBooking.DeleteBooking(_connection, bookingId);
+
+                //if (result == false) {
+                //    throw new Exception($"Deletion of booking with id: {bookingId} resulted in unexpected result");
+                //}
+            }
+            catch {
+                throw;
+            }
+            return result;
+        }
+
         public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(DateTime date) {
             DateTime currentDate = DateTime.Now.Date;
 

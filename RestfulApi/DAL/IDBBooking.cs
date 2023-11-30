@@ -8,7 +8,7 @@ namespace RestfulApi.DAL {
 
         public Task<int> CreateNewBookingOrder(IDbConnection conn, IDbTransaction trans);
 
-        //bool DeleteBooking(int bookingID);
+        public Task<bool> DeleteBooking(IDbConnection conn, int bookingID, IDbTransaction trans = null!);
 
         //bool UpdateBooking(int bookingID, Booking booking);
 

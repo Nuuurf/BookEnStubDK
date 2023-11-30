@@ -5,8 +5,7 @@ using RestfulApi.Models;
 
 namespace RestfulApi.DAL;
 
-public class DBBooking : IDBBooking
-{
+public class DBBooking : IDBBooking {
     /// <summary>
     ///     Inserts a new booking with its values into the database.
     /// </summary>
@@ -17,8 +16,7 @@ public class DBBooking : IDBBooking
     public async Task<int> CreateBooking(IDbConnection conn,
         Booking booking,
         int bookingOrderID,
-        IDbTransaction transaction = null!)
-    {
+        IDbTransaction transaction = null!) {
         string script = "InsertBooking";
         int newBookingId = 0;
 
@@ -39,8 +37,7 @@ public class DBBooking : IDBBooking
     DateTime start,
     DateTime end,
     SearchBookingsFilters filters,
-    IDbTransaction transaction = null!)
-    {
+    IDbTransaction transaction = null!) {
         StringBuilder script = new StringBuilder(
             "SELECT b.Id, b.TimeStart, b.TimeEnd, b.Notes, b.StubId, b.BookingOrderID, bo.Id as OrderID" +
             ", c.name as FirstName, c.phone, c.email " +
@@ -61,8 +58,7 @@ public class DBBooking : IDBBooking
             script.Append(" AND c.phone = @CustomerPhone");
 
         // Adjust the sorting mechanism
-        switch (filters.SortOption)
-        {
+        switch (filters.SortOption) {
             case BookingSortOption.Date:
                 script.Append(" ORDER BY b.TimeStart");
                 break;
@@ -74,8 +70,7 @@ public class DBBooking : IDBBooking
                 break;
         }
 
-        var parameters = new
-        {
+        var parameters = new {
             TimeStart = start,
             TimeEnd = end,
             StubId = filters.StubId,
@@ -86,20 +81,17 @@ public class DBBooking : IDBBooking
 
         List<Booking> bookings;
 
-        try
-        {
+        try {
             var query = script.ToString();
             bookings = (await conn.QueryAsync<Booking, Customer, Booking>(
                 query,
-                (booking, customer) =>
-                {
+                (booking, customer) => {
                     booking.Customer = customer; // Map the customer to the booking
                     return booking;
                 },
                 parameters, transaction, splitOn: "FirstName")).ToList();
         }
-        catch
-        {
+        catch {
             throw;
 
         }
@@ -108,19 +100,16 @@ public class DBBooking : IDBBooking
     }
 
 
-    public async Task<int> CreateNewBookingOrder(IDbConnection conn, IDbTransaction trans = null!)
-    {
+    public async Task<int> CreateNewBookingOrder(IDbConnection conn, IDbTransaction trans = null!) {
         const string insertBookingOrderQuery = "INSERT INTO BookingOrder DEFAULT VALUES; SELECT SCOPE_IDENTITY();";
         int bookingOrderId = -1;
 
-        try
-        {
+        try {
             // Create a new BookingOrder
             CommandDefinition commandDefinition = new CommandDefinition(insertBookingOrderQuery, transaction: trans);
             bookingOrderId = await conn.ExecuteScalarAsync<int>(commandDefinition);
         }
-        catch
-        {
+        catch {
             // Return fail value if failed to create BookingOrder
             return -1;
         }
@@ -130,12 +119,10 @@ public class DBBooking : IDBBooking
 
     public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(IDbConnection conn,
         DateTime date,
-        IDbTransaction transaction = null!)
-    {
+        IDbTransaction transaction = null!) {
         string script = "dbo.GetAvailableBookingsForDate";
 
-        try
-        {
+        try {
             var parameter = new { date = date.Date };
 
             var result = await conn.QueryAsync<AvailableBookingsForTimeframe>(script,
@@ -145,9 +132,35 @@ public class DBBooking : IDBBooking
 
             return result.ToList();
         }
-        catch
-        {
+        catch {
             return new List<AvailableBookingsForTimeframe>();
         }
+    }
+    public async Task<bool> DeleteBooking(IDbConnection conn, int bookingId, IDbTransaction trans = null) {
+        bool result = false;
+        string script = "Delete from Booking where Id = @id";
+
+        try {
+            var parameter = new { id = bookingId };
+
+            int affected = await conn.ExecuteAsync(script, parameter, transaction: trans);
+
+            //number of rows updated
+            if (affected == 1) {
+                result = true;
+            }
+            else if (affected < 1) {
+                //multiple deletions happened
+                throw new Exception($"Unexpected number of deletions ({affected}) while trying to delete booking with id: {bookingId}");
+            }
+            else {
+                throw new Exception("Unable to delete booking with id:" + bookingId);
+            }
+        }
+        catch (Exception ex) {
+            throw new Exception("Unexpect error happened while trying to delete booking \n" + ex.Message);
+        }
+
+        return result;
     }
 }
