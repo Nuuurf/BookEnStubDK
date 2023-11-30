@@ -42,11 +42,13 @@ public class DBBooking : IDBBooking
     IDbTransaction transaction = null!)
     {
         StringBuilder script = new StringBuilder(
-            "SELECT b.Id, b.TimeStart, b.TimeEnd, b.Notes, b.StubId, b.BookingOrderID " +
+            "SELECT b.Id, b.TimeStart, b.TimeEnd, b.Notes, b.StubId, b.BookingOrderID, bo.Id as OrderID" +
+            ", c.name as FirstName, c.phone, c.email " +
             "FROM Booking b " +
             "INNER JOIN BookingOrder bo ON b.BookingOrderID = bo.Id " +
             "INNER JOIN Customer c ON bo.customer_id_FK = c.Id " +
             "WHERE b.TimeStart < @TimeEnd AND b.TimeEnd > @TimeStart");
+
 
         // Dynamically build the query based on provided filters
         if (filters.StubId.HasValue)
@@ -86,13 +88,20 @@ public class DBBooking : IDBBooking
 
         try
         {
-            Console.WriteLine(script.ToString());
-            bookings = (await conn.QueryAsync<Booking>(script.ToString(), parameters, transaction)).ToList();
+            var query = script.ToString();
+            bookings = (await conn.QueryAsync<Booking, Customer, Booking>(
+                query,
+                (booking, customer) =>
+                {
+                    booking.Customer = customer; // Map the customer to the booking
+                    return booking;
+                },
+                parameters, transaction, splitOn: "FirstName")).ToList();
         }
         catch
         {
-            //if it fails send null for error handling in blc
-            bookings = null!;
+            throw;
+
         }
 
         return bookings;
