@@ -4,6 +4,10 @@ using RestfulApi.DAL;
 using System.Data;
 using System.Data.Sql;
 using System.Data.SqlClient;
+using System.Text.Json.Serialization;
+using Swashbuckle.AspNetCore.SwaggerGen;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,17 +30,14 @@ builder.Services.AddScoped<IDBBooking, DBBooking>();
 //    // Explicitly specify the constructor to use
 //    return ActivatorUtilities.CreateInstance<DBBooking>(serviceProvider, connection);
 //});
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-
-    // Use enum names instead of integer values
-    c.UseInlineDefinitionsForEnums();
-});
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
