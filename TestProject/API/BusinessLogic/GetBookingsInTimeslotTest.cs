@@ -21,18 +21,20 @@ namespace TestProject.API.BusinessLogic
             var mockDBBooking = new Mock<IDBBooking>();
 
             DateTime start = DateTime.Now;
-            DateTime end = start.AddHours(1);
-
+            BookingRequestFilter filter = new BookingRequestFilter
+            {
+                Start = start, End = start.AddHours(1)
+            };
             List<Booking> bookings = new List<Booking> {
                 new Booking {Id = 1, TimeStart = start, TimeEnd = start.AddHours(1), Notes = "Hello" },
                 new Booking {Id = 2, TimeStart = start, TimeEnd = start.AddHours(1), Notes = "Olleh" } };
 
-            mockDBBooking.Setup(repo => repo.GetBookingsInTimeslot(null!, start, end, null!, null!)).ReturnsAsync(bookings);
+            mockDBBooking.Setup(repo => repo.GetBookingsInTimeslot(null!, filter, null!)).ReturnsAsync(bookings);
 
             BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, null!, null!); 
 
             //Act
-            var result = await controller.GetBookingsInTimeslot(start, end, null!);
+            var result = await controller.GetBookingsInTimeslot(filter);
 
             //Assert
             Assert.That(result, Is.EqualTo(bookings));
@@ -44,12 +46,15 @@ namespace TestProject.API.BusinessLogic
         {
             //Arrange
             DateTime start = DateTime.Now;
-            DateTime end = start.AddHours(-1);
-            
+            BookingRequestFilter filter = new BookingRequestFilter
+            {
+                Start = start, End = start.AddHours(-1)
+            };
+
             BookingDataControl controller = new BookingDataControl(null!, null!, null!);
 
             //Act
-            var result = await controller.GetBookingsInTimeslot(start, end, null!);
+            var result = await controller.GetBookingsInTimeslot(filter);
 
             //Assert
             Assert.Null(result);
@@ -60,11 +65,16 @@ namespace TestProject.API.BusinessLogic
         {
             //Arrange
             DateTime start = DateTime.Now;
+            BookingRequestFilter filter = new BookingRequestFilter
+            {
+                Start = start,
+                End = start
+            };
 
             BookingDataControl controller = new BookingDataControl(null!, null!, null!);
 
             //Act
-            var result = await controller.GetBookingsInTimeslot(start, start, null!);
+            var result = await controller.GetBookingsInTimeslot(filter);
 
             //Assert
             Assert.Null(result);

@@ -9,7 +9,6 @@ using Moq;
 using RestfulApi.Controllers;
 using RestfulApi.DAL;
 using RestfulApi.Models;
-using WebApplicationMVC.Models;
 using RestfulApi.BusinessLogic;
 using System.Collections;
 
@@ -26,6 +25,11 @@ namespace TestProject.API.Controller
         {
             //Arrange
             DateTime date = DateTime.Now.Date;
+
+            BookingRequestFilter filter = new BookingRequestFilter
+            {
+                Start = date, End = date.AddDays(1), ShowAvailable = true
+            };
             var mockBusinessBooking = new Mock<IBookingData>();
             mockBusinessBooking.Setup(repo => repo.GetAvailableStubsForGivenTimeFrame(date, date.AddDays(1))).ReturnsAsync(new List<AvailableStubsForHour>());
 
@@ -33,7 +37,7 @@ namespace TestProject.API.Controller
 
 
             //Act
-            var result = await controller.ShowBookingsInTimeSlot(date, null, true);
+            var result = await controller.ShowBookingsInTimeSlot(filter);
 
             //Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -44,6 +48,10 @@ namespace TestProject.API.Controller
         {
             //Arrange
             DateTime date = DateTime.Now.Date.AddDays(-1);
+            BookingRequestFilter filter = new BookingRequestFilter
+            {
+                Start = date, ShowAvailable = true
+            };
             List<AvailableStubsForHour> nullList = null!;
 
             var mockBusinessBooking = new Mock<IBookingData>();
@@ -52,7 +60,7 @@ namespace TestProject.API.Controller
             BookingController controller = new BookingController(mockBusinessBooking.Object);
 
             //Act
-            var result = await controller.ShowBookingsInTimeSlot(date, null, true);
+            var result = await controller.ShowBookingsInTimeSlot(filter);
 
             //Assert
             Assert.IsInstanceOf<BadRequestObjectResult>(result);
@@ -67,14 +75,17 @@ namespace TestProject.API.Controller
             //Arrange
             DateTime start = DateTime.Now;
             DateTime end = start.AddHours(1);
-
+            BookingRequestFilter filter = new BookingRequestFilter
+            {
+                Start = start, End = end, ShowAvailable = false
+            };
             var mockBusinessBooking = new Mock<IBookingData>();
-            mockBusinessBooking.Setup(repo => repo.GetBookingsInTimeslot(start, end, It.IsAny<SearchBookingsFilters>())).ReturnsAsync(new List<Booking>());
+            mockBusinessBooking.Setup(repo => repo.GetBookingsInTimeslot(filter)).ReturnsAsync(new List<Booking>());
 
             BookingController controller = new BookingController(mockBusinessBooking.Object);
 
             //Act
-            var result = await controller.ShowBookingsInTimeSlot(start, end, false);
+            var result = await controller.ShowBookingsInTimeSlot(filter);
 
             //Assert
             Assert.IsInstanceOf<NotFoundObjectResult>(result);
@@ -85,19 +96,22 @@ namespace TestProject.API.Controller
         {
             //Arrange
             var mockBusinessBooking = new Mock<IBookingData>();
-DateTime start = DateTime.Now;
+            DateTime start = DateTime.Now;
             DateTime end = start.AddHours(1);
-
+            BookingRequestFilter filter = new BookingRequestFilter
+            {
+                Start = start, End = end, ShowAvailable = false
+            };
             List<Booking> bookings = new List<Booking> {
                 new Booking {Id = 1, TimeStart = start, TimeEnd = start.AddHours(1), Notes = "Hello" },
                 new Booking {Id = 2, TimeStart = start, TimeEnd = start.AddHours(1), Notes = "Olleh" } };
 
-            mockBusinessBooking.Setup(repo => repo.GetBookingsInTimeslot(start, end, It.IsAny<SearchBookingsFilters>())).ReturnsAsync(bookings);
+            mockBusinessBooking.Setup(repo => repo.GetBookingsInTimeslot(filter)).ReturnsAsync(bookings);
 
             BookingController controller = new BookingController(mockBusinessBooking.Object);
 
             //Act
-            var result = await controller.ShowBookingsInTimeSlot(start, end, false) as OkObjectResult;
+            var result = await controller.ShowBookingsInTimeSlot(filter) as OkObjectResult;
 
             //Assert
             Assert.NotNull(result);
@@ -110,11 +124,12 @@ DateTime start = DateTime.Now;
         {
             //Arrange
             BookingController controller = new BookingController(null!);
-
+            BookingRequestFilter filter = new BookingRequestFilter
+            {
+                Start = DateTime.Now, ShowAvailable = false
+            };
             //Act
-            DateTime start = DateTime.Now;
-
-            var result = await controller.ShowBookingsInTimeSlot(start, null, false);
+            var result = await controller.ShowBookingsInTimeSlot(filter);
 
             //Assert
             Assert.IsInstanceOf<BadRequestObjectResult>(result);
@@ -125,16 +140,18 @@ DateTime start = DateTime.Now;
         {
             //Arrange
             DateTime start = DateTime.Now;
-            DateTime end = start.AddHours(-1);
             List<Booking> nullList = null!;
-
+            BookingRequestFilter filter = new BookingRequestFilter
+            {
+                Start = start, End = start.AddHours(-1), ShowAvailable = false
+            };
             var mockBusinessBooking = new Mock<IBookingData>();
-            mockBusinessBooking.Setup(repo => repo.GetBookingsInTimeslot(start, end, null!)).ReturnsAsync(nullList);
+            mockBusinessBooking.Setup(repo => repo.GetBookingsInTimeslot(filter)).ReturnsAsync(nullList);
 
             BookingController controller = new BookingController(mockBusinessBooking.Object);
 
             //Act
-            var result = await controller.ShowBookingsInTimeSlot(start, end, false) as BadRequestObjectResult;
+            var result = await controller.ShowBookingsInTimeSlot(filter) as BadRequestObjectResult;
 
             //Assert
             Assert.IsInstanceOf<BadRequestObjectResult>(result);
@@ -145,17 +162,17 @@ DateTime start = DateTime.Now;
         {
             //Arrange
             DateTime start = DateTime.Now;
-            DateTime end = start.AddHours(+1);
+            BookingRequestFilter filter = new BookingRequestFilter
+            {
+                Start = start, End = start.AddHours(-1), ShowAvailable = false
+            };
             var mockBusinessBooking = new Mock<IBookingData>();
-            mockBusinessBooking.Setup(repo => repo.GetBookingsInTimeslot(start, end, It.IsAny<SearchBookingsFilters>()))
-                .Throws(new Exception());
+            mockBusinessBooking.Setup(repo => repo.GetBookingsInTimeslot(filter)).Throws(new Exception());
 
             BookingController controller = new BookingController(mockBusinessBooking.Object);
 
             //Act
-            
-
-            var resultTask = controller.ShowBookingsInTimeSlot(start, end, false);
+            var resultTask = controller.ShowBookingsInTimeSlot(filter);
             var result = await resultTask;
 
             //Assert

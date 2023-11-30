@@ -93,14 +93,15 @@ namespace RestfulApi.BusinessLogic {
             {
                 return null;
             }
-
+            
             List<AvailableStubsForHour> availabilityList = new List<AvailableStubsForHour>();
 
             // Fetch all stubs
             List<int> allStubs = await _dBBooking.GetAllStubs(_connection);
 
             // Fetch all bookings in the specified time frame in a single query
-            var allBookingsInRange = await _dBBooking.GetBookingsInTimeslot(_connection, start, end, new SearchBookingsFilters());
+            BookingRequestFilter req = new BookingRequestFilter { Start = start, End = end };
+            List<Booking> allBookingsInRange = await _dBBooking.GetBookingsInTimeslot(_connection, req);
 
             for (DateTime date = start; date <= end; date = date.AddHours(1))
             {
@@ -128,11 +129,11 @@ namespace RestfulApi.BusinessLogic {
             return availabilityList;
         }
 
-        public async Task<List<Booking>> GetBookingsInTimeslot(DateTime start, DateTime end, SearchBookingsFilters filters) {
-            if (start >= end) {
+        public async Task<List<Booking>> GetBookingsInTimeslot(BookingRequestFilter req) {
+            if (req.Start >= req.End) {
                 return null!;
             }
-            List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(_connection, start, end, filters);
+            List<Booking> bookings = await _dBBooking.GetBookingsInTimeslot(_connection, req);
 
             return bookings;
         }

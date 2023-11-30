@@ -30,11 +30,7 @@ public class DBBooking : IDBBooking
 
     }
 
-    public async Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn,
-    DateTime start,
-    DateTime end,
-    SearchBookingsFilters filters,
-    IDbTransaction transaction = null!)
+    public async Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, BookingRequestFilter req, IDbTransaction transaction = null!)
     {
         StringBuilder script = new StringBuilder(
             "SELECT b.Id, b.TimeStart, b.TimeEnd, b.Notes, b.StubId, b.BookingOrderID, bo.Id as OrderID" +
@@ -46,17 +42,17 @@ public class DBBooking : IDBBooking
 
 
         // Dynamically build the query based on provided filters
-        if (filters.StubId.HasValue)
+        if (req.StubId.HasValue)
             script.Append(" AND b.StubId = @StubId");
-        if (filters.OrderId.HasValue)
+        if (req.OrderId.HasValue)
             script.Append(" AND b.BookingOrderID = @OrderId");
-        if (!string.IsNullOrWhiteSpace(filters.CustomerEmail))
+        if (!string.IsNullOrWhiteSpace(req.CustomerEmail))
             script.Append(" AND c.email = @CustomerEmail");
-        if (!string.IsNullOrWhiteSpace(filters.CustomerPhone))
+        if (!string.IsNullOrWhiteSpace(req.CustomerPhone))
             script.Append(" AND c.phone = @CustomerPhone");
 
         // Adjust the sorting mechanism
-        switch (filters.SortOption)
+        switch (req.SortOption)
         {
             case BookingSortOption.Date:
                 script.Append(" ORDER BY b.TimeStart");
@@ -71,12 +67,12 @@ public class DBBooking : IDBBooking
 
         var parameters = new
         {
-            TimeStart = start,
-            TimeEnd = end,
-            StubId = filters.StubId,
-            OrderId = filters.OrderId,
-            CustomerEmail = filters.CustomerEmail,
-            CustomerPhone = filters.CustomerPhone
+            TimeStart = req.Start,
+            TimeEnd = req.End,
+            StubId = req.StubId,
+            OrderId = req.OrderId,
+            CustomerEmail = req.CustomerEmail,
+            CustomerPhone = req.CustomerPhone
         };
 
         List<Booking> bookings;

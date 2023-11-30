@@ -54,18 +54,18 @@ namespace RestfulApi.Controllers
 
         //URL: api/booking
         [HttpGet]
-        public async Task<IActionResult> ShowBookingsInTimeSlot(DateTime start, DateTime? end, bool showAvailable, int? stubId = null, int? orderId = null, string? customerEmail = null, string? customerPhone = null, BookingSortOption sortOption = 0)
+        public async Task<IActionResult> ShowBookingsInTimeSlot([FromQuery] BookingRequestFilter req)
         {
             try
             {
-                if (showAvailable == true)
+                if (req.ShowAvailable == true)
                 {
-                    if (end == null)
+                    if (req.End == null)
                     {
-                        end = start.AddDays(1);
+                        req.End = req.Start.AddDays(1);
                     }
                     List<AvailableStubsForHour> availableList
-                            = await _bookingdata.GetAvailableStubsForGivenTimeFrame(start, end.Value);
+                            = await _bookingdata.GetAvailableStubsForGivenTimeFrame(req.Start, req.End.Value);
                         if (availableList == null!)
                         {
                             return BadRequest("End date is prior to start date");
@@ -74,15 +74,13 @@ namespace RestfulApi.Controllers
 
                 }
 
-                if (end == null)
+                if (req.End == null)
                 {
                     return BadRequest("Must provide an end date");
                 }
+                List<Booking> bookingList = await _bookingdata.GetBookingsInTimeslot(req);
 
-                SearchBookingsFilters newSearch = new SearchBookingsFilters { StubId = stubId, OrderId = orderId, CustomerEmail = customerEmail, CustomerPhone = customerPhone, SortOption = sortOption};
-                List<Booking> bookingList = await _bookingdata.GetBookingsInTimeslot(start, end.Value, newSearch);
-
-                if (bookingList == null)
+                if (bookingList == null!)
                 {
                     return BadRequest("End date must be after start date.");
                 }
