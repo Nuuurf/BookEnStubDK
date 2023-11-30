@@ -15,7 +15,7 @@ namespace TestProject.API.DAO
 {
     public class GetAvailableBookingsForGivenDateTest
     {
-        [Test]
+        /*[Test]
         public async Task GetAvailableBookingsForGivenDate_ShouldReturn119AvailableBookings_WithValidDate()
         {
             //Arrange
@@ -38,6 +38,6 @@ IDBBooking booking = new DBBooking();
             //Assert
             Assert.That(availableBookingsForDay, Is.EqualTo(expectedAvailbleBookingCount));
             Assert.That(bookings.Count, Is.EqualTo(expectedTimeSlots));
-        }
+        }*/
     }
 }

@@ -22,12 +22,12 @@ namespace TestProject.API.Controller
          * The Following Tests tests searching for available bookings
          */
         [Test]
-        public async Task ShowBookingsInTimeSlow_ReturnsAvailableBookings_WithValidDate()
+        public async Task ShowBookingsInTimeSlot_ReturnsAvailableBookings_WithValidDate()
         {
             //Arrange
             DateTime date = DateTime.Now.Date;
             var mockBusinessBooking = new Mock<IBookingData>();
-            mockBusinessBooking.Setup(repo => repo.GetAvailableBookingsForGivenDate(date)).ReturnsAsync(new List<AvailableBookingsForTimeframe>());
+            mockBusinessBooking.Setup(repo => repo.GetAvailableStubsForGivenTimeFrame(date, date.AddDays(1))).ReturnsAsync(new List<AvailableStubsForHour>());
 
             BookingController controller = new BookingController(mockBusinessBooking.Object);
 
@@ -40,14 +40,14 @@ namespace TestProject.API.Controller
         }
 
         [Test]
-        public async Task ShowBookingsInTimeSlow_ReturnsNotFound_WithPriorDate()
+        public async Task ShowBookingsInTimeSlot_ReturnsNotFound_WithPriorDate()
         {
             //Arrange
             DateTime date = DateTime.Now.Date.AddDays(-1);
-            List<AvailableBookingsForTimeframe> nullList = null!;
+            List<AvailableStubsForHour> nullList = null!;
 
             var mockBusinessBooking = new Mock<IBookingData>();
-            mockBusinessBooking.Setup(repo => repo.GetAvailableBookingsForGivenDate(date)).ReturnsAsync(nullList);
+            mockBusinessBooking.Setup(repo => repo.GetAvailableStubsForGivenTimeFrame(date, date.AddDays(1))).ReturnsAsync(nullList);
 
             BookingController controller = new BookingController(mockBusinessBooking.Object);
 

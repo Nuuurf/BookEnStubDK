@@ -60,14 +60,18 @@ namespace RestfulApi.Controllers
             {
                 if (showAvailable == true)
                 {
-                    DateTime dateFormatted = start.Date;
-                    List<AvailableBookingsForTimeframe> availableList = await _bookingdata.GetAvailableBookingsForGivenDate(dateFormatted);
-
-                    if (availableList == null)
+                    if (end == null)
                     {
-                        return BadRequest("Placed date is prior to today");
+                        end = start.AddDays(1);
                     }
-                    return Ok(availableList);
+                    List<AvailableStubsForHour> availableList
+                            = await _bookingdata.GetAvailableStubsForGivenTimeFrame(start, end.Value);
+                        if (availableList == null!)
+                        {
+                            return BadRequest("End date is prior to start date");
+                        }
+                        return Ok(availableList);
+
                 }
 
                 if (end == null)
@@ -108,7 +112,7 @@ namespace RestfulApi.Controllers
                     // Map properties from ObjectTypeA to ObjectTypeB
                     TimeStart = itemA.TimeStart,
                     TimeEnd = itemA.TimeEnd,
-                    Notes = itemA.Notes,
+                    Notes = itemA.Notes
                 }).ToList();
 
                 Customer customer = new Customer {

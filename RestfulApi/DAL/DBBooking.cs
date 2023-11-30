@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Data.SqlClient;
 using System.Text;
 using Dapper;
 using RestfulApi.Models;
@@ -12,6 +13,7 @@ public class DBBooking : IDBBooking
     /// </summary>
     /// <param name="conn"></param>
     /// <param name="booking"> the booking object that needs to be persisted</param>
+    /// <param name="bookingOrderID"></param>
     /// <param name="transaction"></param>
     /// <returns>A boolean indicading where the action was successful or not</returns>
     public async Task<int> CreateBooking(IDbConnection conn,
@@ -19,22 +21,15 @@ public class DBBooking : IDBBooking
         int bookingOrderID,
         IDbTransaction transaction = null!)
     {
-        string script = "InsertBooking";
-        int newBookingId = 0;
+        string query = @"
+                INSERT INTO Booking (TimeStart, TimeEnd, StubId, Notes, BookingOrderID)
+                VALUES (@StartTime, @EndTime, @StubId, @Note, @OrderId);
+                SELECT SCOPE_IDENTITY();";
 
-        var parameter = new { date = booking.TimeStart, orderId = bookingOrderID, note = booking.Notes };
+        return await conn.ExecuteScalarAsync<int>(query, new { StartTime = booking.TimeStart, EndTime = booking.TimeEnd, StubId = booking.StubId, Note = booking.Notes, OrderId = bookingOrderID }, transaction:transaction);
 
-        int result = await conn.QueryFirstOrDefaultAsync<int>(script,
-            parameter,
-            commandType: CommandType.StoredProcedure,
-            transaction: transaction);
-
-        newBookingId = result;
-
-        return newBookingId;
     }
 
-    // Not implemented
     public async Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn,
     DateTime start,
     DateTime end,
@@ -128,26 +123,22 @@ public class DBBooking : IDBBooking
         return bookingOrderId;
     }
 
-    public async Task<List<AvailableBookingsForTimeframe>> GetAvailableBookingsForGivenDate(IDbConnection conn,
-        DateTime date,
-        IDbTransaction transaction = null!)
+    public async Task<List<int>> GetBookedStubsForHour(IDbConnection conn, DateTime hour, IDbTransaction transaction = null!)
     {
-        string script = "dbo.GetAvailableBookingsForDate";
+        string query = @"
+                SELECT StubId FROM Booking
+                WHERE TimeStart >= @HourStart AND TimeStart < @HourEnd";
 
-        try
-        {
-            var parameter = new { date = date.Date };
+        DateTime hourStart = new DateTime(hour.Year, hour.Month, hour.Day, hour.Hour, 0, 0);
+        DateTime hourEnd = hourStart.AddHours(1);
+        var result = await conn.QueryAsync<int>(query, new { HourStart = hourStart, HourEnd = hourEnd }, transaction : transaction);
+        return result.ToList();
+    }
+    public async Task<List<int>> GetAllStubs(IDbConnection conn, IDbTransaction transaction = null!)
+    {
+        string query = "SELECT Id FROM Stub";
+        var stubs = await conn.QueryAsync<int>(query, transaction : transaction);
 
-            var result = await conn.QueryAsync<AvailableBookingsForTimeframe>(script,
-                parameter,
-                commandType: CommandType.StoredProcedure,
-                transaction: transaction);
-
-            return result.ToList();
-        }
-        catch
-        {
-            return new List<AvailableBookingsForTimeframe>();
-        }
+        return stubs.ToList();
     }
 }
