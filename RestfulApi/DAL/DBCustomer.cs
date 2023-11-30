@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using RestfulApi.DTOs;
 using RestfulApi.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
@@ -64,6 +65,24 @@ namespace RestfulApi.DAL {
                 }
             }
             catch (Exception ex) {
+                throw new Exception("An error occurred while creating or finding a customer.\n" + ex.Message);
+            }
+
+            return result;
+        }
+
+        public async Task<DTOCustomer> GetCustomer(IDbConnection conn, string phoneInput)
+        {
+            DTOCustomer? result = null;
+            string script = "SELECT name as FullName, phone, email FROM customer where phone = @phone";
+
+            try
+            {
+                var parameters = new { phone = phoneInput};
+                result = await conn.QueryFirstOrDefaultAsync<DTOCustomer>(script, parameters);
+            }
+            catch (Exception ex)
+            {
                 throw new Exception("An error occurred while creating or finding a customer.\n" + ex.Message);
             }
 

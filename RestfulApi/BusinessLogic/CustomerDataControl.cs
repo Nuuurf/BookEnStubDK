@@ -1,5 +1,6 @@
 ﻿
 using RestfulApi.DAL;
+using RestfulApi.DTOs;
 using RestfulApi.Models;
 using System.Data;
 
@@ -29,6 +30,15 @@ namespace RestfulApi.BusinessLogic {
             if(result <= 0) {
                 throw new Exception("IDBCusomter returned invalid customer id. Id: " + result);
             }
+            return result;
+        }
+
+        public async Task<DTOCustomer> GetCustomer(string phone)
+        {
+            DTOCustomer? result = null;
+
+            result = await _dbCustomer.GetCustomer(_connection, phone);
+
             return result;
         }
     }

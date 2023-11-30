@@ -197,7 +197,7 @@ namespace WinFormsApp
         /// <param name="e"></param>
         private void lbo_SelectedTime_EnabledChanged(object sender, EventArgs e)
         {
-            updateButtonOk();
+            UpdateButtonOk();
         }
         /// <summary>
         /// Every time the text in the textbox named: txtBox_FullName changes this event will be called
@@ -206,7 +206,7 @@ namespace WinFormsApp
         /// <param name="e"></param>
         private void txtBox_FullName_TextChanged(object sender, EventArgs e)
         {
-            updateButtonOk();
+            UpdateButtonOk();
         }
         /// <summary>
         /// Every time the text in the textbox named: txtBox_Email changes this event will be called
@@ -215,7 +215,7 @@ namespace WinFormsApp
         /// <param name="e"></param>
         private void txtBox_Email_TextChanged(object sender, EventArgs e)
         {
-            updateButtonOk();
+            UpdateButtonOk();
         }
         /// <summary>
         /// Every time the text in the textbox named: txtBox_PhoneNumber changes this event will be called
@@ -224,7 +224,7 @@ namespace WinFormsApp
         /// <param name="e"></param>
         private void txtBox_PhoneNumber_TextChanged(object sender, EventArgs e)
         {
-            updateButtonOk();
+            UpdateButtonOk();
         }
 
         /// <summary>
