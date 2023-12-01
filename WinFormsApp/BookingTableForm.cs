@@ -33,6 +33,7 @@ namespace WinFormsApp
         int? _orderID;
         string _email = "";
         string _phone = "";
+        BookingRequestFilter _brf = new BookingRequestFilter();
 
         /// <summary>
         /// Only controller for this class. Initialize all elements.
@@ -46,7 +47,7 @@ namespace WinFormsApp
             SetToday();
             InitializeComponent();
             initializeDatepickers();
-            getData(new BookingRequestFilter());
+            getData();
         }
 
         /// <summary>
@@ -77,14 +78,14 @@ namespace WinFormsApp
         /// Contacts the API and populates the table.
         /// Possible errors: No connection, No bookings found.
         /// </summary>
-        private async void getData(BookingRequestFilter brf)
+        private async void getData()
         {
             //Do to possbile errors, try/catch needed.
             try
             {
                 dataGridView1.AutoGenerateColumns = true;
                 //Tries to get bookings from API.
-                _bookings = await _bookingController.getBookingsFromAPI(brf);
+                _bookings = await _bookingController.getBookingsFromAPI(_brf);
                 //Displays the list of bookings in the table.
 
                 foreach (Booking booking in _bookings)
@@ -230,8 +231,9 @@ namespace WinFormsApp
 
             _email = txt_email.Text;
             _phone = txt_Phone.Text;
+            _brf = new BookingRequestFilter(_start, _end, false, _stubID, _orderID, _email, _phone);
 
-            getData(new BookingRequestFilter(_start, _end, false, _stubID, _orderID, _email, _phone));
+            getData();
         }
 
         /// <summary>
@@ -263,7 +265,7 @@ namespace WinFormsApp
                     break;
 
                 case 2:
-                    sortedData = dataSource.OrderBy(item => item.Customer.FullName).ToList();
+                    sortedData = dataSource.OrderBy(item => item.Customer!.FullName).ToList();
                     break;
 
                 case 3:
@@ -323,7 +325,7 @@ namespace WinFormsApp
                 {
                     await _apiService.DeleteAsync($"Booking/{selectedBooking.Id}");
 
-                    getData(new BookingRequestFilter());
+                    getData();
                 }
                 else
                 {
@@ -346,6 +348,8 @@ namespace WinFormsApp
                 txt_OrderID.Text = string.Empty;
                 txt_Phone.Text = string.Empty;
                 txt_StubID.Text = string.Empty;
+                _brf = new BookingRequestFilter();
+                getData();
             }
             else
             {
