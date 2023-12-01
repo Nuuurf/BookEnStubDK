@@ -256,7 +256,7 @@ namespace WinFormsApp
                 txtBox_Email.Text = customer.Email;
                 txtBox_FullName.Text = customer.FullName;
             }
-            catch (Exception ex)
+            catch
             {
                 txtBox_Email.Text = "";
                 txtBox_FullName.Text = "";

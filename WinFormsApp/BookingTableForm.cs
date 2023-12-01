@@ -31,8 +31,8 @@ namespace WinFormsApp
         DateTime _end;
         int? _stubID;
         int? _orderID;
-        string _email;
-        string _phone;
+        string _email = "";
+        string _phone = "";
 
         /// <summary>
         /// Only controller for this class. Initialize all elements.
@@ -112,7 +112,7 @@ namespace WinFormsApp
                 //Pops up a message box if there is no connection to the API.
                 MessageBox.Show(e.Message, "No connection to API");
             }
-            catch (NoBookingException e)
+            catch (NoBookingException)
             {
                 //Gives an exception if there isn't a booking a current date.
                 MessageBox.Show("No bookings found", "Error");
@@ -151,7 +151,7 @@ namespace WinFormsApp
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void btn_Add_Click(object sender, EventArgs e)
+        private void btn_Add_Click(object sender, EventArgs e)
         {
 
             AddBookingForm frm = new AddBookingForm();
@@ -188,19 +188,19 @@ namespace WinFormsApp
             {
                 _start = dtp_StartDate.Value;
                 _end = dtp_EndDate.Value;
-                
+
             }
 
             //Filter
             try
             {
-                if(txt_StubID.Text.Length > 0)
+                if (txt_StubID.Text.Length > 0)
                 {
                     _stubID = int.Parse(txt_StubID.Text);
                 }
-                else 
-                { 
-                    _stubID = null; 
+                else
+                {
+                    _stubID = null;
                 }
             }
             catch (Exception)
@@ -211,27 +211,27 @@ namespace WinFormsApp
 
             try
             {
-                if(txt_OrderID.Text.Length > 0)
+                if (txt_OrderID.Text.Length > 0)
                 {
                     _orderID = int.Parse(txt_OrderID.Text);
                 }
-                else 
-                { 
-                    _orderID = null; 
+                else
+                {
+                    _orderID = null;
                 }
-                
+
             }
             catch (Exception)
             {
                 MessageBox.Show("Order ID: must be a number");
                 txt_OrderID.Text = "";
             }
-            
-            
+
+
             _email = txt_email.Text;
             _phone = txt_Phone.Text;
 
-            getData(new BookingRequestFilter(_start,_end,false,_stubID,_orderID,_email,_phone));
+            getData(new BookingRequestFilter(_start, _end, false, _stubID, _orderID, _email, _phone));
         }
 
         /// <summary>
@@ -333,6 +333,25 @@ namespace WinFormsApp
             }
 
             //MessageBox.Show("This should open the Delete box on the selected row ", "Not implemented");
+        }
+
+        private void btn_clearFilter_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show($"Are you sure you want to clear filters?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            // Check the user's response
+            if (result == DialogResult.Yes)
+            {
+                txt_email.Text = string.Empty;
+                txt_OrderID.Text = string.Empty;
+                txt_Phone.Text = string.Empty;
+                txt_StubID.Text = string.Empty;
+            }
+            else
+            {
+                // User canceled the deletion
+                // You can add additional logic or simply do nothing
+            }
         }
     }
 }

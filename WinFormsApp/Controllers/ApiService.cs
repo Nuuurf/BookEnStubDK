@@ -56,7 +56,7 @@ namespace WinFormsApp.Controllers
 
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                if(response.StatusCode == System.Net.HttpStatusCode.NoContent)
                 {
                     throw new NoBookingException();
                 }
@@ -73,7 +73,7 @@ namespace WinFormsApp.Controllers
 
             string jsonResponse = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<T>(jsonResponse);
+            return JsonConvert.DeserializeObject<T>(jsonResponse)!;
         }
     }
 }

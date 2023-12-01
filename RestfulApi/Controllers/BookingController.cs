@@ -112,7 +112,7 @@ namespace RestfulApi.Controllers {
 
                     return Ok(newBookingId);
                 }
-                catch (OverBookingException ex) {
+                catch (OverBookingException) {
                     return UnprocessableEntity("DA: Alle stubbe for denne tidsperiode er optaget \n EN: All stubs for this period are unavailable");
                 }
                 catch (Exception ex) {
