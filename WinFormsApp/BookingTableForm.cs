@@ -192,8 +192,42 @@ namespace WinFormsApp
             }
 
             //Filter
-            _stubID = int.Parse(txt_StubID.Text);
-            _orderID = int.Parse(txt_OrderID.Text);
+            try
+            {
+                if(txt_StubID.Text.Length > 0)
+                {
+                    _stubID = int.Parse(txt_StubID.Text);
+                }
+                else 
+                { 
+                    _stubID = null; 
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Stub ID: must be a number");
+                txt_StubID.Text = "";
+            }
+
+            try
+            {
+                if(txt_OrderID.Text.Length > 0)
+                {
+                    _orderID = int.Parse(txt_OrderID.Text);
+                }
+                else 
+                { 
+                    _orderID = null; 
+                }
+                
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Order ID: must be a number");
+                txt_OrderID.Text = "";
+            }
+            
+            
             _email = txt_email.Text;
             _phone = txt_Phone.Text;
 
