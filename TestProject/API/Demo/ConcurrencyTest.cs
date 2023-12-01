@@ -103,7 +103,7 @@ namespace TestProject.API.Demo {
 
             ObjectResult? secondResult = tasks[1].Result as ObjectResult;
             Assert.NotNull(secondResult);
-            Assert.AreEqual(500, secondResult.StatusCode);
+            Assert.AreEqual(422, secondResult.StatusCode);
 
                 //Write test results in test summary.
             TestContext.WriteLine($"Client1 responce was {firstResult.StatusCode}");
@@ -125,11 +125,12 @@ namespace TestProject.API.Demo {
         //Create some generic semilar bookings at the same time.
         private static List<Booking> initializeBookings() {
             List<Booking> result = new();
-
+            TimeSpan startSpan = new TimeSpan(15, 0, 0);
+            TimeSpan endSpan = new TimeSpan(16, 0, 0);
             for(int i = 0; i < 6; i++) {
                 Booking booking = new Booking {
-                    TimeStart = DateTime.Now.AddYears(2),
-                    TimeEnd = DateTime.Now.AddYears(2).AddHours(1),
+                    TimeStart = DateTime.Now.Date.AddYears(2) + startSpan,
+                    TimeEnd = DateTime.Now.Date.AddYears(2) + endSpan,
                     Notes = "Delete me please"
                 };
                 result.Add(booking);

@@ -83,7 +83,7 @@ namespace RestfulApi.Controllers {
                     return BadRequest("End date must be after start date.");
                 }
                 if (bookingList.Count == 0) {
-                    return NotFound("No bookings found.");
+                    return NoContent();
                 }
 
                 return Ok(bookingList);
