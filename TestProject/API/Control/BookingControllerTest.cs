@@ -47,7 +47,7 @@ namespace TestProject.API.Control
                     TimeEnd = DateTime.Now.AddHours(2),}
                 };
 
-            Customer customer = new Customer { FullName = "First Name", Email = "Fake Email", Phone = "1234567890", };
+            Customer customer = new Customer { FullName = "First Username", Email = "Fake Username", Phone = "1234567890", };
             int createReturn = 0;
 
             //Act
@@ -74,7 +74,7 @@ namespace TestProject.API.Control
                     TimeEnd = DateTime.Now.AddHours(-1),
                 }
                 };
-            Customer customer = new Customer { FullName = "First Name", Email = "Fake Email", Phone = "1234567890", };
+            Customer customer = new Customer { FullName = "First Username", Email = "Fake Username", Phone = "1234567890", };
             //Act
             AsyncTestDelegate act = () => bdc.CreateBooking(booking, customer);
 

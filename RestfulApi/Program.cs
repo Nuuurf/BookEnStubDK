@@ -5,13 +5,31 @@ using System.Data;
 using System.Data.Sql;
 using System.Data.SqlClient;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Swashbuckle.AspNetCore.SwaggerGen;
-
-
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
-// Add services to the container.
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = configuration["Jwt:Issuer"],
+            ValidAudience = configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"])),
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
+        };
+    });
+
+builder.Services.AddAuthorization();
+// AddToken services to the container.
 builder.Services.AddScoped<IDbConnection>(provider =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -24,18 +42,14 @@ builder.Services.AddScoped<IBookingData, BookingDataControl>();
 builder.Services.AddScoped<ICustomerData, CustomerDataControl>();
 builder.Services.AddScoped<IDBCustomer, DBCustomer>();
 builder.Services.AddScoped<IDBBooking, DBBooking>();
-//builder.Services.AddScoped<IDBBooking>(serviceProvider => {
-//    var connection = serviceProvider.GetRequiredService<SqlConnection>(); // Assuming you have a SqlConnection registered
+builder.Services.AddScoped<IJwtDataControl, JwtDataControl>();
+builder.Services.AddScoped<IDBRefreshToken, DBRefreshToken>();
 
-//    // Explicitly specify the constructor to use
-//    return ActivatorUtilities.CreateInstance<DBBooking>(serviceProvider, connection);
-//});
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -50,6 +64,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
