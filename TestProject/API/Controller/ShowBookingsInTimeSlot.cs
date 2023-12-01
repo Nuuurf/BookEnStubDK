@@ -88,7 +88,7 @@ namespace TestProject.API.Controller
             var result = await controller.ShowBookingsInTimeSlot(filter);
 
             //Assert
-            Assert.IsInstanceOf<NotFoundObjectResult>(result);
+            Assert.IsInstanceOf<NoContentResult>(result);
         }
 
         [Test]
