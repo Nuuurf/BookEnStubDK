@@ -3,6 +3,7 @@ using Moq;
 using RestfulApi.BusinessLogic;
 using RestfulApi.Controllers;
 using RestfulApi.DTOs;
+using RestfulApi.Exceptions;
 using RestfulApi.Models;
 
 namespace TestProject.API.Controller;
@@ -60,7 +61,9 @@ public class CreateBookingTest
     {
         //Arrange
         var mockBusinessBooking = new Mock<IBookingData>();
-        mockBusinessBooking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>(), It.IsAny<Customer>())).ReturnsAsync(0);
+
+        mockBusinessBooking.Setup(repo => repo.CreateBooking(It.IsAny<List<Booking>>(), It.IsAny<Customer>()))
+            .ThrowsAsync(new OverBookingException());
 
         BookingController controller = new BookingController(mockBusinessBooking.Object);
 

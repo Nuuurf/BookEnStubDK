@@ -1,7 +1,9 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using Moq;
 using RestfulApi.BusinessLogic;
 using RestfulApi.DAL;
+using RestfulApi.Exceptions;
 using RestfulApi.Models;
 using TestProject.API.Utilities;
 
@@ -187,7 +189,7 @@ Customer customer = new Customer();
         AsyncTestDelegate result = () => controller.CreateBooking(bookingList, customer);
 
         //Assert
-        Assert.ThrowsAsync<Exception>(result);
+        Assert.ThrowsAsync<OverBookingException>(result);
         mockDbTransaction.Verify(trans => trans.Commit(), Times.Never);
         mockDbTransaction.Verify(trans => trans.Rollback(), Times.Once);
 
@@ -230,7 +232,7 @@ Customer customer = new Customer();
         AsyncTestDelegate result = () => controller.CreateBooking(booking, customer);
 
         //Assert
-        Assert.ThrowsAsync<Exception>(result);
+        Assert.ThrowsAsync<OverBookingException>(result);
 
         return Task.CompletedTask;
     }
