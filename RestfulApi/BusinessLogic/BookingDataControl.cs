@@ -1,4 +1,5 @@
-﻿using RestfulApi;
+﻿using Microsoft.AspNetCore.SignalR;
+using RestfulApi;
 using RestfulApi.DAL;
 using RestfulApi.Exceptions;
 using RestfulApi.Models;
@@ -7,6 +8,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Transactions;
+using RestfulApi.Utilities;
 
 namespace RestfulApi.BusinessLogic {
     public class BookingDataControl : IBookingData {
@@ -14,12 +16,14 @@ namespace RestfulApi.BusinessLogic {
         private readonly IDBBooking _dBBooking;
         private readonly IDbConnection _connection;
         private readonly ICustomerData _customerData;
+        private readonly IHubContext<DateHub> _hubContext;
         //Ready for dependency injection
-        public BookingDataControl(IDBBooking dbBooking, ICustomerData customerControl ,IDbConnection connection) {
+        public BookingDataControl(IDBBooking dbBooking, ICustomerData customerControl, IHubContext<DateHub> hubContext, IDbConnection connection) {
             //Needs to change with injection
             _dBBooking = dbBooking;
-            _connection = connection;
             _customerData = customerControl;
+            _hubContext = hubContext;
+            _connection = connection;
         }
 
         public async Task<int> CreateBooking(List<Booking> bookings, Customer customer) {
@@ -75,6 +79,20 @@ namespace RestfulApi.BusinessLogic {
 
                     //If no exceptions have been thrown, every thing went right. Commit
                     transaction.Commit();
+                    var updatedDates = new HashSet<string>();
+                    // Send update to all relevant date groups
+                    foreach (var booking in bookings)
+                    {
+                        string dateGroup = booking.TimeStart.ToString("yyyy-MM-dd");
+
+                        // Check if the date has already been updated
+                        if (!updatedDates.Contains(dateGroup))
+                        {
+                            // If not updated, send update and add to HashSet
+                            await _hubContext.Clients.Group(dateGroup).SendAsync("ReceiveUpdate", dateGroup);
+                            updatedDates.Add(dateGroup);
+                        }
+                    }
                 }
                 catch{
                     //Something went wrong. Rollback

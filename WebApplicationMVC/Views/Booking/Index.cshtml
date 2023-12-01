@@ -2,6 +2,7 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -11,12 +12,14 @@
 
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
         <!-- Font Awesome CSS -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
         <!-- Bootstrap Datepicker CSS -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+
+        
     </head>
     <body>
 
@@ -68,16 +71,17 @@
         </div>
 
         <!-- jQuery -->
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        
         <!-- Bootstrap JS and Popper.js -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.9/signalr.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
         <!-- Bootstrap Datepicker JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
-
+        
         <!-- JQuery and javascript code for page functionality is below here -->
         <!-- Rest of the script code is in this file -->
         <script src="~/js/BookingPage.js"></script>
@@ -85,34 +89,73 @@
         <script>
             // Makes a GET request to fetch available times for entered date
             $(document).ready(function () {
-                $('#date-search-btn').on('click', function (event) {
-                    // Get the value from the input field
-                    var inputData = $('#dateInput').val();
-                    var parts = inputData.split('/');
+                //Setup a connection to the SignalR hub
+                var connection = new signalR.HubConnectionBuilder()
+                    .withUrl("https://localhost:7021/dateHub")
+                    .build();
+                connection.start();
+                var currentDate;
 
-                    // Create a new Date object with the parts
-                    var formattedDate = new Date(parts[2], parts[1] - 1, parts[0]);
-
-                    // Format the date as yyyy-mm-dd
-                    var formattedDateString =
-                        formattedDate.getFullYear() + '-' +
-                        ('0' + (formattedDate.getMonth() + 1)).slice(-2) + '-' +
-                        ('0' + formattedDate.getDate()).slice(-2);
-
-                    // Make an AJAX GET request
+                toastr.options = {
+                    "closeButton": false,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": false,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": true,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "3500",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                }
+                // Create a function for making the AJAX GET request
+                function makeAjaxRequest(dateString) {
+                    connection.invoke('JoinDateGroup', dateString).catch(function (err) {
+                        return console.error(err.toString());
+                    });
+                    
                     $.ajax({
                         url: '@Url.Action("GetAvailableTimes", "Booking")',
                         type: 'GET',
-                        data: { date: formattedDateString },
+                        data: { date: dateString },
                         success: function (response) {
                             // Handle the successful response here
                             processApiResponse(response);
+                            toastr.success('Available Bookings Updated');
                         },
                         error: function (xhr, status, error) {
                             // Handle errors here
                             console.error('Error:', error);
                         }
                     });
+                }
+
+                // Subscribe to the ReceiveUpdate event
+                connection.on("ReceiveUpdate", function (message) {
+                    var dateSelected = $('#dateInput').val();
+                    if (currentDate === message) {
+                        // Call the AJAX function with the updated date
+                        makeAjaxRequest(currentDate);
+                    }
+                });
+                
+                // Bind the click event to the date-search-btn
+                $('#date-search-btn').on('click', function (event) {
+                    var inputData = $('#dateInput').val();
+                    var parts = inputData.split('/');
+                    var formattedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                    var formattedDateString =
+                        formattedDate.getFullYear() + '-' +
+                        ('0' + (formattedDate.getMonth() + 1)).slice(-2) + '-' +
+                        ('0' + formattedDate.getDate()).slice(-2);
+                    currentDate = formattedDateString;
+                    // Call the AJAX function with the formatted date
+                    makeAjaxRequest(formattedDateString);
                 });
             });
 
