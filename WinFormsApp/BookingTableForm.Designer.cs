@@ -44,6 +44,14 @@
             dtp_EndDate = new DateTimePicker();
             dtp_StartDate = new DateTimePicker();
             chkBox_Today = new CheckBox();
+            label1 = new Label();
+            txt_StubID = new TextBox();
+            txt_OrderID = new TextBox();
+            label2 = new Label();
+            txt_email = new TextBox();
+            label3 = new Label();
+            txt_Phone = new TextBox();
+            label4 = new Label();
             panel1.SuspendLayout();
             pnl_Tabel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
@@ -153,6 +161,14 @@
             // 
             // pnl_Filter
             // 
+            pnl_Filter.Controls.Add(txt_email);
+            pnl_Filter.Controls.Add(label3);
+            pnl_Filter.Controls.Add(txt_Phone);
+            pnl_Filter.Controls.Add(label4);
+            pnl_Filter.Controls.Add(txt_OrderID);
+            pnl_Filter.Controls.Add(label2);
+            pnl_Filter.Controls.Add(txt_StubID);
+            pnl_Filter.Controls.Add(label1);
             pnl_Filter.Controls.Add(btn_refresh);
             pnl_Filter.Controls.Add(lbl_EndDate);
             pnl_Filter.Controls.Add(lbl_StartDate);
@@ -167,7 +183,7 @@
             // 
             // btn_refresh
             // 
-            btn_refresh.Location = new Point(176, 67);
+            btn_refresh.Location = new Point(584, 70);
             btn_refresh.Name = "btn_refresh";
             btn_refresh.Size = new Size(75, 23);
             btn_refresh.TabIndex = 10;
@@ -226,6 +242,70 @@
             chkBox_Today.UseVisualStyleBackColor = true;
             chkBox_Today.CheckedChanged += chkBox_Today_CheckedChanged;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(176, 43);
+            label1.Name = "label1";
+            label1.Size = new Size(45, 15);
+            label1.TabIndex = 11;
+            label1.Text = "Stub ID";
+            // 
+            // txt_StubID
+            // 
+            txt_StubID.Location = new Point(233, 38);
+            txt_StubID.Name = "txt_StubID";
+            txt_StubID.Size = new Size(100, 23);
+            txt_StubID.TabIndex = 12;
+            // 
+            // txt_OrderID
+            // 
+            txt_OrderID.Location = new Point(233, 67);
+            txt_OrderID.Name = "txt_OrderID";
+            txt_OrderID.Size = new Size(100, 23);
+            txt_OrderID.TabIndex = 14;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(176, 72);
+            label2.Name = "label2";
+            label2.Size = new Size(51, 15);
+            label2.TabIndex = 13;
+            label2.Text = "Order ID";
+            // 
+            // txt_email
+            // 
+            txt_email.Location = new Point(398, 67);
+            txt_email.Name = "txt_email";
+            txt_email.Size = new Size(100, 23);
+            txt_email.TabIndex = 18;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(341, 72);
+            label3.Name = "label3";
+            label3.Size = new Size(36, 15);
+            label3.TabIndex = 17;
+            label3.Text = "Email";
+            // 
+            // txt_Phone
+            // 
+            txt_Phone.Location = new Point(398, 38);
+            txt_Phone.Name = "txt_Phone";
+            txt_Phone.Size = new Size(100, 23);
+            txt_Phone.TabIndex = 16;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(341, 43);
+            label4.Name = "label4";
+            label4.Size = new Size(41, 15);
+            label4.TabIndex = 15;
+            label4.Text = "Phone";
+            // 
             // BookingTableForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -262,5 +342,14 @@
         private Button btn_Edit;
         private Button btn_Details;
         private Button btn_refresh;
+        private TextBox txt_StubID;
+        private Label label1;
+        private TextBox textBox1;
+        private Label label2;
+        private TextBox txt_email;
+        private Label label3;
+        private TextBox txt_Phone;
+        private Label label4;
+        private TextBox txt_OrderID;
     }
 }

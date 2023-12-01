@@ -29,6 +29,10 @@ namespace WinFormsApp
         /// </summary>
         DateTime _start;
         DateTime _end;
+        int? _stubID;
+        int? _orderID;
+        string _email;
+        string _phone;
 
         /// <summary>
         /// Only controller for this class. Initialize all elements.
@@ -42,7 +46,7 @@ namespace WinFormsApp
             SetToday();
             InitializeComponent();
             initializeDatepickers();
-            getData();
+            getData(new BookingRequestFilter());
         }
 
         /// <summary>
@@ -73,15 +77,22 @@ namespace WinFormsApp
         /// Contacts the API and populates the table.
         /// Possible errors: No connection, No bookings found.
         /// </summary>
-        private async void getData()
+        private async void getData(BookingRequestFilter brf)
         {
             //Do to possbile errors, try/catch needed.
             try
             {
                 dataGridView1.AutoGenerateColumns = true;
                 //Tries to get bookings from API.
-                _bookings = await _bookingController.getBookingsFromAPI(_start, _end.AddDays(1), false);
+                _bookings = await _bookingController.getBookingsFromAPI(brf);
                 //Displays the list of bookings in the table.
+
+                foreach (Booking booking in _bookings)
+                {
+                    booking.TimeStart = booking.TimeStart.ToLocalTime();
+                    booking.TimeEnd = booking.TimeEnd.ToLocalTime();
+                }
+
                 dataGridView1.DataSource = _bookings;
                 foreach (DataGridViewColumn column in dataGridView1.Columns)
                 {
@@ -171,15 +182,22 @@ namespace WinFormsApp
             if (chkBox_Today.Checked)
             {
                 SetToday();
-                getData();
             }
             //Free use of the date pickers and get the data for bookings.
             else
             {
                 _start = dtp_StartDate.Value;
                 _end = dtp_EndDate.Value;
-                getData();
+                
             }
+
+            //Filter
+            _stubID = int.Parse(txt_StubID.Text);
+            _orderID = int.Parse(txt_OrderID.Text);
+            _email = txt_email.Text;
+            _phone = txt_Phone.Text;
+
+            getData(new BookingRequestFilter(_start,_end,false,_stubID,_orderID,_email,_phone));
         }
 
         /// <summary>
@@ -207,19 +225,22 @@ namespace WinFormsApp
                     break;
 
                 case 1:
-                    sortedData = dataSource.OrderBy(item => item.TimeStart).ToList();
+                    sortedData = dataSource.OrderBy(item => item.StubId).ToList();
                     break;
 
                 case 2:
-                    sortedData = dataSource.OrderBy(item => item.TimeEnd).ToList();
+                    sortedData = dataSource.OrderBy(item => item.Customer.FullName).ToList();
                     break;
 
                 case 3:
-                    sortedData = dataSource.OrderBy(item => item.Notes).ToList();
+                    sortedData = dataSource.OrderBy(item => item.TimeStart).ToList();
                     break;
 
                 case 4:
-                    sortedData = dataSource.OrderBy(item => item.StubId).ToList();
+                    sortedData = dataSource.OrderBy(item => item.TimeEnd).ToList();
+                    break;
+                case 5:
+                    sortedData = dataSource.OrderBy(item => item.Notes).ToList();
                     break;
 
                 default:
@@ -258,7 +279,7 @@ namespace WinFormsApp
             {
                 selectedBooking = dataGridView1.SelectedRows[0].DataBoundItem as Booking;
             }
-            if(selectedBooking != null)
+            if (selectedBooking != null)
             {
                 // Display a confirmation dialog
                 DialogResult result = MessageBox.Show($"Are you sure you want to delete booking {selectedBooking.Id}?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -268,7 +289,7 @@ namespace WinFormsApp
                 {
                     await _apiService.DeleteAsync($"Booking/{selectedBooking.Id}");
 
-                    getData();
+                    getData(new BookingRequestFilter());
                 }
                 else
                 {
@@ -276,7 +297,7 @@ namespace WinFormsApp
                     // You can add additional logic or simply do nothing
                 }
             }
-            
+
             //MessageBox.Show("This should open the Delete box on the selected row ", "Not implemented");
         }
     }

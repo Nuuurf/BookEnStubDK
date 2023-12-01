@@ -27,12 +27,12 @@ namespace WinFormsApp.Controllers
         /// <param name="showAvailable"></param>
         /// <returns></returns>
 
-        public async Task<List<Booking>> getBookingsFromAPI(DateTime timeStart, DateTime timeEnd, bool showAvailable)
+        public async Task<List<Booking>> getBookingsFromAPI(BookingRequestFilter brf)
         {
             //A list to hold the bookings
             List<Booking> bookings = new List<Booking>();
             //Constructs the URL that is to be used.
-            string apiUrl = $"Booking?start={timeStart.ToString("yyyy-MM-dd")}&end={timeEnd.ToString("yyyy-MM-dd")}&showAvailable={showAvailable}";
+            string apiUrl = $"Booking?start={brf.Start.ToString("yyyy-MM-dd")}&end={brf.End.Value.ToString("yyyy-MM-dd")}&showAvailable={brf.ShowAvailable}";
             //Store the bookings that the method gets back from the API
             bookings = await _apiService.GetAsync<List<Booking>>(apiUrl);
             //returns bookinglist

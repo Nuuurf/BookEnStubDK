@@ -89,7 +89,7 @@
             txtBox_FullName.Name = "txtBox_FullName";
             txtBox_FullName.Size = new Size(321, 23);
             txtBox_FullName.TabIndex = 4;
-            txtBox_FullName.TextChanged += txtBox_FullName_TextChanged;
+            txtBox_FullName.TextChanged += UpdateButtonOk;
             // 
             // txtBox_Email
             // 
@@ -98,7 +98,7 @@
             txtBox_Email.Name = "txtBox_Email";
             txtBox_Email.Size = new Size(321, 23);
             txtBox_Email.TabIndex = 5;
-            txtBox_Email.TextChanged += txtBox_Email_TextChanged;
+            txtBox_Email.TextChanged += UpdateButtonOk;
             // 
             // txtBox_PhoneNumber
             // 
@@ -107,7 +107,7 @@
             txtBox_PhoneNumber.Name = "txtBox_PhoneNumber";
             txtBox_PhoneNumber.Size = new Size(321, 23);
             txtBox_PhoneNumber.TabIndex = 6;
-            txtBox_PhoneNumber.TextChanged += txtBox_PhoneNumber_TextChanged;
+            txtBox_PhoneNumber.TextChanged += UpdateButtonOk;
             txtBox_PhoneNumber.Leave += txtBox_PhoneNumber_Leave;
             // 
             // txtBox_Notes
@@ -198,7 +198,7 @@
             lbo_SelectedTime.Size = new Size(190, 94);
             lbo_SelectedTime.TabIndex = 14;
             lbo_SelectedTime.SelectedIndexChanged += lbo_SelectedTime_SelectedIndexChanged;
-            lbo_SelectedTime.EnabledChanged += lbo_SelectedTime_EnabledChanged;
+            lbo_SelectedTime.EnabledChanged += UpdateButtonOk;
             // 
             // AddBookingForm
             // 

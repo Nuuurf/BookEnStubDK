@@ -44,6 +44,7 @@ namespace WinFormsApp
         private async void dtp_BookingDate_ValueChanged(object sender, EventArgs e)
         {
             await updateComboBox();
+            btn_Add.Enabled = false;
         }
 
         private async Task updateComboBox()
@@ -54,7 +55,8 @@ namespace WinFormsApp
 
             foreach (AvailableStubsForHour availableBookings in _availableBookingsList)
             {
-
+                availableBookings.TimeStart = availableBookings.TimeStart.ToLocalTime();
+                availableBookings.TimeEnd = availableBookings.TimeEnd.ToLocalTime();
                 string builder = availableBookings.TimeStart.Hour + " - " + availableBookings.TimeEnd.Hour + ", Stubs: " +
                     availableBookings.AvailableStubIds.Count;
 
@@ -69,8 +71,6 @@ namespace WinFormsApp
             string date = dtp_BookingDate.Value.ToString("yyyy-MM-dd");
             string url = $"Booking?start={date}&showAvailable=true&sortOption=0";
             _availableBookingsList = await _apiService.GetAsync<List<AvailableStubsForHour>>(url);
-
-            // https://localhost:7021/Booking?start=2023-11-30&showAvailable=true&sortOption=0
 
         }
 
@@ -166,7 +166,7 @@ namespace WinFormsApp
         /// <summary>
         /// Updates the state of the OK button based on certain conditions.
         /// </summary>
-        private void UpdateButtonOk()
+        private void UpdateButtonOk(object sender, EventArgs e)
         {
             // Check if there is at least one selected time slot
             bool bookingCondition = _selectedTimeSlot.Count > 0;
@@ -190,42 +190,6 @@ namespace WinFormsApp
                 btn_OK.Enabled = false; // Disable the OK button
             }
         }
-        /// <summary>
-        /// Every time the listbox named: lbo_SelectedTime changes enabled state this event will be called
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void lbo_SelectedTime_EnabledChanged(object sender, EventArgs e)
-        {
-            UpdateButtonOk();
-        }
-        /// <summary>
-        /// Every time the text in the textbox named: txtBox_FullName changes this event will be called
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void txtBox_FullName_TextChanged(object sender, EventArgs e)
-        {
-            UpdateButtonOk();
-        }
-        /// <summary>
-        /// Every time the text in the textbox named: txtBox_Email changes this event will be called
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void txtBox_Email_TextChanged(object sender, EventArgs e)
-        {
-            UpdateButtonOk();
-        }
-        /// <summary>
-        /// Every time the text in the textbox named: txtBox_PhoneNumber changes this event will be called
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void txtBox_PhoneNumber_TextChanged(object sender, EventArgs e)
-        {
-            UpdateButtonOk();
-        }
 
         /// <summary>
         /// When the "ok"-button is clicked this event will be called, 
@@ -235,6 +199,7 @@ namespace WinFormsApp
         /// <param name="e"></param>
         private async void btn_OK_Click(object sender, EventArgs e)
         {
+            btn_OK.Enabled = false;
             //Local Variables
             string url = "Booking";
             BookingRequest bookingRequest = new BookingRequest();
@@ -260,9 +225,10 @@ namespace WinFormsApp
             BookingRequest bookingRequest = new BookingRequest();
             DTOCustomer customer = new DTOCustomer() { FullName = txtBox_FullName.Text, Email = txtBox_Email.Text, Phone = txtBox_PhoneNumber.Text };
 
+
             foreach (AvailableStubsForHour selectedBookings in _selectedTimeSlot)
             {
-                bookingRequest.Appointments.Add(new NewBooking() { TimeStart = selectedBookings.TimeStart, TimeEnd = selectedBookings.TimeEnd, Notes = txtBox_Notes.Text });
+                bookingRequest.Appointments.Add(new NewBooking() { TimeStart = selectedBookings.TimeStart.ToUniversalTime(), TimeEnd = selectedBookings.TimeEnd.ToUniversalTime(), Notes = txtBox_Notes.Text });
 
             }
             bookingRequest.Customer = customer;

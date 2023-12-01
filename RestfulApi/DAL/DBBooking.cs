@@ -33,7 +33,7 @@ public class DBBooking : IDBBooking {
     {
         StringBuilder script = new StringBuilder(
             "SELECT b.Id, b.TimeStart, b.TimeEnd, b.Notes, b.StubId, b.BookingOrderID, bo.Id as OrderID" +
-            ", c.name as FirstName, c.phone, c.email " +
+            ", c.name as FullName, c.phone, c.email " +
             "FROM Booking b " +
             "INNER JOIN BookingOrder bo ON b.BookingOrderID = bo.Id " +
             "INNER JOIN Customer c ON bo.customer_id_FK = c.Id " +
@@ -84,7 +84,7 @@ public class DBBooking : IDBBooking {
                     booking.Customer = customer; // Map the customer to the booking
                     return booking;
                 },
-                parameters, transaction, splitOn: "FirstName")).ToList();
+                parameters, transaction, splitOn: "FullName")).ToList();
         }
         catch {
             throw;
