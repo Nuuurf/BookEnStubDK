@@ -60,7 +60,7 @@ namespace RestfulApi.DAL {
                 result = await conn.QueryFirstOrDefaultAsync<int>(scriptIfExists, parameters, transaction: trans);
 
                 if (result == 0) {
-                    var parametersCreateNew = new { name = customer.FirstName, phone = customer.Phone, email = customer.Email };
+                    var parametersCreateNew = new { name = customer.FullName, phone = customer.Phone, email = customer.Email };
                     result = (int)(await conn.ExecuteScalarAsync(scriptInsertCustomer, parametersCreateNew, transaction: trans))!;
                 }
             }
@@ -71,15 +71,15 @@ namespace RestfulApi.DAL {
             return result;
         }
 
-        public async Task<DTOCustomer> GetCustomer(IDbConnection conn, string phoneInput)
+        public async Task<Customer> GetCustomer(IDbConnection conn, string phoneInput, IDbTransaction trans = null!)
         {
-            DTOCustomer? result = null;
+            Customer? result = null;
             string script = "SELECT name as FullName, phone, email FROM customer where phone = @phone";
 
             try
             {
                 var parameters = new { phone = phoneInput};
-                result = await conn.QueryFirstOrDefaultAsync<DTOCustomer>(script, parameters);
+                result = await conn.QueryFirstOrDefaultAsync<Customer>(script, parameters, transaction: trans);
             }
             catch (Exception ex)
             {

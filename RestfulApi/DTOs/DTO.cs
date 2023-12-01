@@ -6,7 +6,7 @@ namespace RestfulApi.DTOs {
 
         public static Customer ConvertToCustomer(DTOCustomer customerToConvert) {
             return new Customer {
-                FirstName = customerToConvert.FullName,
+                FullName = customerToConvert.FullName,
                 Phone = customerToConvert.Phone,
                 Email = customerToConvert.Email
             };
@@ -30,7 +30,7 @@ namespace RestfulApi.DTOs {
 
         public static DTOCustomer ConvertToDTOCustomer(Customer customerToConvert) {
             return new DTOCustomer {
-                FullName = customerToConvert.FirstName,
+                FullName = customerToConvert.FullName,
                 Phone = customerToConvert.Phone,
                 Email = customerToConvert.Email
             };

@@ -28,13 +28,13 @@ namespace TestProject.API.Demo {
         private static List<Booking> _bookings = initializeBookings();
 
         private static Customer _customer1 = new Customer {
-            FirstName = "Client1",
+            FullName = "Client1",
             Phone = "11111111",
             Email = "client1@concurrency.test"
         };
 
         private static Customer _customer2 = new Customer {
-            FirstName = "Client2",
+            FullName = "Client2",
             Phone = "22222222",
             Email = "client2@concurrency.test"
         };

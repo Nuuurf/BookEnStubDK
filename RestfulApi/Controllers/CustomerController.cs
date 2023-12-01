@@ -20,7 +20,7 @@ namespace RestfulApi.Controllers
         }
 
         [HttpGet("{phone}")]
-        public async Task<IActionResult> getCustomerFromPhone(string phone)
+        public async Task<IActionResult> getCustomerFromPhone(string? phone)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace RestfulApi.Controllers
                     return BadRequest("Phone is required");
                 }
 
-                DTOCustomer customer = await _customerdata.GetCustomer(phone);
+                DTOCustomer customer = DTO.ConvertToDTOCustomer(await _customerdata.GetCustomer(phone));
 
                 if (customer == null)
                 {

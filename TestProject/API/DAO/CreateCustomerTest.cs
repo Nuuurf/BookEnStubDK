@@ -18,7 +18,7 @@ namespace TestProject.API.DAO
         private DBCustomer _DbCustomer = new DBCustomer();
 private static Customer customer = new Customer
 {
-    FirstName = "Lars",
+    FullName = "Lars",
     Phone = "88888888",
     Email = "Lars@Lars.dk"
 };

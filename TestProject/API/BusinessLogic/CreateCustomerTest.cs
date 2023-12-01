@@ -15,7 +15,7 @@ namespace TestProject.API.BusinessLogic {
     public class CreateCustomerTest {
 private static Customer customer = new Customer
 {
-    FirstName = "Lars",
+    FullName = "Lars",
     Phone = "88888888",
     Email = "somethingmail@noget.dk"
 };

@@ -33,11 +33,11 @@ namespace RestfulApi.BusinessLogic {
             return result;
         }
 
-        public async Task<DTOCustomer> GetCustomer(string phone)
+        public async Task<Customer> GetCustomer(string phone, IDbTransaction trans = null!)
         {
-            DTOCustomer? result = null;
+            Customer? result = null;
 
-            result = await _dbCustomer.GetCustomer(_connection, phone);
+            result = await _dbCustomer.GetCustomer(_connection, phone, trans);
 
             return result;
         }
