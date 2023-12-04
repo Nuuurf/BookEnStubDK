@@ -1,4 +1,6 @@
-﻿using RestfulApi;
+﻿using Dapper;
+using Microsoft.Extensions.Caching.Memory;
+using RestfulApi;
 using RestfulApi.DAL;
 using RestfulApi.Exceptions;
 using RestfulApi.Models;
@@ -14,12 +16,23 @@ namespace RestfulApi.BusinessLogic {
         private readonly IDBBooking _dBBooking;
         private readonly IDbConnection _connection;
         private readonly ICustomerData _customerData;
+
+        private MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
+        private const string StubsCacheKey = "allStubs";
+        private static SemaphoreSlim _bookingSemaphore = new SemaphoreSlim(1, 1);
+
+        private System.Data.IsolationLevel _IsolationLevel;
         //Ready for dependency injection
         public BookingDataControl(IDBBooking dbBooking, ICustomerData customerControl ,IDbConnection connection) {
             //Needs to change with injection
             _dBBooking = dbBooking;
             _connection = connection;
             _customerData = customerControl;
+        }
+
+        public System.Data.IsolationLevel TestInsertIsolationLevel(System.Data.IsolationLevel level) {
+            _IsolationLevel = level;
+            return _IsolationLevel;
         }
 
         public async Task<int> CreateBooking(List<Booking> bookings, Customer customer) {
@@ -44,8 +57,8 @@ namespace RestfulApi.BusinessLogic {
 
             //check if some error is not caught 
             bool wasAssociated = false;
-
-            using (var transaction = _connection.BeginTransaction(System.Data.IsolationLevel.Serializable)) {
+            await _bookingSemaphore.WaitAsync();
+            using (var transaction = _connection.BeginTransaction(_IsolationLevel)) {
                 try {
 
                     //Create a new booking order and retrieve its id
@@ -82,6 +95,10 @@ namespace RestfulApi.BusinessLogic {
 
                     //Pass the exception to calling method
                     throw;
+                }
+                finally
+                {
+                    _bookingSemaphore.Release();
                 }
 
                 //return the booking order id, which has the bookings assigned to it.
@@ -176,31 +193,50 @@ namespace RestfulApi.BusinessLogic {
         private async Task<int?> GetAvailableOrRandomStub(IDbConnection conn, int? desiredStubId, DateTime startTime, IDbTransaction transaction = null)
         {
             // Get all stubs
-            List<int> allStubs = await _dBBooking.GetAllStubs(conn, transaction);
-
-            var bookedStubs = await _dBBooking.GetBookedStubsForHour(conn, startTime, transaction);
-            if (desiredStubId != null || desiredStubId >= 1 || desiredStubId <= allStubs.Count)
+            if (!_cache.TryGetValue(StubsCacheKey, out List<int> allStubs))
             {
+                allStubs = await _dBBooking.GetAllStubs(conn, transaction);
+                _cache.Set(StubsCacheKey, allStubs, TimeSpan.FromHours(1));
+            }
 
+            string cacheKey = $"BookedStubs_{startTime:yyyyMMddHH}";
+            if (!_cache.TryGetValue(cacheKey, out List<int> bookedStubs))
+            {
+                bookedStubs = await _dBBooking.GetBookedStubsForHour(conn, startTime, transaction);
+                _cache.Set(cacheKey, bookedStubs, TimeSpan.FromMinutes(30));
+            }
+
+            int? selectedStubId = null;
+            if (desiredStubId != null && desiredStubId >= 1 && desiredStubId <= allStubs.Count)
+            {
                 // Check if the desired stub is available
                 if (!bookedStubs.Contains(desiredStubId.Value))
                 {
-                    return desiredStubId;
+                    selectedStubId = desiredStubId;
                 }
             }
-            
-            // Exclude booked stubs
-            var availableStubs = allStubs.Except(bookedStubs).ToList();
 
-            // Select a random stub if any are available
-            if (availableStubs.Any())
+            if (selectedStubId == null)
             {
-                Random random = new Random();
-                return availableStubs[random.Next(availableStubs.Count)];
+                // Exclude booked stubs
+                var availableStubs = allStubs.Except(bookedStubs).ToList();
+                if (availableStubs.Any())
+                {
+                    Random random = new Random();
+                    selectedStubId = availableStubs[random.Next(availableStubs.Count)];
+                }
             }
 
-            return null; // No stubs available
+            // If a stub was selected, update the cache
+            if (selectedStubId != null)
+            {
+                bookedStubs.Add(selectedStubId.Value);
+                _cache.Set(cacheKey, bookedStubs, TimeSpan.FromMinutes(30));
+            }
+
+            return selectedStubId;
         }
+
 
     }
 }

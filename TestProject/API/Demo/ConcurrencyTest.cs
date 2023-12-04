@@ -51,7 +51,7 @@ namespace TestProject.API.Demo {
             Customer = DTO.ConvertToDTOCustomer(_customer2)
         };
 
-
+        private System.Data.IsolationLevel _IsolationLevel = System.Data.IsolationLevel.ReadCommitted;
 
         //[Test]
         //public void ConcurrencyTest_RepeatableRead() {
@@ -59,16 +59,21 @@ namespace TestProject.API.Demo {
         //}
 
         [Test]
-        public async Task ConcurrencyTest_Serializable() {
-            //Arrange   //Not actually used since we cant inject isolation levels
-            IsolationLevel isolationlevel = IsolationLevel.Serializable;
+        public async Task IsolationLevelPerformanceTest() {
+            //Arrange   //Not always used, since we dont have isolation level injection on most branches.
+            System.Data.IsolationLevel isolationlevel = _IsolationLevel;
                 //Set up clients to compete for resource, with two different connection.
                 //Client 1
             IDbConnection connection1 = _connection.GetOpenConnection();
-            BookingController client1 = new BookingController(new BookingDataControl(_dBBooking1, new CustomerDataControl(_dBCustomer1, connection1), connection1));
+            BookingDataControl client1BookingController = new BookingDataControl(_dBBooking1, new CustomerDataControl(_dBCustomer1, connection1), connection1);
+            TestContext.WriteLine(client1BookingController.TestInsertIsolationLevel(isolationlevel));
+            BookingController client1 = new BookingController(client1BookingController);
+            
                 //Client 2
             IDbConnection connection2 = _connection.GetOpenConnection();
-            BookingController client2 = new BookingController(new BookingDataControl(_dBBooking2, new CustomerDataControl(_dBCustomer2, connection2), connection2));
+            BookingDataControl client2BookingController = new BookingDataControl(_dBBooking2, new CustomerDataControl(_dBCustomer2, connection2), connection2);
+            TestContext.WriteLine(client2BookingController.TestInsertIsolationLevel(isolationlevel));
+            BookingController client2 = new BookingController(client2BookingController);
 
                 //Create something to contain the tasks while they compute
             List<Task<IActionResult>> tasks = new List<Task<IActionResult>>();
@@ -77,7 +82,7 @@ namespace TestProject.API.Demo {
 
             Stopwatch stopwatch = new Stopwatch();
             // Act
-                //Start a timer, just for fun since we cant measure the time difference between isolationlevels.
+                //Start a timer
             stopwatch.Start();
                 //Start client1 request
             Task<IActionResult> taskClient1 = client1.CreateBooking(_bookingRequest1);
@@ -99,20 +104,71 @@ namespace TestProject.API.Demo {
             // Assert
             var firstResult = tasks[0].Result;
             Assert.IsInstanceOf<OkObjectResult>(firstResult);
-
+            
             var secondResult = tasks[1].Result;
-            Assert.IsInstanceOf<UnprocessableEntityResult>(secondResult);
-
-            //Write test results in test summary.
-            TestContext.WriteLine($"Client1 responce was {firstResult}");
-            TestContext.WriteLine($"Client2 responce was {secondResult}");
+            Assert.IsInstanceOf<UnprocessableEntityObjectResult>(secondResult);
 
             //Write test results in test summary.
             //TestContext.WriteLine($"Client1 responce was {firstResult.StatusCode}");
             //TestContext.WriteLine($"Client2 responce was {secondResult.StatusCode}");
-            //TestContext.WriteLine($"Delay between client requests was ({waitPeriod}) milliseconds long");
-            //TestContext.WriteLine($"Simulation took {stopwatch.Elapsed} time to complete");
+            TestContext.WriteLine($"Delay between client requests was ({waitPeriod}) milliseconds long");
+            TestContext.WriteLine($"Simulation took {stopwatch.Elapsed} time to complete");
         }
+        [Test]
+        public async Task IsolationLevelPerformanceTestMarcus()
+        {
+            // Arrange
+            System.Data.IsolationLevel isolationlevel = _IsolationLevel;
+
+            // Shared BookingDataControl instance
+            IDbConnection sharedConnection = _connection.GetOpenConnection();
+            BookingDataControl sharedBookingController = new BookingDataControl(_dBBooking1, new CustomerDataControl(_dBCustomer1, sharedConnection), sharedConnection);
+            TestContext.WriteLine(sharedBookingController.TestInsertIsolationLevel(isolationlevel));
+
+            // Shared BookingController instances
+            BookingController client1 = new BookingController(sharedBookingController);
+            BookingController client2 = new BookingController(sharedBookingController);
+
+            // List to hold tasks
+            List<Task<IActionResult>> tasks = new List<Task<IActionResult>>();
+
+            int waitPeriod = 1;
+            Stopwatch stopwatch = new Stopwatch();
+
+            // Act
+            stopwatch.Start();
+
+            // Start client1 request
+            Task<IActionResult> taskClient1 = client1.CreateBooking(_bookingRequest1);
+            tasks.Add(taskClient1);
+
+            // Simulate an artificial delay
+            await Task.Delay(waitPeriod);
+
+            // Start client2 request
+            Task<IActionResult> taskClient2 = client2.CreateBooking(_bookingRequest2);
+            tasks.Add(taskClient2);
+
+            // Wait for all tasks to be done
+            await Task.WhenAll(tasks);
+
+            // Stop timer
+            stopwatch.Stop();
+
+            // Assert
+            var firstResult = tasks[0].Result;
+            Assert.IsInstanceOf<OkObjectResult>(firstResult);
+
+            var secondResult = tasks[1].Result;
+            Assert.IsInstanceOf<UnprocessableEntityObjectResult>(secondResult);
+
+            // Write test results in test summary
+            TestContext.WriteLine($"Client1 responce was {firstResult}");
+            TestContext.WriteLine($"Client2 responce was {secondResult}");
+            TestContext.WriteLine($"Delay between client requests was ({waitPeriod}) milliseconds long");
+            TestContext.WriteLine($"Simulation took {stopwatch.Elapsed} time to complete");
+        }
+
 
         //Clean database this way, because we cannot manage actions as a transaction and rollback afterwards.
         [TearDown]
