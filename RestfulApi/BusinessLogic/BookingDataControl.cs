@@ -24,8 +24,9 @@ namespace RestfulApi.BusinessLogic {
             _customerData = customerControl;
         }
 
-        public void TestInsertIsolationLevel(System.Data.IsolationLevel level) {
+        public System.Data.IsolationLevel TestInsertIsolationLevel(System.Data.IsolationLevel level) {
             _IsolationLevel = level;
+            return _IsolationLevel;
         }
 
         public async Task<int> CreateBooking(List<Booking> bookings, Customer customer) {
