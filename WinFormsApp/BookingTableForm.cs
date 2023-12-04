@@ -87,7 +87,7 @@ namespace WinFormsApp
 
                 //Tries to get bookings from API.
                 _bookings = await _bookingController.getBookingsFromAPI(_brf);
-                
+
                 //Displays the list of bookings in the table.
                 foreach (Booking booking in _bookings)
                 {

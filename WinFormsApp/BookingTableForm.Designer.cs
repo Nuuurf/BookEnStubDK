@@ -28,7 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            components = new System.ComponentModel.Container();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             panel1 = new Panel();
             pnl_Tabel = new Panel();
             dataGridView1 = new DataGridView();
@@ -38,6 +39,7 @@
             btn_Add = new Button();
             btn_Edit = new Button();
             pnl_Filter = new Panel();
+            btn_clearFilter = new Button();
             txt_email = new TextBox();
             label3 = new Label();
             txt_Phone = new TextBox();
@@ -52,7 +54,7 @@
             dtp_EndDate = new DateTimePicker();
             dtp_StartDate = new DateTimePicker();
             chkBox_Today = new CheckBox();
-            btn_clearFilter = new Button();
+            toolTip1 = new ToolTip(components);
             panel1.SuspendLayout();
             pnl_Tabel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
@@ -84,13 +86,13 @@
             // 
             dataGridView1.AllowUserToResizeColumns = false;
             dataGridView1.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView1.Dock = DockStyle.Fill;
             dataGridView1.Location = new Point(0, 0);
@@ -125,6 +127,7 @@
             btn_Details.Size = new Size(75, 23);
             btn_Details.TabIndex = 9;
             btn_Details.Text = "Details";
+            toolTip1.SetToolTip(btn_Details, "NOT IMPLEMENTED");
             btn_Details.UseVisualStyleBackColor = true;
             btn_Details.Click += btn_Details_Click;
             // 
@@ -136,16 +139,20 @@
             btn_Delete.Size = new Size(75, 23);
             btn_Delete.TabIndex = 8;
             btn_Delete.Text = "Delete";
+            toolTip1.SetToolTip(btn_Delete, "Deletes the selected booking");
             btn_Delete.UseVisualStyleBackColor = true;
             btn_Delete.Click += btn_Delete_Click;
             // 
             // btn_Add
             // 
+            btn_Add.AccessibleDescription = "";
+            btn_Add.AccessibleName = "";
             btn_Add.Location = new Point(34, 6);
             btn_Add.Name = "btn_Add";
             btn_Add.Size = new Size(75, 23);
             btn_Add.TabIndex = 7;
             btn_Add.Text = "Add";
+            toolTip1.SetToolTip(btn_Add, "Click here to add a booking");
             btn_Add.UseVisualStyleBackColor = true;
             btn_Add.Click += btn_Add_Click;
             // 
@@ -157,6 +164,7 @@
             btn_Edit.Size = new Size(75, 23);
             btn_Edit.TabIndex = 6;
             btn_Edit.Text = "Edit";
+            toolTip1.SetToolTip(btn_Edit, "NOT IMPLEMENTED");
             btn_Edit.UseVisualStyleBackColor = true;
             btn_Edit.Click += btn_Edit_Click;
             // 
@@ -183,12 +191,24 @@
             pnl_Filter.Size = new Size(796, 100);
             pnl_Filter.TabIndex = 0;
             // 
+            // btn_clearFilter
+            // 
+            btn_clearFilter.Location = new Point(584, 68);
+            btn_clearFilter.Name = "btn_clearFilter";
+            btn_clearFilter.Size = new Size(75, 22);
+            btn_clearFilter.TabIndex = 19;
+            btn_clearFilter.Text = "Clear Filter";
+            toolTip1.SetToolTip(btn_clearFilter, "Click to clear the filters, will update table");
+            btn_clearFilter.UseVisualStyleBackColor = true;
+            btn_clearFilter.Click += btn_clearFilter_Click;
+            // 
             // txt_email
             // 
             txt_email.Location = new Point(398, 67);
             txt_email.Name = "txt_email";
             txt_email.Size = new Size(100, 23);
             txt_email.TabIndex = 18;
+            toolTip1.SetToolTip(txt_email, "Sets filter to only include a certain customer by email");
             // 
             // label3
             // 
@@ -205,6 +225,7 @@
             txt_Phone.Name = "txt_Phone";
             txt_Phone.Size = new Size(100, 23);
             txt_Phone.TabIndex = 16;
+            toolTip1.SetToolTip(txt_Phone, "Sets filter to only include a certain customer by phonenumber");
             // 
             // label4
             // 
@@ -221,6 +242,7 @@
             txt_OrderID.Name = "txt_OrderID";
             txt_OrderID.Size = new Size(100, 23);
             txt_OrderID.TabIndex = 14;
+            toolTip1.SetToolTip(txt_OrderID, "Sets filter to only include a certain order by ID (must be a number)");
             // 
             // label2
             // 
@@ -237,6 +259,7 @@
             txt_StubID.Name = "txt_StubID";
             txt_StubID.Size = new Size(100, 23);
             txt_StubID.TabIndex = 12;
+            toolTip1.SetToolTip(txt_StubID, "Sets filter to only include a certain stub by ID (must be a number)");
             // 
             // label1
             // 
@@ -254,6 +277,7 @@
             btn_refresh.Size = new Size(75, 23);
             btn_refresh.TabIndex = 10;
             btn_refresh.Text = "Refresh";
+            toolTip1.SetToolTip(btn_refresh, "Refreshes the booking-table");
             btn_refresh.UseVisualStyleBackColor = true;
             btn_refresh.Click += btn_refresh_Click;
             // 
@@ -283,16 +307,20 @@
             dtp_EndDate.Name = "dtp_EndDate";
             dtp_EndDate.Size = new Size(98, 23);
             dtp_EndDate.TabIndex = 3;
+            toolTip1.SetToolTip(dtp_EndDate, "Sets the upper range of the date filter");
             dtp_EndDate.Value = new DateTime(2023, 11, 30, 0, 0, 0, 0);
             // 
             // dtp_StartDate
             // 
+            dtp_StartDate.AccessibleDescription = "Test";
+            dtp_StartDate.AccessibleRole = AccessibleRole.ToolTip;
             dtp_StartDate.Enabled = false;
             dtp_StartDate.Format = DateTimePickerFormat.Short;
             dtp_StartDate.Location = new Point(72, 39);
             dtp_StartDate.Name = "dtp_StartDate";
             dtp_StartDate.Size = new Size(98, 23);
             dtp_StartDate.TabIndex = 2;
+            toolTip1.SetToolTip(dtp_StartDate, "Sets the lower range of the date filter");
             dtp_StartDate.ValueChanged += dtp_StartDate_ValueChanged;
             // 
             // chkBox_Today
@@ -305,18 +333,9 @@
             chkBox_Today.Size = new Size(57, 19);
             chkBox_Today.TabIndex = 1;
             chkBox_Today.Text = "Today";
+            toolTip1.SetToolTip(chkBox_Today, "Checked: Get bookings from today");
             chkBox_Today.UseVisualStyleBackColor = true;
             chkBox_Today.CheckedChanged += chkBox_Today_CheckedChanged;
-            // 
-            // btn_clearFilter
-            // 
-            btn_clearFilter.Location = new Point(584, 68);
-            btn_clearFilter.Name = "btn_clearFilter";
-            btn_clearFilter.Size = new Size(75, 22);
-            btn_clearFilter.TabIndex = 19;
-            btn_clearFilter.Text = "Clear Filter";
-            btn_clearFilter.UseVisualStyleBackColor = true;
-            btn_clearFilter.Click += btn_clearFilter_Click;
             // 
             // BookingTableForm
             // 
@@ -363,5 +382,6 @@
         private Label label4;
         private TextBox txt_OrderID;
         private Button btn_clearFilter;
+        private ToolTip toolTip1;
     }
 }
