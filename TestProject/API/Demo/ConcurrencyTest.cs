@@ -97,19 +97,21 @@ namespace TestProject.API.Demo {
             stopwatch.Stop();
 
             // Assert
-            OkObjectResult? firstResult = tasks[0].Result as OkObjectResult;
-            Assert.NotNull(firstResult);
-            Assert.AreEqual(200, firstResult.StatusCode);
+            var firstResult = tasks[0].Result;
+            Assert.IsInstanceOf<OkObjectResult>(firstResult);
 
-            ObjectResult? secondResult = tasks[1].Result as ObjectResult;
-            Assert.NotNull(secondResult);
-            Assert.AreEqual(422, secondResult.StatusCode);
+            var secondResult = tasks[1].Result;
+            Assert.IsInstanceOf<UnprocessableEntityResult>(secondResult);
 
-                //Write test results in test summary.
-            TestContext.WriteLine($"Client1 responce was {firstResult.StatusCode}");
-            TestContext.WriteLine($"Client2 responce was {secondResult.StatusCode}");
-            TestContext.WriteLine($"Delay between client requests was ({waitPeriod}) milliseconds long");
-            TestContext.WriteLine($"Simulation took {stopwatch.Elapsed} time to complete");
+            //Write test results in test summary.
+            TestContext.WriteLine($"Client1 responce was {firstResult}");
+            TestContext.WriteLine($"Client2 responce was {secondResult}");
+
+            //Write test results in test summary.
+            //TestContext.WriteLine($"Client1 responce was {firstResult.StatusCode}");
+            //TestContext.WriteLine($"Client2 responce was {secondResult.StatusCode}");
+            //TestContext.WriteLine($"Delay between client requests was ({waitPeriod}) milliseconds long");
+            //TestContext.WriteLine($"Simulation took {stopwatch.Elapsed} time to complete");
         }
 
         //Clean database this way, because we cannot manage actions as a transaction and rollback afterwards.
