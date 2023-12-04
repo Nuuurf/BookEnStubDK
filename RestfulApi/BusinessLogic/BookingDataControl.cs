@@ -17,13 +17,15 @@ namespace RestfulApi.BusinessLogic {
         private readonly IDbConnection _connection;
         private readonly ICustomerData _customerData;
         private readonly IHubContext<DateHub> _hubContext;
+        private readonly IEmailDataControl _emailData;
         //Ready for dependency injection
-        public BookingDataControl(IDBBooking dbBooking, ICustomerData customerControl, IHubContext<DateHub> hubContext, IDbConnection connection) {
+        public BookingDataControl(IDBBooking dbBooking, ICustomerData customerControl, IHubContext<DateHub> hubContext, IDbConnection connection, IEmailDataControl emailData) {
             //Needs to change with injection
             _dBBooking = dbBooking;
             _customerData = customerControl;
             _hubContext = hubContext;
             _connection = connection;
+            _emailData = emailData;
         }
 
         public async Task<int> CreateBooking(List<Booking> bookings, Customer customer) {
@@ -79,6 +81,9 @@ namespace RestfulApi.BusinessLogic {
 
                     //If no exceptions have been thrown, every thing went right. Commit
                     transaction.Commit();
+
+                    await _emailData.SendEmail(customer.Email, bookings, customer, newBookingOrderId);
+                    
                     var updatedDates = new HashSet<string>();
                     // Send update to all relevant date groups
                     foreach (var booking in bookings)

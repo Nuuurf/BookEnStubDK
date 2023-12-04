@@ -63,6 +63,7 @@ builder.Services.AddScoped<IDBCustomer, DBCustomer>();
 builder.Services.AddScoped<IDBBooking, DBBooking>();
 builder.Services.AddScoped<IJwtDataControl, JwtDataControl>();
 builder.Services.AddScoped<IDBRefreshToken, DBRefreshToken>();
+builder.Services.AddScoped<IEmailDataControl, EmailDataControl>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
