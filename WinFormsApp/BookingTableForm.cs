@@ -84,10 +84,11 @@ namespace WinFormsApp
             try
             {
                 dataGridView1.AutoGenerateColumns = true;
+
                 //Tries to get bookings from API.
                 _bookings = await _bookingController.getBookingsFromAPI(_brf);
+                
                 //Displays the list of bookings in the table.
-
                 foreach (Booking booking in _bookings)
                 {
                     booking.TimeStart = booking.TimeStart.ToLocalTime();
@@ -95,6 +96,10 @@ namespace WinFormsApp
                 }
 
                 dataGridView1.DataSource = _bookings;
+
+                //Removes Booking-ID from the Grid-View as it is not needed.
+                dataGridView1.Columns.Remove("Id");
+
                 foreach (DataGridViewColumn column in dataGridView1.Columns)
                 {
                     if (column.Name == "Notes")
@@ -115,7 +120,7 @@ namespace WinFormsApp
             }
             catch (NoBookingException)
             {
-                //Gives an exception if there isn't a booking a current date.
+                //Gives an exception if there isn't a booking for a current date.
                 MessageBox.Show("No bookings found", "Error");
                 //Clears the current tabel.
                 dataGridView1.DataSource = null;
@@ -123,6 +128,7 @@ namespace WinFormsApp
                 dataGridView1.DataSource = _bookings;
             }
         }
+
         /// <summary>
         /// When today checkbox changes, certain elements will be disabled/enabled.
         /// </summary>

@@ -192,6 +192,46 @@ namespace WinFormsApp
         }
 
         /// <summary>
+        /// Every time the listbox named: lbo_SelectedTime changes enabled state this event will be called
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void lbo_SelectedTime_EnabledChanged(object sender, EventArgs e)
+        {
+            UpdateButtonOk(sender, e);
+        }
+
+        /// <summary>
+        /// Every time the text in the textbox named: txtBox_FullName changes this event will be called
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void txtBox_FullName_TextChanged(object sender, EventArgs e)
+        {
+            UpdateButtonOk(sender, e);
+        }
+
+        /// <summary>
+        /// Every time the text in the textbox named: txtBox_Email changes this event will be called
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void txtBox_Email_TextChanged(object sender, EventArgs e)
+        {
+            UpdateButtonOk(sender, e);
+        }
+
+        /// <summary>
+        /// Every time the text in the textbox named: txtBox_PhoneNumber changes this event will be called
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void txtBox_PhoneNumber_TextChanged(object sender, EventArgs e)
+        {
+            UpdateButtonOk(sender, e);
+        }
+
+        /// <summary>
         /// When the "ok"-button is clicked this event will be called, 
         /// it will attempt to gather infomation in the text boxes and create a request to the API
         /// </summary>
@@ -217,7 +257,6 @@ namespace WinFormsApp
             {
                 MessageBox.Show(ex.Message, "Error");
             }
-
         }
 
         private BookingRequest BookingRequestBuilder()
