@@ -51,7 +51,7 @@ namespace TestProject.API.Demo {
             Customer = DTO.ConvertToDTOCustomer(_customer2)
         };
 
-
+        private System.Data.IsolationLevel _IsolationLevel = System.Data.IsolationLevel.Serializable;
 
         //[Test]
         //public void ConcurrencyTest_RepeatableRead() {
@@ -59,15 +59,20 @@ namespace TestProject.API.Demo {
         //}
 
         [Test]
-        public async Task ConcurrencyTest_Serializable() {
-            //Arrange   //Not actually used since we cant inject isolation levels
-            IsolationLevel isolationlevel = IsolationLevel.Serializable;
+        public async Task IsolationLevelPerformanceTest() {
+            //Arrange   //Not always used, since we dont have isolation level injection on most branches.
+            System.Data.IsolationLevel isolationlevel = _IsolationLevel;
                 //Set up clients to compete for resource, with two different connection.
                 //Client 1
             IDbConnection connection1 = _connection.GetOpenConnection();
+            BookingDataControl client1BookingController = new BookingDataControl(_dBBooking1, new CustomerDataControl(_dBCustomer1, connection1), connection1);
+            client1BookingController.TestInsertIsolationLevel(isolationlevel);
             BookingController client1 = new BookingController(new BookingDataControl(_dBBooking1, new CustomerDataControl(_dBCustomer1, connection1), connection1));
+            
                 //Client 2
             IDbConnection connection2 = _connection.GetOpenConnection();
+            BookingDataControl client2BookingController = new BookingDataControl(_dBBooking2, new CustomerDataControl(_dBCustomer2, connection2), connection2);
+            client2BookingController.TestInsertIsolationLevel(isolationlevel);
             BookingController client2 = new BookingController(new BookingDataControl(_dBBooking2, new CustomerDataControl(_dBCustomer2, connection2), connection2));
 
                 //Create something to contain the tasks while they compute
@@ -77,7 +82,7 @@ namespace TestProject.API.Demo {
 
             Stopwatch stopwatch = new Stopwatch();
             // Act
-                //Start a timer, just for fun since we cant measure the time difference between isolationlevels.
+                //Start a timer
             stopwatch.Start();
                 //Start client1 request
             Task<IActionResult> taskClient1 = client1.CreateBooking(_bookingRequest1);

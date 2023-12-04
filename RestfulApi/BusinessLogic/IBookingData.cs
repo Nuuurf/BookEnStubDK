@@ -11,5 +11,7 @@ namespace RestfulApi.BusinessLogic {
 
         public Task<List<AvailableStubsForHour>> GetAvailableStubsForGivenTimeFrame(DateTime start, DateTime end);
 
+        public void TestInsertIsolationLevel(System.Data.IsolationLevel level);
+
     }
 }

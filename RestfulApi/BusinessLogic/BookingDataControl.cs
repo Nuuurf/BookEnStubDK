@@ -14,12 +14,18 @@ namespace RestfulApi.BusinessLogic {
         private readonly IDBBooking _dBBooking;
         private readonly IDbConnection _connection;
         private readonly ICustomerData _customerData;
+
+        private System.Data.IsolationLevel _IsolationLevel;
         //Ready for dependency injection
         public BookingDataControl(IDBBooking dbBooking, ICustomerData customerControl ,IDbConnection connection) {
             //Needs to change with injection
             _dBBooking = dbBooking;
             _connection = connection;
             _customerData = customerControl;
+        }
+
+        public void TestInsertIsolationLevel(System.Data.IsolationLevel level) {
+            _IsolationLevel = level;
         }
 
         public async Task<int> CreateBooking(List<Booking> bookings, Customer customer) {
@@ -45,7 +51,7 @@ namespace RestfulApi.BusinessLogic {
             //check if some error is not caught 
             bool wasAssociated = false;
 
-            using (var transaction = _connection.BeginTransaction(System.Data.IsolationLevel.Serializable)) {
+            using (var transaction = _connection.BeginTransaction(_IsolationLevel)) {
                 try {
 
                     //Create a new booking order and retrieve its id
