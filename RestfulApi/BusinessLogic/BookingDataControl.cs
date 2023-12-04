@@ -21,7 +21,8 @@ namespace RestfulApi.BusinessLogic {
         private const string StubsCacheKey = "allStubs";
         private static SemaphoreSlim _bookingSemaphore = new SemaphoreSlim(1, 1);
 
-        private System.Data.IsolationLevel _IsolationLevel;
+        //Change here if the isolation level need to be changed in the methods that use the field.
+        private System.Data.IsolationLevel _IsolationLevel = System.Data.IsolationLevel.ReadCommitted;
         //Ready for dependency injection
         public BookingDataControl(IDBBooking dbBooking, ICustomerData customerControl ,IDbConnection connection) {
             //Needs to change with injection
@@ -30,10 +31,11 @@ namespace RestfulApi.BusinessLogic {
             _customerData = customerControl;
         }
 
-        public System.Data.IsolationLevel TestInsertIsolationLevel(System.Data.IsolationLevel level) {
-            _IsolationLevel = level;
-            return _IsolationLevel;
-        }
+        //Used for isolation level injections, when testing concurrency control
+        //public System.Data.IsolationLevel TestInsertIsolationLevel(System.Data.IsolationLevel level) {
+        //    _IsolationLevel = level;
+        //    return _IsolationLevel;
+        //}
 
         public async Task<int> CreateBooking(List<Booking> bookings, Customer customer) {
             //If null return exception

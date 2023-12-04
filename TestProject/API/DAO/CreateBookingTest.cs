@@ -20,7 +20,7 @@ namespace TestProject.API.DAO
             TimeStart = new DateTime(2023, 11, 10, 9, 0, 0),
             TimeEnd = new DateTime(2023, 11, 10, 10, 0, 0),
             Notes = "Some generic notes",
-            StubId = 1
+            StubId = 5
             };
 
         private static Booking booking2 = new Booking
@@ -28,7 +28,7 @@ namespace TestProject.API.DAO
             TimeStart = new DateTime(2023, 11, 10, 10, 0, 0),
             TimeEnd = new DateTime(2023, 11, 10, 11, 0, 0),
             Notes = "Some generic notes",
-            StubId = 2
+            StubId = 6
         };
 
         private static Booking booking3 = new Booking
@@ -36,7 +36,7 @@ namespace TestProject.API.DAO
             TimeStart = new DateTime(2023, 11, 10, 11, 0, 0),
             TimeEnd = new DateTime(2023, 11, 10, 12, 0, 0),
             Notes = "Some generic notes",
-            StubId = 3
+            StubId = 7
         };
         public static IEnumerable<Booking> TestBookings
         {

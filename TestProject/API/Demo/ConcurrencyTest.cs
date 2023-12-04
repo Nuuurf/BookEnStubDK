@@ -66,13 +66,13 @@ namespace TestProject.API.Demo {
                 //Client 1
             IDbConnection connection1 = _connection.GetOpenConnection();
             BookingDataControl client1BookingController = new BookingDataControl(_dBBooking1, new CustomerDataControl(_dBCustomer1, connection1), connection1);
-            TestContext.WriteLine(client1BookingController.TestInsertIsolationLevel(isolationlevel));
+            //TestContext.WriteLine(client1BookingController.TestInsertIsolationLevel(isolationlevel));
             BookingController client1 = new BookingController(client1BookingController);
             
                 //Client 2
             IDbConnection connection2 = _connection.GetOpenConnection();
             BookingDataControl client2BookingController = new BookingDataControl(_dBBooking2, new CustomerDataControl(_dBCustomer2, connection2), connection2);
-            TestContext.WriteLine(client2BookingController.TestInsertIsolationLevel(isolationlevel));
+            //TestContext.WriteLine(client2BookingController.TestInsertIsolationLevel(isolationlevel));
             BookingController client2 = new BookingController(client2BookingController);
 
                 //Create something to contain the tasks while they compute
@@ -123,7 +123,7 @@ namespace TestProject.API.Demo {
             // Shared BookingDataControl instance
             IDbConnection sharedConnection = _connection.GetOpenConnection();
             BookingDataControl sharedBookingController = new BookingDataControl(_dBBooking1, new CustomerDataControl(_dBCustomer1, sharedConnection), sharedConnection);
-            TestContext.WriteLine(sharedBookingController.TestInsertIsolationLevel(isolationlevel));
+            //TestContext.WriteLine(sharedBookingController.TestInsertIsolationLevel(isolationlevel));
 
             // Shared BookingController instances
             BookingController client1 = new BookingController(sharedBookingController);
