@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             panel1 = new Panel();
             pnl_Tabel = new Panel();
             dataGridView1 = new DataGridView();
@@ -86,13 +86,13 @@
             // 
             dataGridView1.AllowUserToResizeColumns = false;
             dataGridView1.AllowUserToResizeRows = false;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView1.Dock = DockStyle.Fill;
             dataGridView1.Location = new Point(0, 0);
@@ -218,6 +218,7 @@
             label3.Size = new Size(36, 15);
             label3.TabIndex = 17;
             label3.Text = "Email";
+            toolTip1.SetToolTip(label3, "Sets filter to only include a certain customer by email");
             // 
             // txt_Phone
             // 
@@ -235,6 +236,7 @@
             label4.Size = new Size(41, 15);
             label4.TabIndex = 15;
             label4.Text = "Phone";
+            toolTip1.SetToolTip(label4, "Sets filter to only include a certain customer by phonenumber");
             // 
             // txt_OrderID
             // 
@@ -252,6 +254,7 @@
             label2.Size = new Size(51, 15);
             label2.TabIndex = 13;
             label2.Text = "Order ID";
+            toolTip1.SetToolTip(label2, "Sets filter to only include a certain order by ID (must be a number)");
             // 
             // txt_StubID
             // 
@@ -269,6 +272,7 @@
             label1.Size = new Size(45, 15);
             label1.TabIndex = 11;
             label1.Text = "Stub ID";
+            toolTip1.SetToolTip(label1, "Sets filter to only include a certain stub by ID (must be a number)");
             // 
             // btn_refresh
             // 
@@ -289,6 +293,7 @@
             lbl_EndDate.Size = new Size(53, 15);
             lbl_EndDate.TabIndex = 5;
             lbl_EndDate.Text = "End date";
+            toolTip1.SetToolTip(lbl_EndDate, "Sets the upper range of the date filter");
             // 
             // lbl_StartDate
             // 
@@ -298,6 +303,7 @@
             lbl_StartDate.Size = new Size(57, 15);
             lbl_StartDate.TabIndex = 4;
             lbl_StartDate.Text = "Start date";
+            toolTip1.SetToolTip(lbl_StartDate, "Sets the lower range of the date filter");
             // 
             // dtp_EndDate
             // 

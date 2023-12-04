@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             label1 = new Label();
             label2 = new Label();
             label3 = new Label();
@@ -44,6 +45,7 @@
             btn_Add = new Button();
             btn_Remove = new Button();
             lbo_SelectedTime = new ListBox();
+            toolTip1 = new ToolTip(components);
             SuspendLayout();
             // 
             // label1
@@ -54,6 +56,7 @@
             label1.Size = new Size(95, 15);
             label1.TabIndex = 0;
             label1.Text = "Full name . . . . . .";
+            toolTip1.SetToolTip(label1, "Enter customers name");
             // 
             // label2
             // 
@@ -63,6 +66,7 @@
             label2.Size = new Size(96, 15);
             label2.TabIndex = 1;
             label2.Text = "Email . . . . . . . . . .";
+            toolTip1.SetToolTip(label2, "Enter customers email");
             // 
             // label3
             // 
@@ -72,6 +76,7 @@
             label3.Size = new Size(122, 15);
             label3.TabIndex = 2;
             label3.Text = "Phone number . . . . . .";
+            toolTip1.SetToolTip(label3, "Enter customers phonenumber, if it exists rest of the customer data will be fetched from the database");
             // 
             // label4
             // 
@@ -81,6 +86,7 @@
             label4.Size = new Size(108, 15);
             label4.TabIndex = 3;
             label4.Text = "Note . . . . . . . . . . . . ";
+            toolTip1.SetToolTip(label4, "Enter customers special requests, eg: Birthday");
             // 
             // txtBox_FullName
             // 
@@ -127,6 +133,7 @@
             btn_OK.Size = new Size(70, 22);
             btn_OK.TabIndex = 8;
             btn_OK.Text = "OK";
+            toolTip1.SetToolTip(btn_OK, "Confirms the current booking, watch for errors");
             btn_OK.UseVisualStyleBackColor = true;
             btn_OK.Click += btn_OK_Click;
             // 
@@ -138,6 +145,7 @@
             btn_Cancel.Size = new Size(82, 22);
             btn_Cancel.TabIndex = 9;
             btn_Cancel.Text = "Cancel";
+            toolTip1.SetToolTip(btn_Cancel, "Cancels the current booking and closes the window");
             btn_Cancel.UseVisualStyleBackColor = true;
             btn_Cancel.Click += btn_Cancel_Click;
             // 
@@ -149,6 +157,7 @@
             dtp_BookingDate.Name = "dtp_BookingDate";
             dtp_BookingDate.Size = new Size(114, 23);
             dtp_BookingDate.TabIndex = 10;
+            toolTip1.SetToolTip(dtp_BookingDate, "Sets the date of the booking");
             dtp_BookingDate.ValueChanged += dtp_BookingDate_ValueChanged;
             // 
             // cmb_AvailableTimeSlot
@@ -159,6 +168,7 @@
             cmb_AvailableTimeSlot.Name = "cmb_AvailableTimeSlot";
             cmb_AvailableTimeSlot.Size = new Size(176, 23);
             cmb_AvailableTimeSlot.TabIndex = 11;
+            toolTip1.SetToolTip(cmb_AvailableTimeSlot, "Pick a time to add to the booking");
             cmb_AvailableTimeSlot.SelectedIndexChanged += cmb_AvailableTimeSlot_SelectedIndexChanged;
             cmb_AvailableTimeSlot.SelectedValueChanged += cmb_AvailableTimeSlot_SelectedValueChanged;
             // 
@@ -171,6 +181,7 @@
             btn_Add.Size = new Size(69, 22);
             btn_Add.TabIndex = 12;
             btn_Add.Text = "Add";
+            toolTip1.SetToolTip(btn_Add, "Adds the chosen date and time to current booking");
             btn_Add.UseVisualStyleBackColor = true;
             btn_Add.Click += btn_Add_Click;
             // 
@@ -183,6 +194,7 @@
             btn_Remove.Size = new Size(75, 22);
             btn_Remove.TabIndex = 13;
             btn_Remove.Text = "Remove";
+            toolTip1.SetToolTip(btn_Remove, "Removes the chosen date and time from current booking");
             btn_Remove.UseVisualStyleBackColor = true;
             btn_Remove.Click += btn_Remove_Click;
             // 
@@ -197,6 +209,7 @@
             lbo_SelectedTime.Name = "lbo_SelectedTime";
             lbo_SelectedTime.Size = new Size(190, 94);
             lbo_SelectedTime.TabIndex = 14;
+            toolTip1.SetToolTip(lbo_SelectedTime, "This contains the current date and times for the current booking");
             lbo_SelectedTime.SelectedIndexChanged += lbo_SelectedTime_SelectedIndexChanged;
             lbo_SelectedTime.EnabledChanged += UpdateButtonOk;
             // 
@@ -244,5 +257,6 @@
         private Button btn_Add;
         private Button btn_Remove;
         private ListBox lbo_SelectedTime;
+        private ToolTip toolTip1;
     }
 }
