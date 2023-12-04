@@ -11,5 +11,8 @@ namespace RestfulApi.BusinessLogic {
 
         public Task<List<AvailableStubsForHour>> GetAvailableStubsForGivenTimeFrame(DateTime start, DateTime end);
 
+        //Artifact from concurrencyTest, use later if wanted.
+        //public System.Data.IsolationLevel TestInsertIsolationLevel(System.Data.IsolationLevel level);
+
     }
 }
