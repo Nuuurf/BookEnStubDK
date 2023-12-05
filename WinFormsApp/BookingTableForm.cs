@@ -121,7 +121,7 @@ namespace WinFormsApp
             catch (NoBookingException)
             {
                 //Gives an exception if there isn't a booking for a current date.
-                MessageBox.Show("No bookings found", "Error");
+                MessageBox.Show("No bookings found", "Info");
                 //Clears the current tabel.
                 dataGridView1.DataSource = null;
                 _bookings.Clear();
@@ -212,7 +212,7 @@ namespace WinFormsApp
             }
             catch (Exception)
             {
-                MessageBox.Show("Stub ID: must be a number");
+                MessageBox.Show("Stub ID: must be a number","Error");
                 txt_StubID.Text = "";
             }
 
@@ -230,7 +230,7 @@ namespace WinFormsApp
             }
             catch (Exception)
             {
-                MessageBox.Show("Order ID: must be a number");
+                MessageBox.Show("Order ID: must be a number","Error");
                 txt_OrderID.Text = "";
             }
 
