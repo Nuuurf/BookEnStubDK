@@ -24,18 +24,18 @@ namespace RestfulApi.Controllers
         {
             try
             {
+                Customer? sCustomer;
                 if(phone == null)
                 {
                     return BadRequest("Phone is required");
                 }
-
-                DTOCustomer customer = DTO.ConvertToDTOCustomer(await _customerdata.GetCustomer(phone));
-
-                if (customer == null)
+                sCustomer = await _customerdata.GetCustomer(phone);
+                if (sCustomer == null)
                 {
                     return NotFound("No customer with that phonenumber exists");
                 }
 
+                DTOCustomer customer = DTO.ConvertToDTOCustomer(sCustomer);
                 return Ok(customer);
             }
             catch (Exception ex)
