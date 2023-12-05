@@ -12,10 +12,10 @@ namespace TestProject.API.Utilities
 
         private DBConnection()
         {
-            string dataSource = "hildur.ucn.dk";
-            string initialCatalog = "DMA-CSD-S225_10210213"; //33
-            string userID = "DMA-CSD-S225_10210213"; //42
-            string password = "Password1!";
+            string dataSource = "localhost";
+            string initialCatalog = "DMA-CSD-S225_10461242"; //33
+            string userID = "sa"; //42
+            string password = "secret*";
 
             connectionString = $"Data Source={dataSource};Initial Catalog={initialCatalog};User ID={userID};Password={password};";
 

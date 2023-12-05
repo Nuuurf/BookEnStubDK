@@ -17,12 +17,8 @@ namespace RestfulApi.BusinessLogic {
         private readonly IDbConnection _connection;
         private readonly ICustomerData _customerData;
 
-        private MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
-        private const string StubsCacheKey = "allStubs";
-        private static SemaphoreSlim _bookingSemaphore = new SemaphoreSlim(1, 1);
-
         //Change here if the isolation level need to be changed in the methods that use the field.
-        private System.Data.IsolationLevel _IsolationLevel = System.Data.IsolationLevel.ReadCommitted;
+        private System.Data.IsolationLevel _IsolationLevel = System.Data.IsolationLevel.RepeatableRead;
         //Ready for dependency injection
         public BookingDataControl(IDBBooking dbBooking, ICustomerData customerControl ,IDbConnection connection) {
             //Needs to change with injection
@@ -59,7 +55,6 @@ namespace RestfulApi.BusinessLogic {
 
             //check if some error is not caught 
             bool wasAssociated = false;
-            await _bookingSemaphore.WaitAsync();
             using (var transaction = _connection.BeginTransaction(_IsolationLevel)) {
                 try {
 
@@ -76,11 +71,14 @@ namespace RestfulApi.BusinessLogic {
                         throw new Exception("An error occured while associating customer with booking order. Customer id: " + customerId + ". BookingOrderId: " + newBookingOrderId);
                     }
 
-                    //Persist each booking from input
                     foreach (Booking b in bookings)
                     {
                         b.StubId = await GetAvailableOrRandomStub(_connection, b.StubId, b.TimeStart, transaction);
-
+                    }
+                    //Persist each booking from input
+                    foreach (Booking b in bookings)
+                    {
+                        //b.StubId = await GetAvailableOrRandomStub(_connection, b.StubId, b.TimeStart, transaction);
                         if (b.StubId == null)
                         {
                             throw new OverBookingException($"No Available stubs for {b.TimeStart}");
@@ -98,11 +96,7 @@ namespace RestfulApi.BusinessLogic {
                     //Pass the exception to calling method
                     throw;
                 }
-                finally
-                {
-                    _bookingSemaphore.Release();
-                }
-
+                
                 //return the booking order id, which has the bookings assigned to it.
                 return newBookingOrderId;
             }
@@ -195,18 +189,9 @@ namespace RestfulApi.BusinessLogic {
         private async Task<int?> GetAvailableOrRandomStub(IDbConnection conn, int? desiredStubId, DateTime startTime, IDbTransaction transaction = null)
         {
             // Get all stubs
-            if (!_cache.TryGetValue(StubsCacheKey, out List<int> allStubs))
-            {
-                allStubs = await _dBBooking.GetAllStubs(conn, transaction);
-                _cache.Set(StubsCacheKey, allStubs, TimeSpan.FromHours(1));
-            }
+            List<int> allStubs = await _dBBooking.GetAllStubs(conn, transaction);
 
-            string cacheKey = $"BookedStubs_{startTime:yyyyMMddHH}";
-            if (!_cache.TryGetValue(cacheKey, out List<int> bookedStubs))
-            {
-                bookedStubs = await _dBBooking.GetBookedStubsForHour(conn, startTime, transaction);
-                _cache.Set(cacheKey, bookedStubs, TimeSpan.FromMinutes(30));
-            }
+            List<int> bookedStubs = await _dBBooking.GetBookedStubsForHour(conn, startTime, transaction);
 
             int? selectedStubId = null;
             if (desiredStubId != null && desiredStubId >= 1 && desiredStubId <= allStubs.Count)
@@ -233,8 +218,7 @@ namespace RestfulApi.BusinessLogic {
             if (selectedStubId != null)
             {
                 bookedStubs.Add(selectedStubId.Value);
-                _cache.Set(cacheKey, bookedStubs, TimeSpan.FromMinutes(30));
-            }
+                }
 
             return selectedStubId;
         }
