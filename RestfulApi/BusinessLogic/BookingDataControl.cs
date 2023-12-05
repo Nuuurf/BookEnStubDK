@@ -17,6 +17,9 @@ namespace RestfulApi.BusinessLogic {
         private readonly IDbConnection _connection;
         private readonly ICustomerData _customerData;
 
+        private readonly MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
+
+        private const string StubsCacheKey = "allStubs";
         //Change here if the isolation level need to be changed in the methods that use the field.
         private System.Data.IsolationLevel _IsolationLevel = System.Data.IsolationLevel.Serializable;
         //Ready for dependency injection
@@ -167,7 +170,11 @@ namespace RestfulApi.BusinessLogic {
         }
         private async Task<int?> GetAvailableOrRandomStub(IDbConnection conn, int? desiredStubId, DateTime startTime, IDbTransaction transaction = null)
         {
-            var allStubs = await _dBBooking.GetAllStubs(conn, transaction);
+            if (!_cache.TryGetValue(StubsCacheKey, out List<int> allStubs))
+            {
+                allStubs = await _dBBooking.GetAllStubs(conn, transaction);
+                _cache.Set(StubsCacheKey, allStubs, TimeSpan.FromHours(1));
+            }
 
             // Lock the rows during transaction
             var bookedStubs = await _dBBooking.GetBookedStubsForHour(conn, startTime, transaction, true);
