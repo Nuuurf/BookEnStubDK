@@ -9,6 +9,7 @@ namespace RestfulApi.DAL
         public Task AddToken(IDbConnection conn, RefreshToken token, IDbTransaction transaction = null!);
 
         public Task<User> FindUser(IDbConnection conn, string username, IDbTransaction transaction = null!);
+        public Task<bool> RegisterUser(IDbConnection conn, User user, IDbTransaction transaction = null!);
 
         public Task<(RefreshToken, AuthTokenClaims)> FindToken(IDbConnection conn, string token, IDbTransaction transaction = null!);
 

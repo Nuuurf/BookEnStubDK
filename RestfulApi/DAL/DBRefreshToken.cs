@@ -19,6 +19,23 @@ namespace RestfulApi.DAL
             return result.ElementAt(0);
         }
 
+        public async Task<bool> RegisterUser(IDbConnection conn, User user, IDbTransaction transaction = null!)
+        {
+            string query
+                = "INSERT INTO [User] (Username, PasswordHash, PasswordSalt, Role) VALUES (@Username, @PasswordHash, @PasswordSalt, @Role)";
+
+            var parameters = new
+            {
+                Username = user.Username,
+                PasswordHash = user.PasswordHash,
+                PasswordSalt = user.PasswordSalt,
+                Role = user.Role.GetDescription()
+            };
+
+            int rowsAffected = await conn.ExecuteAsync(query, parameters, transaction: transaction);
+
+            return rowsAffected > 0;
+        }
         public async Task AddToken(IDbConnection conn, RefreshToken token, IDbTransaction transaction = null!)
         {
             string query

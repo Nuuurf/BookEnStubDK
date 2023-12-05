@@ -28,12 +28,12 @@ private readonly IDbConnection _dbConnection;
         public async Task<AccessTokenResponse> Login(UserLoginModel login)
         {
             User? user = await _dbRefreshToken.FindUser(_dbConnection, login.Username.ToLower());
-            if (user != null && VerifyPassword(user, login.Password))
+            if (user != null! && VerifyPassword(user, login.Password))
             {
-                AuthTokenClaims claims = new AuthTokenClaims { ID = user.UserId.ToString(), Username = user.Username };
+                AuthTokenClaims claims = new AuthTokenClaims { ID = user.UserId.ToString(), Role = user.Role, Username = user.Username };
                 string newAccessToken = GenerateToken(_configuration, claims);
                 string newRefreshToken = GenerateRefreshToken();
-                Task.Run(() => SaveRefreshToken(user.UserId.ToString(), newRefreshToken));
+                await SaveRefreshToken(user.UserId.ToString(), newRefreshToken);
 
                 AccessTokenResponse responseToken = new AccessTokenResponse
                 {
@@ -42,11 +42,42 @@ private readonly IDbConnection _dbConnection;
                 };
                 return responseToken;
             }
-            return null;
+            return null!;
         }
+
+        public async Task<AccessTokenResponse> Register(UserCreationModel newUserModel)
+        {
+            string salt = GenerateSalt();
+            User newUser = new User
+            {
+                Role = newUserModel.Role,
+                Username = newUserModel.Username,
+                PasswordSalt = salt,
+                PasswordHash = HashPassword(newUserModel.Password, salt)
+            };
+
+            bool success = await _dbRefreshToken.RegisterUser(_dbConnection, newUser);
+
+            if (success)
+            {
+                AuthTokenClaims claims = new AuthTokenClaims { ID = newUser.UserId.ToString(), Role = newUser.Role, Username = newUser.Username };
+                string newAccessToken = GenerateToken(_configuration, claims);
+                string newRefreshToken = GenerateRefreshToken();
+                await SaveRefreshToken(newUser.UserId.ToString(), newRefreshToken);
+
+                AccessTokenResponse responseToken = new AccessTokenResponse
+                {
+                    RefreshToken = newRefreshToken,
+                    AccessToken = newAccessToken
+                };
+                return responseToken;
+            }
+            return null!;
+        }
+
         public async Task<AccessTokenResponse> UseRefreshToken(string refreshToken)
         {
-            AuthTokenClaims claims = null;
+            AuthTokenClaims claims = null!;
 
             using (IDbTransaction transaction = _dbConnection.BeginTransaction())
             {
@@ -98,6 +129,7 @@ throw;
             };
             return responseToken;
         }
+
         private string GenerateToken(IConfiguration configuration, AuthTokenClaims user)
         {
             var issuer = configuration["Jwt:Issuer"];
@@ -108,8 +140,7 @@ throw;
             {
                 new Claim("Id", user.ID),
                 new Claim("name", user.Username),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, "Admin")
+                new Claim(ClaimTypes.Role, user.Role.GetDescription())
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -158,6 +189,7 @@ throw;
             string enteredHash = HashPassword(passwordToVerify, user.PasswordSalt);
             return enteredHash == user.PasswordHash;
         }
+
         private string GenerateSalt()
         {
             byte[] saltBytes = new byte[32];
@@ -167,6 +199,7 @@ throw;
             }
             return Convert.ToBase64String(saltBytes);
         }
+
         private string HashPassword(string password, string salt)
         {
             var passwordBytes = Encoding.UTF8.GetBytes(password);
@@ -177,6 +210,5 @@ throw;
                 return Convert.ToBase64String(hashedBytes);
             }
         }
-        
     }
 }

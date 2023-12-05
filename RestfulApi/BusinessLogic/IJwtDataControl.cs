@@ -10,6 +10,7 @@ namespace RestfulApi.BusinessLogic
     {
         public Task<AccessTokenResponse> Login(UserLoginModel login);
 
+        public Task<AccessTokenResponse> Register(UserCreationModel newUserModel);
         public Task<AccessTokenResponse> UseRefreshToken(string refreshToken);
 
     }

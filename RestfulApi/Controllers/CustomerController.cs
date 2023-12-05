@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RestfulApi.BusinessLogic;
 using RestfulApi.DTOs;
@@ -20,6 +21,7 @@ namespace RestfulApi.Controllers
         }
 
         [HttpGet("{phone}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> getCustomerFromPhone(string? phone)
         {
             try

@@ -25,8 +25,8 @@ namespace RestfulApi.Controllers
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(model.Password) || model.Password.Length <= 5 ||
-                    string.IsNullOrWhiteSpace(model.Username) || model.Username.Length <= 5)
+                if (string.IsNullOrWhiteSpace(model.Password) || model.Password.Length <= 8 ||
+                    string.IsNullOrWhiteSpace(model.Username) || model.Username.Length <= 8)
                 {
                     return BadRequest("Invalid Username or Password");
                 }
@@ -41,6 +41,36 @@ namespace RestfulApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("register")]
+        [Authorize(Policy = "MustBeOwner")]
+        public async Task<IActionResult> Register([FromBody] UserCreationModel user)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(user.Password)
+                    || user.Password.Length <= 8
+                    || string.IsNullOrWhiteSpace(user.Username)
+                    || user.Username.Length <= 8)
+                {
+                    return BadRequest("Username or Password not valid");
+                }
+
+                AccessTokenResponse response = await _jwtDataControl.Register(user);
+
+                if (response != null)
+                {
+                    return Ok(response);
+                }
+
+                return BadRequest("User was not created");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+
             }
         }
 

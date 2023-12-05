@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.SignalR;
 using RestfulApi.Utilities;
+using RestfulApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -30,7 +31,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("MustBeAdmin", policy => policy.RequireRole(UserRoles.Admin.GetDescription(), UserRoles.Owner.GetDescription()));
+    options.AddPolicy("MustBeOwner", policy => policy.RequireRole(UserRoles.Owner.GetDescription()));
+});
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
@@ -113,9 +118,7 @@ app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapHub<DateHub>("/dateHub");
-
 app.MapControllers();
 
 app.Run();

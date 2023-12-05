@@ -8,6 +8,7 @@ using RestfulApi.DTOs;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using RestfulApi.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RestfulApi.Controllers {
 
@@ -54,6 +55,8 @@ namespace RestfulApi.Controllers {
         [HttpGet]
         public async Task<IActionResult> ShowBookingsInTimeSlot([FromQuery] BookingRequestFilter req)
         {
+            var user = HttpContext.User;
+            bool isAdmin = user.IsInRole(UserRoles.Admin.GetDescription());
             try
             {
                 if (req.ShowAvailable == true)
@@ -72,6 +75,10 @@ namespace RestfulApi.Controllers {
 
                 }
 
+                if (!isAdmin)
+                {
+                    return Unauthorized();
+                }
                 if (req.End == null)
                 {
                     return BadRequest("Must provide an end date");
@@ -127,6 +134,7 @@ namespace RestfulApi.Controllers {
 
         // URL: api/booking
         [HttpDelete("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public IActionResult DeleteBooking(int id) {
             try {
                 bool bookingSuccess = _bookingdata.DeleteBooking(id).Result;
