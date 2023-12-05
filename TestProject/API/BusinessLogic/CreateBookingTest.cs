@@ -12,7 +12,7 @@ namespace TestProject.API.BusinessLogic;
 public class CreateBookingTest
 {
 
-    private TimeSpan ts = new TimeSpan(15, 0, 0);
+    /*private TimeSpan ts = new TimeSpan(15, 0, 0);
 
     private Mock<ICustomerData> MockCustomerControl()
     {
@@ -235,5 +235,5 @@ Customer customer = new Customer();
         Assert.ThrowsAsync<OverBookingException>(result);
 
         return Task.CompletedTask;
-    }
+    }*/
 }

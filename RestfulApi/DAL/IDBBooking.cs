@@ -14,7 +14,7 @@ namespace RestfulApi.DAL {
 
         public Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, BookingRequestFilter req, IDbTransaction transaction = null!);
 
-        public Task<List<int>> GetBookedStubsForHour(IDbConnection conn, DateTime hour, IDbTransaction transaction = null!);
+        public Task<List<int>> GetBookedStubsForHour(IDbConnection conn, DateTime hour, IDbTransaction transaction = null!, bool lockRows = false);
 
         public Task<List<int>> GetAllStubs(IDbConnection conn, IDbTransaction transaction = null!);
 

@@ -55,67 +55,53 @@ namespace TestProject.API.Demo {
         [Test]
         public async Task IsolationLevelPerformanceTest()
         {
-            int maxIterations = 5000;  // Maximum number of times to run the test
-            bool testPassed = false;
+            // Arrange
+            IDbConnection connection1 = _connection.GetOpenConnection();
+            IDbConnection connection2 = _connection.GetOpenConnection();
+            BookingDataControl controller1 = new BookingDataControl(_dBBooking1, new CustomerDataControl(_dBCustomer1, connection1), connection1);
+            BookingDataControl controller2 = new BookingDataControl(_dBBooking1, new CustomerDataControl(_dBCustomer1, connection2), connection2);
 
-            for (int iteration = 0; iteration < maxIterations && !testPassed; iteration++)
-            {
-                // Arrange
-                IDbConnection connection1 = _connection.GetOpenConnection();
-                IDbConnection connection2 = _connection.GetOpenConnection();
-                BookingDataControl controller1 = new BookingDataControl(_dBBooking1, new CustomerDataControl(_dBCustomer1, connection1), connection1);
-                BookingDataControl controller2 = new BookingDataControl(_dBBooking1, new CustomerDataControl(_dBCustomer1, connection2), connection2);
+            BookingController client1 = new BookingController(controller1);
+            BookingController client2 = new BookingController(controller2);
 
-                BookingController client1 = new BookingController(controller1);
-                BookingController client2 = new BookingController(controller2);
+            List<Task<IActionResult>> tasks = new List<Task<IActionResult>>();
 
-                List<Task<IActionResult>> tasks = new List<Task<IActionResult>>();
+            // Act
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-                // Act
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
+            Task<IActionResult> taskClient1 = client1.CreateBooking(_bookingRequest1);
+            tasks.Add(taskClient1);
 
-                Task<IActionResult> taskClient1 = client1.CreateBooking(_bookingRequest1);
-                tasks.Add(taskClient1);
+            await Task.Delay(1);  // Simulate an artificial delay
 
-                await Task.Delay(1);  // Simulate an artificial delay
+            Task<IActionResult> taskClient2 = client2.CreateBooking(_bookingRequest2);
+            tasks.Add(taskClient2);
 
-                Task<IActionResult> taskClient2 = client2.CreateBooking(_bookingRequest2);
-                tasks.Add(taskClient2);
+            await Task.WhenAll(tasks);
 
-                await Task.WhenAll(tasks);
+            stopwatch.Stop();
 
-                stopwatch.Stop();
+            // Assert
+            var firstResult = tasks[0].Result as ObjectResult;
+            var secondResult = tasks[1].Result as ObjectResult;
 
-                // Assert
-                var firstResult = tasks[0].Result as ObjectResult;
-                var secondResult = tasks[1].Result as ObjectResult;
+            bool isFirstResultOk = firstResult is OkObjectResult;
+            bool isSecondResultOk = secondResult is OkObjectResult;
+            bool isFirstResultUnprocessable = firstResult is UnprocessableEntityObjectResult;
+            bool isSecondResultUnprocessable = secondResult is UnprocessableEntityObjectResult;
 
-                bool isFirstResultOk = firstResult is OkObjectResult;
-                bool isSecondResultOk = secondResult is OkObjectResult;
-                bool isFirstResultUnprocessable = firstResult is UnprocessableEntityObjectResult;
-                bool isSecondResultUnprocessable = secondResult is UnprocessableEntityObjectResult;
+            bool isOneOkAndOneUnprocessable = (isFirstResultOk && isSecondResultUnprocessable) || (isFirstResultUnprocessable && isSecondResultOk);
 
-                bool isOneOkAndOneUnprocessable = (isFirstResultOk && isSecondResultUnprocessable) || (isFirstResultUnprocessable && isSecondResultOk);
+            // Write test results for the execution
+            TestContext.WriteLine($"Client1 response was {firstResult}");
+            TestContext.WriteLine($"Client2 response was {secondResult}");
+            TestContext.WriteLine($"Delay between client requests was 1 millisecond");
+            TestContext.WriteLine($"Simulation took {stopwatch.Elapsed} time to complete");
 
-                if (!isOneOkAndOneUnprocessable)
-                {
-                    // Write test results in test summary for the failed iteration
-                    TestContext.WriteLine($"Iteration {iteration + 1} failed.");
-                    TestContext.WriteLine($"Client1 response was {firstResult}");
-                    TestContext.WriteLine($"Client2 response was {secondResult}");
-                    TestContext.WriteLine($"Delay between client requests was 1 millisecond");
-                    TestContext.WriteLine($"Simulation took {stopwatch.Elapsed} time to complete");
-
-                    // Break out of the loop if the test fails
-                    break;
-                }
-
-                testPassed = true; // Mark test as passed if we reach this point
-            }
-
-            Assert.IsTrue(testPassed, "Test failed in one or more iterations.");
+            Assert.IsTrue(isOneOkAndOneUnprocessable, "Test failed to meet the expected condition.");
         }
+
 
 
 

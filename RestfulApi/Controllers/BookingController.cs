@@ -105,11 +105,6 @@ namespace RestfulApi.Controllers {
             List<Booking> bookings = DTO.ConvertToBookingList(booking.Appointments);
             Customer customer = DTO.ConvertToCustomer(booking.Customer);
 
-            int retryCount = 0;
-            const int maxRetries = 1;
-
-            while (retryCount <= maxRetries)
-            {
                 try
                 {
                     int newBookingId = await _bookingdata.CreateBooking(bookings, customer);
@@ -119,24 +114,11 @@ namespace RestfulApi.Controllers {
                 {
                     return UnprocessableEntity("DA: Alle stubbe for denne tidsperiode er optaget \n EN: All stubs for this period are unavailable");
                 }
-                catch (SqlException ex) when (ex.Number == 1205)
-                { // SQL Server deadlock error number
-                    if (retryCount >= maxRetries)
-                    {
-                        return StatusCode(500, "Internal Server Error: Maximum retry attempts exceeded.");
-                    }
-                    retryCount++;
-                }
                 catch (Exception ex)
                 {
                     return StatusCode(500, $"Internal Server Error: {ex.Message}");
                 }
             }
-
-            return StatusCode(500, "Internal Server Error: Unknown issue.");
-        }
-
-
 
         // URL: api/booking
         [HttpDelete("{id}")]
