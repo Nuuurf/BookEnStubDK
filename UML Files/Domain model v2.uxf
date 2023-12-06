@@ -4,8 +4,8 @@
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>70</x>
-      <y>350</y>
+      <x>224</x>
+      <y>336</y>
       <w>140</w>
       <h>140</h>
     </coordinates>
@@ -19,8 +19,8 @@ Number
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>350</x>
-      <y>350</y>
+      <x>504</x>
+      <y>336</y>
       <w>140</w>
       <h>140</h>
     </coordinates>
@@ -35,16 +35,15 @@ Notes</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>854</x>
-      <y>350</y>
+      <x>1008</x>
+      <y>336</y>
       <w>154</w>
       <h>140</h>
     </coordinates>
     <panel_attributes>Customer
 -
 halign=left
-Firstname
-Lastname
+Fullname
 Email
 Phone</panel_attributes>
     <additional_attributes/>
@@ -52,8 +51,8 @@ Phone</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>728</x>
-      <y>406</y>
+      <x>882</x>
+      <y>392</y>
       <w>154</w>
       <h>56</h>
     </coordinates>
@@ -64,8 +63,8 @@ m2=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>196</x>
-      <y>406</y>
+      <x>350</x>
+      <y>392</y>
       <w>182</w>
       <h>56</h>
     </coordinates>
@@ -76,22 +75,23 @@ m2=0..*</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>602</x>
-      <y>350</y>
+      <x>756</x>
+      <y>336</y>
       <w>140</w>
       <h>140</h>
     </coordinates>
     <panel_attributes>Booking Order
 -
 halign=left
-BookingDate</panel_attributes>
+Ordre nr.
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>476</x>
-      <y>406</y>
+      <x>630</x>
+      <y>392</y>
       <w>154</w>
       <h>56</h>
     </coordinates>

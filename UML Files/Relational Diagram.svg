@@ -29,6 +29,7 @@
     /></g
     ><g transform="translate(850,460)"
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+<<<<<<< Updated upstream
       /><text x="19" font-size="10px" y="23.1313" text-decoration="underline" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >BookingOrderID_FK</text
     ></g
@@ -39,16 +40,35 @@
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
       /><text x="29" font-size="10px" y="23.1313" text-decoration="underline" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >CustomerID_FK</text
+=======
+      /><text x="29" font-size="10px" y="23.1328" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+      >BookingOrderID</text
+>>>>>>> Stashed changes
     ></g
     ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(200,340)" stroke-opacity="0" stroke="rgb(255,255,255)"
     ><rect x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)" stroke="none"
     /></g
     ><g transform="translate(200,340)"
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+<<<<<<< Updated upstream
       /><text x="19" font-size="10px" y="23.1313" text-decoration="underline" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >BookingOrderID_PK</text
     ></g
     ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(200,300)" stroke-opacity="0" stroke="rgb(255,255,255)"
+=======
+      /><text x="27" font-size="10px" y="23.1328" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+      >Customer_id_FK</text
+    ></g
+    ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(450,350)" stroke-opacity="0" stroke="rgb(255,255,255)"
+    ><rect x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)" stroke="none"
+    /></g
+    ><g transform="translate(450,350)"
+    ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+      /><text x="60" font-size="10px" y="23.1328" text-decoration="underline" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+      >Id</text
+    ></g
+    ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(450,310)" stroke-opacity="0" stroke="rgb(255,255,255)"
+>>>>>>> Stashed changes
     ><path d="M0.5 0.5 L68.5 0.5 L79 12.5 L79 39 L0.5 39 Z" stroke="none" clip-path="url(#clipPath3)"
     /></g
     ><g transform="translate(200,300)"
@@ -89,16 +109,26 @@
     /></g
     ><g transform="translate(720,460)"
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+<<<<<<< Updated upstream
       /><text x="40" font-size="10px" y="23.1313" text-decoration="underline" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >StubID_FK</text
+=======
+      /><text x="50" font-size="10px" y="23.1328" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+      >StubId</text
+>>>>>>> Stashed changes
     ></g
     ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(200,590)" stroke-opacity="0" stroke="rgb(255,255,255)"
     ><rect x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)" stroke="none"
     /></g
     ><g transform="translate(200,590)"
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+<<<<<<< Updated upstream
       /><text x="40" font-size="10px" y="23.1313" text-decoration="underline" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >StubID_PK</text
+=======
+      /><text x="60" font-size="10px" y="23.1328" text-decoration="underline" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+      >Id</text
+>>>>>>> Stashed changes
     ></g
     ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(590,460)" stroke-opacity="0" stroke="rgb(255,255,255)"
     ><rect x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)" stroke="none"
@@ -113,7 +143,11 @@
     /></g
     ><g transform="translate(460,460)"
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+<<<<<<< Updated upstream
       /><text x="44" font-size="10px" y="23.1313" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+=======
+      /><text x="44" font-size="10px" y="23.1328" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+>>>>>>> Stashed changes
       >TimeEnd</text
     ></g
     ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(330,460)" stroke-opacity="0" stroke="rgb(255,255,255)"
@@ -121,7 +155,11 @@
     /></g
     ><g transform="translate(330,460)"
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+<<<<<<< Updated upstream
       /><text x="43" font-size="10px" y="23.1313" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+=======
+      /><text x="43" font-size="10px" y="23.1328" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+>>>>>>> Stashed changes
       >TimeStart</text
     ></g
     ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(200,460)" stroke-opacity="0" stroke="rgb(255,255,255)"
@@ -129,6 +167,7 @@
     /></g
     ><g transform="translate(200,460)"
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+<<<<<<< Updated upstream
       /><text x="32" font-size="10px" y="23.1313" text-decoration="underline" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >BookingID_PK</text
     ></g
@@ -139,32 +178,61 @@
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
       /><text x="52" font-size="10px" y="23.1313" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >Email</text
+=======
+      /><text x="60" font-size="10px" y="23.1328" text-decoration="underline" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+      >Id</text
+>>>>>>> Stashed changes
     ></g
     ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(460,200)" stroke-opacity="0" stroke="rgb(255,255,255)"
     ><rect x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)" stroke="none"
     /></g
     ><g transform="translate(460,200)"
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+<<<<<<< Updated upstream
       /><text x="50" font-size="10px" y="23.1313" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >Phone</text
+=======
+      /><text x="52" font-size="10px" y="23.1328" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+      >Email</text
+>>>>>>> Stashed changes
     ></g
     ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(330,200)" stroke-opacity="0" stroke="rgb(255,255,255)"
     ><rect x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)" stroke="none"
     /></g
     ><g transform="translate(330,200)"
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+<<<<<<< Updated upstream
       /><text x="51" font-size="10px" y="23.1313" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >Name</text
+=======
+      /><text x="50" font-size="10px" y="23.1328" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+      >Phone</text
+>>>>>>> Stashed changes
     ></g
     ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(200,200)" stroke-opacity="0" stroke="rgb(255,255,255)"
     ><rect x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)" stroke="none"
     /></g
     ><g transform="translate(200,200)"
     ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+<<<<<<< Updated upstream
       /><text x="28" font-size="10px" y="23.1313" text-decoration="underline" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >CustomerID_PK</text
     ></g
     ><g transform="translate(250,370)"
+=======
+      /><text x="51" font-size="10px" y="23.1328" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+      >Name</text
+    ></g
+    ><g fill="rgb(255,255,255)" fill-opacity="0" transform="translate(450,210)" stroke-opacity="0" stroke="rgb(255,255,255)"
+    ><rect x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)" stroke="none"
+    /></g
+    ><g transform="translate(450,210)"
+    ><rect fill="none" x="0.5" width="128.5" height="38.5" y="0.5" clip-path="url(#clipPath2)"
+      /><text x="60" font-size="10px" y="23.1328" text-decoration="underline" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
+      >Id</text
+    ></g
+    ><g transform="translate(500,380)"
+>>>>>>> Stashed changes
     ><path fill="none" d="M10.5 11.5 L10.5 40.5" clip-path="url(#clipPath4)"
       /><path fill="none" d="M10.5 40.5 L660.5 40.5" clip-path="url(#clipPath4)"
       /><path fill="none" d="M660.5 40.5 L660.5 90.5" clip-path="url(#clipPath4)"
