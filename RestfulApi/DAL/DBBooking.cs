@@ -112,17 +112,21 @@ public class DBBooking : IDBBooking {
         return bookingOrderId;
     }
 
-    public async Task<List<int>> GetBookedStubsForHour(IDbConnection conn, DateTime hour, IDbTransaction transaction = null!)
+    public async Task<List<int>> GetBookedStubsForHour(IDbConnection conn, DateTime hour, IDbTransaction transaction = null, bool lockRows = false)
     {
-        string query = @"
-                SELECT StubId FROM Booking
-                WHERE TimeStart >= @HourStart AND TimeStart < @HourEnd";
+        var hourStart = new DateTime(hour.Year, hour.Month, hour.Day, hour.Hour, 0, 0);
+        var hourEnd = hourStart.AddHours(1);
 
-        DateTime hourStart = new DateTime(hour.Year, hour.Month, hour.Day, hour.Hour, 0, 0);
-        DateTime hourEnd = hourStart.AddHours(1);
-        var result = await conn.QueryAsync<int>(query, new { HourStart = hourStart, HourEnd = hourEnd }, transaction : transaction);
+        // Add locking hints based on the lockRows parameter
+        string lockHint = lockRows ? "WITH (ROWLOCK, UPDLOCK)" : "";
+        string query = $@"
+            SELECT StubId FROM Booking {lockHint}
+            WHERE TimeStart >= @HourStart AND TimeStart < @HourEnd";
+
+        var result = await conn.QueryAsync<int>(query, new { HourStart = hourStart, HourEnd = hourEnd }, transaction: transaction);
         return result.ToList();
     }
+
 
     public async Task<List<int>> GetAllStubs(IDbConnection conn, IDbTransaction transaction = null!)
     {

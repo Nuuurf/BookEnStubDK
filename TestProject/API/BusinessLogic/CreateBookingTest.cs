@@ -60,7 +60,7 @@ public class CreateBookingTest
 
         mockDBBooking
             .Setup(repo =>
-                repo.GetBookedStubsForHour(mockDBConnection.Object, It.IsAny<DateTime>(), mockDbTransaction.Object))
+                repo.GetBookedStubsForHour(mockDBConnection.Object, It.IsAny<DateTime>(), mockDbTransaction.Object, It.IsAny<bool>()))
             .ReturnsAsync(new List<int>());
 
         BookingDataControl controller
@@ -173,7 +173,7 @@ Customer customer = new Customer();
 
         mockDBBooking
             .Setup(repo =>
-                repo.GetBookedStubsForHour(mockDBConnection.Object, It.IsAny<DateTime>(), mockDbTransaction.Object))
+                repo.GetBookedStubsForHour(mockDBConnection.Object, It.IsAny<DateTime>(), mockDbTransaction.Object, It.IsAny<bool>()))
             .ReturnsAsync(new List<int>());
         mockDBBooking.Setup(repo => repo.CreateBooking(
                 mockDBConnection.Object,
@@ -217,7 +217,7 @@ Customer customer = new Customer();
 
         mockDBBooking
             .Setup(repo =>
-                repo.GetBookedStubsForHour(mockDBConnection.Object, It.IsAny<DateTime>(), mockDbTransaction.Object))
+                repo.GetBookedStubsForHour(mockDBConnection.Object, It.IsAny<DateTime>(), mockDbTransaction.Object, It.IsAny<bool>()))
             .ReturnsAsync(new List<int>());
         mockDBBooking.Setup(repo => repo.CreateBooking(
                 mockDBConnection.Object,

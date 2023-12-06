@@ -17,12 +17,11 @@ namespace RestfulApi.BusinessLogic {
         private readonly IDbConnection _connection;
         private readonly ICustomerData _customerData;
 
-        private MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
-        private const string StubsCacheKey = "allStubs";
-        private static SemaphoreSlim _bookingSemaphore = new SemaphoreSlim(1, 1);
+        private readonly MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
 
+        private const string StubsCacheKey = "allStubs";
         //Change here if the isolation level need to be changed in the methods that use the field.
-        private System.Data.IsolationLevel _IsolationLevel = System.Data.IsolationLevel.ReadCommitted;
+        private System.Data.IsolationLevel _IsolationLevel = System.Data.IsolationLevel.Serializable;
         //Ready for dependency injection
         public BookingDataControl(IDBBooking dbBooking, ICustomerData customerControl ,IDbConnection connection) {
             //Needs to change with injection
@@ -37,74 +36,51 @@ namespace RestfulApi.BusinessLogic {
         //    return _IsolationLevel;
         //}
 
-        public async Task<int> CreateBooking(List<Booking> bookings, Customer customer) {
-            //If null return exception
-            if (bookings == null) {
-                throw new ArgumentNullException("Booking is null");
-            }
-
-            if (customer == null)
+        public async Task<int> CreateBooking(List<Booking> bookings, Customer customer)
+        {
+            if (bookings == null) throw new ArgumentNullException("Booking is null");
+            if (customer == null) throw new ArgumentNullException("Customer is null");
+            if (!bookings.All(ValidateBookingDates))
             {
-                throw new ArgumentNullException("Customer is null");
+                throw new ArgumentException("Invalid booking dates");
             }
 
-            //Validate booking dates are in the right format and time
-            if (!bookings.All(ValidateBookingDates)) {
-                throw new ArgumentException("Booking date format exception. Booking start date exceeds bookings end date");
-            }
-
-            //Assign id to default error values
             int newBookingOrderId = -1;
             int customerId = -1;
 
-            //check if some error is not caught 
             bool wasAssociated = false;
-            await _bookingSemaphore.WaitAsync();
-            using (var transaction = _connection.BeginTransaction(_IsolationLevel)) {
-                try {
 
-                    //Create a new booking order and retrieve its id
+            using (var transaction = _connection.BeginTransaction(_IsolationLevel))
+            {
+                try
+                {
                     newBookingOrderId = await _dBBooking.CreateNewBookingOrder(_connection, transaction);
-
-                    //create or retrieve customer id
                     customerId = await _customerData.CreateCustomer(_connection, customer, transaction);
-
-                    //associate customer id with booking order
                     wasAssociated = await _customerData.AssociateCustomerWithBookingOrder(_connection, customerId, newBookingOrderId, transaction);
 
-                    if(!wasAssociated) {
-                        throw new Exception("An error occured while associating customer with booking order. Customer id: " + customerId + ". BookingOrderId: " + newBookingOrderId);
+                    if (!wasAssociated)
+                    {
+                        throw new Exception("Error associating customer with booking order");
                     }
 
-                    //Persist each booking from input
-                    foreach (Booking b in bookings)
+                    foreach (var b in bookings)
                     {
                         b.StubId = await GetAvailableOrRandomStub(_connection, b.StubId, b.TimeStart, transaction);
-
                         if (b.StubId == null)
                         {
-                            throw new OverBookingException($"No Available stubs for {b.TimeStart}");
+                            throw new OverBookingException($"No available stubs for {b.TimeStart}");
                         }
                         await _dBBooking.CreateBooking(_connection, b, newBookingOrderId, transaction);
                     }
 
-                    //If no exceptions have been thrown, every thing went right. Commit
                     transaction.Commit();
+                    return newBookingOrderId;
                 }
-                catch{
-                    //Something went wrong. Rollback
+                catch
+                {
                     transaction.Rollback();
-
-                    //Pass the exception to calling method
                     throw;
                 }
-                finally
-                {
-                    _bookingSemaphore.Release();
-                }
-
-                //return the booking order id, which has the bookings assigned to it.
-                return newBookingOrderId;
             }
         }
         public async Task<bool> DeleteBooking(int bookingId) {
@@ -194,51 +170,30 @@ namespace RestfulApi.BusinessLogic {
         }
         private async Task<int?> GetAvailableOrRandomStub(IDbConnection conn, int? desiredStubId, DateTime startTime, IDbTransaction transaction = null)
         {
-            // Get all stubs
             if (!_cache.TryGetValue(StubsCacheKey, out List<int> allStubs))
             {
                 allStubs = await _dBBooking.GetAllStubs(conn, transaction);
                 _cache.Set(StubsCacheKey, allStubs, TimeSpan.FromHours(1));
             }
 
-            string cacheKey = $"BookedStubs_{startTime:yyyyMMddHH}";
-            if (!_cache.TryGetValue(cacheKey, out List<int> bookedStubs))
-            {
-                bookedStubs = await _dBBooking.GetBookedStubsForHour(conn, startTime, transaction);
-                _cache.Set(cacheKey, bookedStubs, TimeSpan.FromMinutes(30));
-            }
+            // Lock the rows during transaction
+            var bookedStubs = await _dBBooking.GetBookedStubsForHour(conn, startTime, transaction, true);
 
             int? selectedStubId = null;
-            if (desiredStubId != null && desiredStubId >= 1 && desiredStubId <= allStubs.Count)
+            if (desiredStubId.HasValue && !bookedStubs.Contains(desiredStubId.Value))
             {
-                // Check if the desired stub is available
-                if (!bookedStubs.Contains(desiredStubId.Value))
-                {
-                    selectedStubId = desiredStubId;
-                }
+                selectedStubId = desiredStubId;
             }
 
-            if (selectedStubId == null)
+            if (!selectedStubId.HasValue)
             {
-                // Exclude booked stubs
                 var availableStubs = allStubs.Except(bookedStubs).ToList();
                 if (availableStubs.Any())
                 {
-                    Random random = new Random();
-                    selectedStubId = availableStubs[random.Next(availableStubs.Count)];
+                    selectedStubId = availableStubs[new Random().Next(availableStubs.Count)];
                 }
             }
-
-            // If a stub was selected, update the cache
-            if (selectedStubId != null)
-            {
-                bookedStubs.Add(selectedStubId.Value);
-                _cache.Set(cacheKey, bookedStubs, TimeSpan.FromMinutes(30));
-            }
-
             return selectedStubId;
         }
-
-
     }
 }

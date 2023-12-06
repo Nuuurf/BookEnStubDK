@@ -95,35 +95,30 @@ namespace RestfulApi.Controllers {
 
         // URL: api/booking
         [HttpPost]
-        public async Task<IActionResult> CreateBooking(BookingRequest? booking = null) {
-            //Console.WriteLine(booking.Customer.FullName.ToString());
-            // Handle Customer association with BookingOrder here
-            if (booking != null) {
-                
-                //Convert from dto to internal model class
-                List<Booking> bookings = DTO.ConvertToBookingList(booking.Appointments);
+        public async Task<IActionResult> CreateBooking(BookingRequest? booking = null)
+        {
+            if (booking == null)
+            {
+                return BadRequest("No JSON object were transmitted with request");
+            }
 
-                Customer customer = DTO.ConvertToCustomer(booking.Customer);
-                
+            List<Booking> bookings = DTO.ConvertToBookingList(booking.Appointments);
+            Customer customer = DTO.ConvertToCustomer(booking.Customer);
 
-                try {
-
+                try
+                {
                     int newBookingId = await _bookingdata.CreateBooking(bookings, customer);
-
                     return Ok(newBookingId);
                 }
-                catch (OverBookingException) {
+                catch (OverBookingException)
+                {
                     return UnprocessableEntity("DA: Alle stubbe for denne tidsperiode er optaget \n EN: All stubs for this period are unavailable");
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     return StatusCode(500, $"Internal Server Error: {ex.Message}");
                 }
             }
-            else {
-                return BadRequest("No JSON object were transmitted with request");
-            }
-        }
-
 
         // URL: api/booking
         [HttpDelete("{id}")]
