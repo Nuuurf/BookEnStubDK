@@ -54,7 +54,7 @@
                                 <!-- Phone Number -->
                                 <div class="mb-3">
                                     <label for="phoneNumber" class="form-label">Telefonnummer</label>
-                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Ex: +45 88 88 88 88" required>
+                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Ex: 88 88 88 88" required>
                                 </div>
 
                                 <!-- Notes -->
@@ -87,7 +87,35 @@
 
         <script>
             $(document).ready(function () {
-                $('.btn-book-confirm').on('click', function () {
+                // Function to validate and format the phone number
+                function formatPhoneNumber(phoneNumber) {
+                    // Regular expression to validate the phone number
+                    var regex = /^(\d{2} ?){3}\d{2}$/;
+                    if (regex.test(phoneNumber)) {
+                        // Remove spaces for formatting
+                        return phoneNumber.replace(/\s/g, '');
+                    } else {
+                        return false;
+                    }
+                }
+
+                // Click event for the submit button
+                $('.btn-book-confirm').on('click', function (event) {
+                    var phoneNumber = $('#phoneNumber').val();
+
+                    // Format and validate the phone number
+                    var formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+
+                    if (!formattedPhoneNumber) {
+                        // If phone number is invalid, display an error and prevent form submission
+                        $('#errorTextBox').text('Ugyldigt telefonnummer.');
+                        event.preventDefault();
+                        return false;
+                    }
+
+                    // Update the phone number input with the formatted number
+                    $('#phoneNumber').val(formattedPhoneNumber);
+
                     // Retrieve data from local storage
                     var selectedAppointments = localStorage.getItem('selectedAppointments');
 
@@ -109,10 +137,13 @@
                         }
                     } else {
                         console.log('No appointments found in local storage');
+                        event.preventDefault(); // Prevent form submission if no appointments are found
                     }
                 });
             });
         </script>
+
+
     </body>
     </html>
 }
