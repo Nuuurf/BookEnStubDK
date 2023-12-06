@@ -28,17 +28,11 @@ namespace WinFormsApp
             InitializeComponent();
 
             initializeDatePicker();
-            initializeComboBox();
         }
 
         private void initializeDatePicker()
         {
             dtp_BookingDate.MinDate = DateTime.Now;
-        }
-
-        private async void initializeComboBox()
-        {
-            await updateComboBox();
         }
 
         private async void dtp_BookingDate_ValueChanged(object sender, EventArgs e)
@@ -59,7 +53,7 @@ namespace WinFormsApp
                 {
                     availableBookings.TimeStart = availableBookings.TimeStart.ToLocalTime();
                     availableBookings.TimeEnd = availableBookings.TimeEnd.ToLocalTime();
-                    string builder = availableBookings.TimeStart.Hour + " - " + availableBookings.TimeEnd.Hour + ", Stubs: " +
+                    string builder = availableBookings.TimeStart.ToString("HH:mm") + " - " + availableBookings.TimeEnd.ToString("HH:mm") + "   |   Stubs: " +
                         availableBookings.AvailableStubIds.Count;
 
 
