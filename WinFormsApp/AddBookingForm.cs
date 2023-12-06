@@ -50,20 +50,29 @@ namespace WinFormsApp
         private async Task updateComboBox()
         {
             cmb_AvailableTimeSlot.Items.Clear();
-            await getAviableTimeSlotsFromAPI();
-
-
-            foreach (AvailableStubsForHour availableBookings in _availableBookingsList)
+            try
             {
-                availableBookings.TimeStart = availableBookings.TimeStart.ToLocalTime();
-                availableBookings.TimeEnd = availableBookings.TimeEnd.ToLocalTime();
-                string builder = availableBookings.TimeStart.Hour + " - " + availableBookings.TimeEnd.Hour + ", Stubs: " +
-                    availableBookings.AvailableStubIds.Count;
+                await getAviableTimeSlotsFromAPI();
 
 
-                cmb_AvailableTimeSlot.Items.Add(builder);
+                foreach (AvailableStubsForHour availableBookings in _availableBookingsList)
+                {
+                    availableBookings.TimeStart = availableBookings.TimeStart.ToLocalTime();
+                    availableBookings.TimeEnd = availableBookings.TimeEnd.ToLocalTime();
+                    string builder = availableBookings.TimeStart.Hour + " - " + availableBookings.TimeEnd.Hour + ", Stubs: " +
+                        availableBookings.AvailableStubIds.Count;
 
+
+                    cmb_AvailableTimeSlot.Items.Add(builder);
+
+                }
             }
+            catch (HttpRequestException e)
+            {
+                //Pops up a message box if there is no connection to the API.
+                MessageBox.Show(e.Message, "No connection to API");
+            }
+
         }
 
         private async Task getAviableTimeSlotsFromAPI()
