@@ -1,21 +1,43 @@
 ﻿using System;
 using System.Data;
+using Dapper;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using RestfulApi.BusinessLogic;
 using RestfulApi.DAL;
+using RestfulApi.Controllers;
 using RestfulApi.Exceptions;
 using RestfulApi.Models;
 using TestProject.API.Utilities;
+using RestfulApi.DTOs;
+using System.Diagnostics;
 
 namespace TestProject.API.BusinessLogic;
 
-public class CreateBookingTest
-{
+public class CreateBookingTest {
+    private IDbConnection _connection;
+
+    private readonly BookingRequest _bookingRequest = new BookingRequest {
+        Appointments = new List<DTONewBooking>
+        {
+        new DTONewBooking
+        {
+            Notes = "Delete me please",
+            TimeStart = DateTime.Now.AddHours(1),
+            TimeEnd = DateTime.Now.AddHours(2) // Adjusted to be 2 hours after TimeStart
+        }
+    },
+        Customer = new DTOCustomer {
+            FullName = "Banana Joe",
+            Email = "Joe@Banana.com",
+            Phone = "1234"
+        }
+    };
+
 
     private TimeSpan ts = new TimeSpan(15, 0, 0);
 
-    private Mock<ICustomerData> MockCustomerControl()
-    {
+    private Mock<ICustomerData> MockCustomerControl() {
         var mockCustomerControl = new Mock<ICustomerData>();
         //Setting up Buisness Logic Customer Mock
         mockCustomerControl.Setup(repo =>
@@ -33,8 +55,7 @@ public class CreateBookingTest
     }
 
     [Test]
-    public async Task CreateBooking_ReturnsNewBookingId_WithNewBooking()
-    {
+    public async Task CreateBooking_ReturnsNewBookingId_WithNewBooking() {
         // Arrange
         DateTime bookingStart = DateTime.Now.Date.AddDays(1) + ts;
         DateTime bookingEnd = bookingStart.AddHours(1);
@@ -56,7 +77,7 @@ public class CreateBookingTest
                 repo.CreateNewBookingOrder(mockDBConnection.Object, mockDbTransaction.Object))
             .ReturnsAsync(1);
         mockDBBooking.Setup(repo => repo.GetAllStubs(mockDBConnection.Object, mockDbTransaction.Object))
-            .ReturnsAsync(new List<int>{1});
+            .ReturnsAsync(new List<int> { 1 });
 
         mockDBBooking
             .Setup(repo =>
@@ -77,13 +98,12 @@ public class CreateBookingTest
     }
 
     [Test]
-    public Task CreateBooking_ThrowsArgumentException_WithPriorDate()
-    {
+    public Task CreateBooking_ThrowsArgumentException_WithPriorDate() {
         //Arrange
         DateTime bookingDate = DateTime.Now.AddDays(-1);
         List<Booking> booking = new List<Booking> { new Booking { TimeStart = bookingDate } };
-Customer customer = new Customer();
-        
+        Customer customer = new Customer();
+
         BookingDataControl controller = new BookingDataControl(null!, null!, null!);
 
         //Act   
@@ -96,8 +116,7 @@ Customer customer = new Customer();
     }
 
     [Test]
-    public Task CreateBooking_ThrowsArgumentNullException_WithNullBooking()
-    {
+    public Task CreateBooking_ThrowsArgumentNullException_WithNullBooking() {
         //Arrange
         List<Booking> booking = null!;
 
@@ -112,8 +131,7 @@ Customer customer = new Customer();
         return Task.CompletedTask;
     }
     [Test]
-    public Task CreateBooking_ThrowsArgumentNullException_WithNullCustomer()
-    {
+    public Task CreateBooking_ThrowsArgumentNullException_WithNullCustomer() {
         //Arrange
         List<Booking> booking = new List<Booking>();
 
@@ -129,8 +147,7 @@ Customer customer = new Customer();
     }
 
     [Test]
-    public Task CreateBooking_ThrowsArgumentException_WithEndDateEarlierThanStart()
-    {
+    public Task CreateBooking_ThrowsArgumentException_WithEndDateEarlierThanStart() {
         //Arrange
         DateTime bookingStart = DateTime.Now.Date + ts;
         DateTime bookingEnd = bookingStart.AddDays(-1);
@@ -138,9 +155,9 @@ Customer customer = new Customer();
         {
             new Booking { TimeStart = bookingStart, TimeEnd = bookingEnd }
         };
-Customer customer = new Customer();
+        Customer customer = new Customer();
 
-        BookingDataControl controller = new BookingDataControl(null!,null!, null!);
+        BookingDataControl controller = new BookingDataControl(null!, null!, null!);
 
         //Act   
         AsyncTestDelegate result = () => controller.CreateBooking(booking, customer);
@@ -152,13 +169,11 @@ Customer customer = new Customer();
     }
 
     [Test]
-    public Task CreateBooking_ThrowsException_WithNoAvailbableStubsForBooking()
-    {
+    public Task CreateBooking_ThrowsException_WithNoAvailbableStubsForBooking() {
         //Arrange
         DateTime bookingStart = DateTime.Now.Date.AddDays(1) + ts;
         DateTime bookingEnd = bookingStart.AddHours(1);
-        Booking booking = new Booking
-        {
+        Booking booking = new Booking {
             TimeStart = bookingStart,
             TimeEnd = bookingEnd
         };
@@ -183,7 +198,7 @@ Customer customer = new Customer();
             .Throws<Exception>();
 
 
-        BookingDataControl controller = new BookingDataControl(mockDBBooking.Object,mockCustomerControl.Object, mockDBConnection.Object);
+        BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, mockCustomerControl.Object, mockDBConnection.Object);
 
         //Act   
         AsyncTestDelegate result = () => controller.CreateBooking(bookingList, customer);
@@ -197,8 +212,7 @@ Customer customer = new Customer();
     }
 
     [Test]
-    public Task CreateBooking_DatabaseThrowsException()
-    {
+    public Task CreateBooking_DatabaseThrowsException() {
         //Arrange
         var mockDBBooking = new Mock<IDBBooking>();
         var (mockDBConnection, mockDbTransaction) = PredefinedMocks.ConnectionMocks();
@@ -235,5 +249,40 @@ Customer customer = new Customer();
         Assert.ThrowsAsync<OverBookingException>(result);
 
         return Task.CompletedTask;
+    }
+
+    [SetUp]
+    public void SetUp() {
+        _connection = DBConnection.Instance.GetOpenConnection();
+    }
+
+    [TearDown]
+    public void TearDown() {
+        using (IDbConnection con = _connection) {
+            string script = "Delete from booking where notes = 'Delete me please'";
+
+            con.Execute(script);
+        }
+        _connection.Close();
+    }
+
+    [Test]
+    public async Task CreateBooking_AssociateWithCustomer_IntegrationTest() {
+        // Arrange
+        IDBCustomer _customer = new DBCustomer();
+        IDBBooking _dBBooking = new DBBooking();
+        ICustomerData _customerControl = new CustomerDataControl(_customer, _connection);
+        IBookingData mockBookingData = new BookingDataControl(_dBBooking, _customerControl, _connection);
+        BookingController controller = new BookingController(mockBookingData);
+
+        // Act
+        var resultTask = controller.CreateBooking(_bookingRequest);
+        IActionResult result = await resultTask;
+
+        //Assert
+        if (result is ObjectResult objectResult) {
+            Assert.That(objectResult.StatusCode, Is.EqualTo(200));
+        }
+        Assert.IsInstanceOf<ObjectResult>(result);
     }
 }

@@ -38,7 +38,7 @@ namespace WebApplicationMVC.Controllers {
                         // Add to the list if the parsing is successful
                         bookingList.Add(new NewBooking() {
                             TimeStart = parsedDateTime,
-                            TimeEnd = parsedDateTime.AddHours(1),
+                            TimeEnd = parsedDateTime.ToLocalTime(),
                             Notes = notes
                         });
                     } else {
@@ -106,7 +106,6 @@ namespace WebApplicationMVC.Controllers {
         // API URL: /Booking/Confirm
         [HttpPost]
         public IActionResult Confirm(string jsonDataInput) {
-            Console.WriteLine(jsonDataInput);
             if (jsonDataInput == "Confirm") {
                 return View();
             } else {

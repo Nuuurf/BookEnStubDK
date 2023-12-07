@@ -20,36 +20,6 @@ namespace RestfulApi.Controllers {
             _bookingdata = bookingData;
         }
 
-        /*
-                // URL: api/booking
-                [HttpPut]
-                public IActionResult UpdateBooking([FromBody] Booking updatedBooking) {
-                    try {
-                        bool success = _DBBooking.UpdateBooking(updatedBooking);
-                        if (success == false) {
-                            return NotFound("Booking not updated");
-                        }
-                        return Ok(success);
-                    } catch (Exception ex) {
-                        return StatusCode(500, $"Internal Server Error: {ex.Message}");
-                    }
-                }
-
-                // URL: api/booking
-                [HttpGet("id")]
-                public IActionResult GetSingleBooking(int id) {
-                    try {
-                        Booking booking = _DBBooking.GetSingleBooking(id);
-                        if (booking == null) {
-                            return NotFound("No booking found.");
-                        }
-
-                        return Ok(booking);
-                    } catch (Exception ex) {
-                        return StatusCode(500, $"Internal Server Error: {ex.Message}");
-                    }
-                }*/
-
         //URL: api/booking
         [HttpGet]
         public async Task<IActionResult> ShowBookingsInTimeSlot([FromQuery] BookingRequestFilter req)
