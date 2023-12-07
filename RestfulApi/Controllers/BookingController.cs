@@ -92,9 +92,9 @@ namespace RestfulApi.Controllers {
 
         // URL: api/booking
         [HttpDelete("{id}")]
-        public IActionResult DeleteBooking(int id) {
+        public async Task<IActionResult> DeleteBooking(int id) {
             try {
-                bool bookingSuccess = _bookingdata.DeleteBooking(id).Result;
+                bool bookingSuccess = await _bookingdata.DeleteBooking(id);
                 if(bookingSuccess) {
                     return Ok(bookingSuccess);
                 }

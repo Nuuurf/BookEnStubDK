@@ -13,7 +13,7 @@ namespace TestProject.API.Controller {
     public class DeleteBookingTest {
 
         [Test]
-        public void DeleteBooking_ShouldReturnOk() {
+        public async Task DeleteBooking_ShouldReturnOk() {
             //Arrange
             var mockBookingData = new Mock<IBookingData>();
             int bookingId = 1;
@@ -24,7 +24,7 @@ namespace TestProject.API.Controller {
             BookingController bookingController = new BookingController(mockBookingData.Object);
 
             //Act
-            result = bookingController.DeleteBooking(bookingId);
+            result = await bookingController.DeleteBooking(bookingId);
 
             //Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -33,7 +33,7 @@ namespace TestProject.API.Controller {
         }
 
         [Test]
-        public void DeleteBooking_ShouldReturn500() {
+        public async Task DeleteBooking_ShouldReturn500() {
             //Arrange
             var mockBookingData = new Mock<IBookingData>();
             int bookingId = 1;
@@ -44,7 +44,7 @@ namespace TestProject.API.Controller {
             BookingController bookingController = new BookingController(mockBookingData.Object);
 
             //Act
-            result = bookingController.DeleteBooking(bookingId);
+            result = await bookingController.DeleteBooking(bookingId);
 
             //Assert
             Assert.IsInstanceOf<ObjectResult>(result);
@@ -54,7 +54,7 @@ namespace TestProject.API.Controller {
         }
 
         [Test]
-        public void DeleteBooking_ShouldReturn422() {
+        public async Task DeleteBooking_ShouldReturn422() {
             //Arrange
             var mockBookingData = new Mock<IBookingData>();
             int bookingId = 1;
@@ -65,7 +65,7 @@ namespace TestProject.API.Controller {
             BookingController bookingController = new BookingController(mockBookingData.Object);
 
             //Act
-            result = bookingController.DeleteBooking(bookingId);
+            result = await bookingController.DeleteBooking(bookingId);
 
             //Assert
             Assert.IsInstanceOf<UnprocessableEntityObjectResult>(result);
