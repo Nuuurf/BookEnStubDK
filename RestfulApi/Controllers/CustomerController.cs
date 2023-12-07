@@ -20,7 +20,7 @@ namespace RestfulApi.Controllers
         }
 
         [HttpGet("{phone}")]
-        public async Task<IActionResult> getCustomerFromPhone(string? phone)
+        public async Task<IActionResult> FindCustomerFromPhone(string? phone)
         {
             try
             {

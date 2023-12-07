@@ -28,21 +28,15 @@ public class DeleteBookingIntegrationTest
         [SetUp]
         public void SetUp()
         {
-            using (IDbConnection con = _connection)
-            {
-                string script = "Delete from booking where notes = 'Delete Bookings For Delete Integration Test'";
+            string script = "Delete from booking where notes = 'Delete Bookings For Delete Integration Test'";
 
-                con.Execute(script);
+            _connection.Execute(script);
                 string scriptInsert = @"
                 INSERT INTO Booking (TimeStart, TimeEnd, StubId, Notes, BookingOrderID) 
                 VALUES ('2023-12-08T15:00:00', '2023-12-08T16:00:00', 1, 'Delete Bookings For Delete Integration Test', 1);
                 SELECT SCOPE_IDENTITY();";
 
-                _bookingId = con.ExecuteScalar<int>(scriptInsert);
-
-            }
-
-
+                _bookingId = _connection.ExecuteScalar<int>(scriptInsert);
         }
 
         [Test]
