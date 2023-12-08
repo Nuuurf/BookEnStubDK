@@ -33,7 +33,7 @@ namespace RestfulApi.Controllers {
                         req.End = req.Start.AddDays(1);
                     }
                     List<AvailableStubsForHour> availableList
-                            = await _bookingdata.GetAvailableStubsForGivenTimeFrame(req.Start, req.End.Value);
+                            = await _bookingdata.GetAvailableStubsForGivenTimeFrame(req);
                         if (availableList == null!)
                         {
                             return BadRequest("End date is prior to start date");

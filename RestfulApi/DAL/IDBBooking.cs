@@ -10,7 +10,9 @@ namespace RestfulApi.DAL {
 
         public Task<bool> DeleteBooking(IDbConnection conn, int bookingID, IDbTransaction trans = null!);
 
-        //bool UpdateBooking(int bookingID, Booking booking);
+        public Task<List<Booking>> GetAvailableBookingsForGivenTimeframe(IDbConnection conn,
+            BookingRequestFilter req,
+            IDbTransaction transaction = null!);
 
         public Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, BookingRequestFilter req, IDbTransaction transaction = null!);
 

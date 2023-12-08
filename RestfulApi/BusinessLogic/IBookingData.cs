@@ -9,7 +9,7 @@ namespace RestfulApi.BusinessLogic {
         
         public Task<List<Booking>> GetBookingsInTimeslot(BookingRequestFilter req);
 
-        public Task<List<AvailableStubsForHour>> GetAvailableStubsForGivenTimeFrame(DateTime start, DateTime end);
+        public Task<List<AvailableStubsForHour>> GetAvailableStubsForGivenTimeFrame(BookingRequestFilter req);
 
         //Artifact from concurrencyTest, use later if wanted.
         //public System.Data.IsolationLevel TestInsertIsolationLevel(System.Data.IsolationLevel level);

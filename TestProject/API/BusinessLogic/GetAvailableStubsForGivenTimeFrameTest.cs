@@ -31,18 +31,19 @@ namespace TestProject.API.BusinessLogic
             //Arrange
             DateTime start = dateTime;
             DateTime end = start.AddHours(2);
+            BookingRequestFilter req = new BookingRequestFilter{ Start = start, End = end };
 
             Mock<IDBBooking> mockDBBooking = new Mock<IDBBooking>();
             mockDBBooking.Setup(repo => repo.GetAllStubs(mockDbConnection.Object, null!)).ReturnsAsync(new List<int>{1,2,3});
 
             mockDBBooking.Setup(repo =>
-                    repo.GetBookingsInTimeslot(mockDbConnection.Object, It.IsAny<BookingRequestFilter>(),null!))
+                    repo.GetAvailableBookingsForGivenTimeframe(mockDbConnection.Object, req,null!))
                 .ReturnsAsync(bookingList);
 
             BookingDataControl controller = new BookingDataControl(mockDBBooking.Object, null!, mockDbConnection.Object);
 
             //Act   
-            List<AvailableStubsForHour> result = await controller.GetAvailableStubsForGivenTimeFrame(start, end);
+            List<AvailableStubsForHour> result = await controller.GetAvailableStubsForGivenTimeFrame(req);
 
             //Assert
             Assert.That(result.Count, Is.EqualTo(3));
@@ -59,11 +60,12 @@ namespace TestProject.API.BusinessLogic
             //Arrange
             DateTime start = dateTime;
             DateTime end = start.AddHours(-2);
-            
+            BookingRequestFilter req = new BookingRequestFilter { Start = start, End = end };
+
             BookingDataControl controller = new BookingDataControl(null!, null!, null!);
 
             //Act   
-            List<AvailableStubsForHour> result = await controller.GetAvailableStubsForGivenTimeFrame(start, end);
+            List<AvailableStubsForHour> result = await controller.GetAvailableStubsForGivenTimeFrame(req);
 
             //Assert
             Assert.IsNull(result);

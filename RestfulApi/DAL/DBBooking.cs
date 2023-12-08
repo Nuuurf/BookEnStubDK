@@ -29,6 +29,17 @@ public class DBBooking : IDBBooking {
 
     }
 
+    public async Task<List<Booking>> GetAvailableBookingsForGivenTimeframe(IDbConnection conn, BookingRequestFilter req, IDbTransaction transaction = null!)
+    {
+        string query
+            = "SELECT TimeStart, TimeEnd, StubId From Booking WHERE TimeStart < @TimeEnd AND TimeEnd > @TimeStart";
+
+        var parameters = new { TimeStart = req.Start, TimeEnd = req.End };
+        var result = await conn.QueryAsync<Booking>(query, parameters, transaction: transaction);
+        return result.ToList();
+
+    }
+
     public async Task<List<Booking>> GetBookingsInTimeslot(IDbConnection conn, BookingRequestFilter req, IDbTransaction transaction = null!)
     {
         StringBuilder script = new StringBuilder(

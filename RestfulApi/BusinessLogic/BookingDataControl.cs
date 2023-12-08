@@ -97,9 +97,9 @@ namespace RestfulApi.BusinessLogic {
             }
             return result;
         }
-        public async Task<List<AvailableStubsForHour>> GetAvailableStubsForGivenTimeFrame(DateTime start, DateTime end)
+        public async Task<List<AvailableStubsForHour>> GetAvailableStubsForGivenTimeFrame(BookingRequestFilter req)
         {
-            if (start > end)
+            if (req.Start > req.End)
             {
                 return null;
             }
@@ -110,10 +110,9 @@ namespace RestfulApi.BusinessLogic {
             List<int> allStubs = await _dBBooking.GetAllStubs(_connection);
 
             // Fetch all bookings in the specified time frame in a single query
-            BookingRequestFilter req = new BookingRequestFilter { Start = start, End = end };
-            List<Booking> allBookingsInRange = await _dBBooking.GetBookingsInTimeslot(_connection, req);
-
-            for (DateTime date = start; date <= end; date = date.AddHours(1))
+            List<Booking> allBookingsInRange = await _dBBooking.GetAvailableBookingsForGivenTimeframe(_connection, req);
+            
+            for (DateTime date = req.Start; date <= req.End; date = date.AddHours(1))
             {
                 if (date.Hour < 9 || date.Hour >= 22) continue;
 

@@ -25,19 +25,19 @@ namespace TestProject.API.Controller
         {
             //Arrange
             DateTime date = DateTime.Now.Date;
-
-            BookingRequestFilter filter = new BookingRequestFilter
+            
+            BookingRequestFilter req = new BookingRequestFilter
             {
                 Start = date, End = date.AddDays(1), ShowAvailable = true
             };
             var mockBusinessBooking = new Mock<IBookingData>();
-            mockBusinessBooking.Setup(repo => repo.GetAvailableStubsForGivenTimeFrame(date, date.AddDays(1))).ReturnsAsync(new List<AvailableStubsForHour>());
+            mockBusinessBooking.Setup(repo => repo.GetAvailableStubsForGivenTimeFrame(req)).ReturnsAsync(new List<AvailableStubsForHour>());
 
             BookingController controller = new BookingController(mockBusinessBooking.Object);
 
 
             //Act
-            var result = await controller.ShowBookingsInTimeSlot(filter);
+            var result = await controller.ShowBookingsInTimeSlot(req);
 
             //Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -48,19 +48,19 @@ namespace TestProject.API.Controller
         {
             //Arrange
             DateTime date = DateTime.Now.Date.AddDays(-1);
-            BookingRequestFilter filter = new BookingRequestFilter
+            BookingRequestFilter req = new BookingRequestFilter
             {
                 Start = date, ShowAvailable = true
             };
             List<AvailableStubsForHour> nullList = null!;
 
             var mockBusinessBooking = new Mock<IBookingData>();
-            mockBusinessBooking.Setup(repo => repo.GetAvailableStubsForGivenTimeFrame(date, date.AddDays(1))).ReturnsAsync(nullList);
+            mockBusinessBooking.Setup(repo => repo.GetAvailableStubsForGivenTimeFrame(req)).ReturnsAsync(nullList);
 
             BookingController controller = new BookingController(mockBusinessBooking.Object);
 
             //Act
-            var result = await controller.ShowBookingsInTimeSlot(filter);
+            var result = await controller.ShowBookingsInTimeSlot(req);
 
             //Assert
             Assert.IsInstanceOf<BadRequestObjectResult>(result);
