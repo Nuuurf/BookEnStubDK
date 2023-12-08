@@ -9,7 +9,7 @@ namespace WinFormsApp.Models
     public class BookingRequest
     {
         public List<NewBooking> Appointments { get; set; }
-        public DTOCustomer? Customer { get; set; }
+        public Customer? Customer { get; set; }
 
         public BookingRequest()
         {

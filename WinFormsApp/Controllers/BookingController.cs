@@ -25,10 +25,10 @@ namespace WinFormsApp.Controllers
         /// <param name="brf"></param>
         /// <returns></returns>
 
-        public async Task<List<Booking>> getBookingsFromAPI(BookingRequestFilter brf)
-        {
+        public async Task<List<Booking>> getBookingsFromAPI(BookingRequestFilter brf) {
             //A list to hold the bookings
             List<Booking> bookings = new List<Booking>();
+
             //Constructs the URL that is to be used.
             string apiUrl = $"Booking?" +
                 $"start={brf.Start.ToString("yyyy-MM-dd")}" +
@@ -38,8 +38,10 @@ namespace WinFormsApp.Controllers
                 $"&OrderId={brf.OrderId}" +
                 $"&CustomerEmail={brf.CustomerEmail}" +
                 $"&CustomerPhone={brf.CustomerPhone}";
+
             //Store the bookings that the method gets back from the API
             bookings = await _apiService.GetAsync<List<Booking>>(apiUrl);
+
             //returns bookinglist
             return bookings;
 

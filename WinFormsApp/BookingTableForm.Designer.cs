@@ -32,7 +32,7 @@
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             panel1 = new Panel();
             pnl_Tabel = new Panel();
-            dataGridView1 = new DataGridView();
+            bookingGridView = new DataGridView();
             pnl_Buttons = new Panel();
             btn_Details = new Button();
             btn_Delete = new Button();
@@ -57,7 +57,7 @@
             toolTip1 = new ToolTip(components);
             panel1.SuspendLayout();
             pnl_Tabel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)bookingGridView).BeginInit();
             pnl_Buttons.SuspendLayout();
             pnl_Filter.SuspendLayout();
             SuspendLayout();
@@ -76,7 +76,7 @@
             // 
             // pnl_Tabel
             // 
-            pnl_Tabel.Controls.Add(dataGridView1);
+            pnl_Tabel.Controls.Add(bookingGridView);
             pnl_Tabel.Dock = DockStyle.Fill;
             pnl_Tabel.Location = new Point(0, 133);
             pnl_Tabel.Margin = new Padding(3, 4, 3, 4);
@@ -86,30 +86,30 @@
             // 
             // dataGridView1
             // 
-            dataGridView1.AllowUserToResizeColumns = false;
-            dataGridView1.AllowUserToResizeRows = false;
+            bookingGridView.AllowUserToResizeColumns = false;
+            bookingGridView.AllowUserToResizeRows = false;
             dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = SystemColors.Control;
             dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
             dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
             dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Dock = DockStyle.Fill;
-            dataGridView1.Location = new Point(0, 0);
-            dataGridView1.Margin = new Padding(3, 4, 3, 4);
-            dataGridView1.MultiSelect = false;
-            dataGridView1.Name = "dataGridView1";
-            dataGridView1.ReadOnly = true;
-            dataGridView1.RowHeadersWidth = 51;
-            dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView1.Size = new Size(753, 467);
-            dataGridView1.TabIndex = 0;
-            dataGridView1.CellMouseDoubleClick += dataGridView1_CellMouseDoubleClick;
-            dataGridView1.ColumnHeaderMouseClick += dataGridView1_ColumnHeaderMouseClick;
-            dataGridView1.RowEnter += dataGridView1_RowEnter;
+            bookingGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            bookingGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            bookingGridView.Dock = DockStyle.Fill;
+            bookingGridView.Location = new Point(0, 0);
+            bookingGridView.Margin = new Padding(3, 4, 3, 4);
+            bookingGridView.MultiSelect = false;
+            bookingGridView.Name = "dataGridView1";
+            bookingGridView.ReadOnly = true;
+            bookingGridView.RowHeadersWidth = 51;
+            bookingGridView.RowTemplate.Height = 25;
+            bookingGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            bookingGridView.Size = new Size(753, 467);
+            bookingGridView.TabIndex = 0;
+            bookingGridView.CellMouseDoubleClick += dataGridView1_CellMouseDoubleClick;
+            bookingGridView.ColumnHeaderMouseClick += bookingGridView_ColumnHeaderMouseClick;
+            bookingGridView.RowEnter += dataGridView1_RowEnter;
             // 
             // pnl_Buttons
             // 
@@ -375,7 +375,7 @@
             Text = "BookingTableForm";
             panel1.ResumeLayout(false);
             pnl_Tabel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)bookingGridView).EndInit();
             pnl_Buttons.ResumeLayout(false);
             pnl_Filter.ResumeLayout(false);
             pnl_Filter.PerformLayout();
@@ -388,7 +388,7 @@
         private Panel pnl_Tabel;
         private Panel pnl_Buttons;
         private Panel pnl_Filter;
-        private DataGridView dataGridView1;
+        private DataGridView bookingGridView;
         private Label lbl_EndDate;
         private Label lbl_StartDate;
         private DateTimePicker dtp_EndDate;

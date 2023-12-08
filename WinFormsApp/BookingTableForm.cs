@@ -83,7 +83,7 @@ namespace WinFormsApp
             //Do to possbile errors, try/catch needed.
             try
             {
-                dataGridView1.AutoGenerateColumns = true;
+                bookingGridView.AutoGenerateColumns = true;
 
                 //Tries to get bookings from API.
                 _bookings = await _bookingController.getBookingsFromAPI(_brf);
@@ -95,12 +95,12 @@ namespace WinFormsApp
                     booking.TimeEnd = booking.TimeEnd.ToLocalTime();
                 }
 
-                dataGridView1.DataSource = _bookings;
+                bookingGridView.DataSource = _bookings;
 
                 //Removes Booking-ID from the Grid-View as it is not needed.
-                dataGridView1.Columns.Remove("Id");
+                bookingGridView.Columns.Remove("Id");
 
-                foreach (DataGridViewColumn column in dataGridView1.Columns)
+                foreach (DataGridViewColumn column in bookingGridView.Columns)
                 {
                     if (column.Name == "Notes")
                     {
@@ -123,9 +123,9 @@ namespace WinFormsApp
                 //Gives an exception if there isn't a booking for a current date.
                 MessageBox.Show("No bookings found", "Info");
                 //Clears the current tabel.
-                dataGridView1.DataSource = null;
+                bookingGridView.DataSource = null;
                 _bookings.Clear();
-                dataGridView1.DataSource = _bookings;
+                bookingGridView.DataSource = _bookings;
             }
         }
 
@@ -247,13 +247,13 @@ namespace WinFormsApp
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void dataGridView1_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        private void bookingGridView_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             //Selects a column based on it's given index.
-            DataGridViewColumn selectedColumn = dataGridView1.Columns[e.ColumnIndex];
+            DataGridViewColumn selectedColumn = bookingGridView.Columns[e.ColumnIndex];
 
             // Gets the list of bookings and sets it to the table.
-            List<Booking> dataSource = (List<Booking>)dataGridView1.DataSource;
+            List<Booking> dataSource = (List<Booking>)bookingGridView.DataSource;
 
             // New list for sorting the index.
             List<Booking> sortedData = new List<Booking>();
@@ -263,7 +263,7 @@ namespace WinFormsApp
             switch (e.ColumnIndex)
             {
                 case 0:
-                    sortedData = dataSource.OrderBy(item => item.Id).ToList();
+                    sortedData = dataSource.OrderBy(item => item.OrderID).ToList();
                     break;
 
                 case 1:
@@ -281,6 +281,7 @@ namespace WinFormsApp
                 case 4:
                     sortedData = dataSource.OrderBy(item => item.TimeEnd).ToList();
                     break;
+
                 case 5:
                     sortedData = dataSource.OrderBy(item => item.Notes).ToList();
                     break;
@@ -289,7 +290,10 @@ namespace WinFormsApp
                     sortedData = dataSource.OrderBy(item => item.TimeStart).ToList();
                     break;
             }
-            dataGridView1.DataSource = sortedData;
+            bookingGridView.DataSource = sortedData;
+            if (bookingGridView.Columns["Id"] != null) {
+                bookingGridView.Columns.Remove("Id");
+            }
         }
 
         private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -317,9 +321,9 @@ namespace WinFormsApp
         private async void btn_Delete_Click(object sender, EventArgs e)
         {
             Booking? selectedBooking = new Booking();
-            if (dataGridView1.SelectedRows.Count > 0)
+            if (bookingGridView.SelectedRows.Count > 0)
             {
-                selectedBooking = dataGridView1.SelectedRows[0].DataBoundItem as Booking;
+                selectedBooking = bookingGridView.SelectedRows[0].DataBoundItem as Booking;
             }
             if (selectedBooking != null)
             {

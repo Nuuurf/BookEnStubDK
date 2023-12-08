@@ -174,7 +174,6 @@
             cmb_AvailableTimeSlot.TabIndex = 2;
             toolTip1.SetToolTip(cmb_AvailableTimeSlot, "Pick a time to add to the booking");
             cmb_AvailableTimeSlot.SelectedIndexChanged += cmb_AvailableTimeSlot_SelectedIndexChanged;
-            cmb_AvailableTimeSlot.SelectedValueChanged += cmb_AvailableTimeSlot_SelectedValueChanged;
             // 
             // btn_Add
             // 

@@ -21,20 +21,20 @@ namespace WinFormsApp.Controllers
             _url = "https://localhost:7021/";
         }
 
-        public async Task<T> GetAsync<T>(string url)
+        public async Task<T> GetAsync<T>(string endPoint)
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, _url + url);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, _url + endPoint);
             var response = await SendRequestAsync<T>(requestMessage);
 
             return response;
         }
 
-        public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest content)
+        public async Task<TResponse> PostAsync<TRequest, TResponse>(string endPoint, TRequest content)
         {
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _url + url)
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _url + endPoint)
             {
                 Content = httpContent
             };
@@ -44,9 +44,9 @@ namespace WinFormsApp.Controllers
             return response;
         }
 
-        public async Task DeleteAsync(string url)
+        public async Task DeleteAsync(string endPoint)
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, _url + url);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, _url + endPoint);
             await SendRequestAsync<object>(requestMessage);
         }
 
