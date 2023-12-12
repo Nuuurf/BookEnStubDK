@@ -1,0 +1,129 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>BookEnStub</title>
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+        <!-- Font Awesome CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+        <!-- Bootstrap Datepicker CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    </head>
+    <body>
+
+        <div class="container mt-4 pb-3 mb-5" id="toplevelContainer">
+            <h2 class="mb-4">Tidsbooking</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h5 class="mb-0 mr-5 pr-5">Ledige Tider</h5>
+                            <!-- Datepicker input field -->
+                            <div class="input-group date">
+                                <input type="text" class="form-control datepicker" id="dateInput">
+                                <div class="input-group-append">
+                                    <button class="input-group-text" id="date-search-btn">
+                                        <strong class="pr-2">Søg </strong><i class="fa fa-calendar"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group" id="available-times">
+                                <!-- Time slots will be added dynamically here -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h5 class="mb-0">Valgte Tidspunkter</h5>
+                            <form asp-controller="Booking" asp-action="Confirm" method="post" id="bookingForm">
+                            <input type="text" id="jsonDataInput" name="jsonDataInput" style="display: none;">
+                                <button class="btn btn-success btn-sm confirm-booking-btn" onclick="prepareAndSubmit()" disabled>
+                                <!--confirm-booking-btn to check button press-->
+                                Bestil Booking <i class="fas fa-check"></i>
+                            </button>
+                            </form>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group" id="selected-appointments">
+                                <!-- Selected appointments will be added here dynamically -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+        <!-- Bootstrap JS and Popper.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+        <!-- Bootstrap Datepicker JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+
+        <!-- JQuery and javascript code for page functionality is below here -->
+        <!-- Rest of the script code is in this file -->
+        <script src="~/js/BookingPage.js"></script>
+
+        <script>
+            // Makes a GET request to fetch available times for entered date
+            $(document).ready(function () {
+                $('#date-search-btn').on('click', function (event) {
+                    // Get the value from the input field
+                    var inputData = $('#dateInput').val();
+                    var parts = inputData.split('/');
+
+                    // Create a new Date object with the parts
+                    var formattedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+
+                    // Format the date as yyyy-mm-dd
+                    var formattedDateString =
+                        formattedDate.getFullYear() + '-' +
+                        ('0' + (formattedDate.getMonth() + 1)).slice(-2) + '-' +
+                        ('0' + formattedDate.getDate()).slice(-2);
+
+                    // Make an AJAX GET request
+                    $.ajax({
+                        url: '@Url.Action("GetAvailableTimes", "Booking")',
+                        type: 'GET',
+                        data: { date: formattedDateString },
+                        success: function (response) {
+                            // Handle the successful response here
+                            processApiResponse(response);
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle errors here
+                            console.error('Error:', error);
+                        }
+                    });
+                });
+            });
+
+            // Submit timeslots and save appointments
+            function prepareAndSubmit() {
+                saveAppointmentsToLocalStorage();
+                var jsonData = "Confirm";
+                document.getElementById('jsonDataInput').value = jsonData;
+                document.getElementById('bookingForm').submit();
+            }
+        </script>
+    </body>
+    </html>
+}

@@ -1,0 +1,149 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tidsbooking</title>
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Font Awesome Icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    </head>
+    <body>
+        <div class="container mt-4 pb-3 mb-5">
+            <h2 class="mb-4">Bekræft Booking</h2>
+            <div class="row">
+                <!-- Booking Times Card -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h5 class="mb-0 mr-5 pr-5">Tid(er) Reserveret</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group" id="booked-times">
+                                <!-- Time slots will be added dynamically here -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Information Card -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h5 class="mb-0">Booking oplysninger</h5>
+                        </div>
+                        <div class="card-body">
+                            <form asp-controller="Booking" asp-action="BookAppointment" method="post">
+                                <!-- Full Name -->
+                                <div class="mb-3">
+                                    <label for="fullName" class="form-label">Fulde Navn</label>
+                                    <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Ex: Lars Larsen" required>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="Ex: lars@email.dk" required>
+                                </div>
+
+                                <!-- Phone Number -->
+                                <div class="mb-3">
+                                    <label for="phoneNumber" class="form-label">Telefonnummer</label>
+                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Ex: 88 88 88 88" required>
+                                </div>
+
+                                <!-- Notes -->
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Kommentar</label>
+                                    <input type="text" class="form-control" id="notes" name="notes" placeholder="Ex: Fødselsdag, kan vi få flag?">
+                                </div>
+
+                                <!-- Hidden field for JSON -->
+                                <input type="hidden" class="form-control" id="jsonString" name="jsonString" />
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-success btn-book-confirm">Bekræft Booking </button>
+                                <p class="text-danger font-italic text-center" id="errorTextBox"></p>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Bootstrap JS (optional, for certain Bootstrap features) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- jQuery (required for Bootstrap JavaScript plugins) -->
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+        <!-- JQuery and javascript code for page functionality is below here -->
+        <!-- Rest of the script code is in this file, is under wwwroot/js/filename.js -->
+        <script src="~/js/ConfirmPage.js"></script>
+
+        <script>
+            $(document).ready(function () {
+                // Function to validate and format the phone number
+                function formatPhoneNumber(phoneNumber) {
+                    // Regular expression to validate the phone number
+                    var regex = /^(\d{2} ?){3}\d{2}$/;
+                    if (regex.test(phoneNumber)) {
+                        // Remove spaces for formatting
+                        return phoneNumber.replace(/\s/g, '');
+                    } else {
+                        return false;
+                    }
+                }
+
+                // Click event for the submit button
+                $('.btn-book-confirm').on('click', function (event) {
+                    var phoneNumber = $('#phoneNumber').val();
+
+                    // Format and validate the phone number
+                    var formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+
+                    if (!formattedPhoneNumber) {
+                        // If phone number is invalid, display an error and prevent form submission
+                        $('#errorTextBox').text('Ugyldigt telefonnummer.');
+                        event.preventDefault();
+                        return false;
+                    }
+
+                    // Update the phone number input with the formatted number
+                    $('#phoneNumber').val(formattedPhoneNumber);
+
+                    // Retrieve data from local storage
+                    var selectedAppointments = localStorage.getItem('selectedAppointments');
+
+                    if (selectedAppointments) {
+                        // Parse the stored string back into an object
+                        var appointments = JSON.parse(selectedAppointments);
+
+                        // Extract only the datetime values from the appointments
+                        var datetimeValues = appointments.map(function (appointment) {
+                            return appointment.datetime;
+                        });
+
+                        // Prepare the JSON object for the POST request
+                        var postData = JSON.stringify(datetimeValues);
+
+                        if (selectedAppointments !== null) {
+                            // Update the value of the hidden field
+                            $('#jsonString').val(postData);
+                        }
+                    } else {
+                        console.log('No appointments found in local storage');
+                        event.preventDefault(); // Prevent form submission if no appointments are found
+                    }
+                });
+            });
+        </script>
+
+
+    </body>
+    </html>
+}
