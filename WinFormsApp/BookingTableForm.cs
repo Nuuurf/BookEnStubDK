@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using WinFormsApp.Controllers;
@@ -34,6 +35,9 @@ namespace WinFormsApp
         string _email = "";
         string _phone = "";
         BookingRequestFilter _brf = new BookingRequestFilter();
+        private static System.Timers.Timer timer;
+        private static int countdownDuration = 10;
+        private bool isCountdownRunning = false;
 
         /// <summary>
         /// Only controller for this class. Initialize all elements.
@@ -83,9 +87,11 @@ namespace WinFormsApp
             //Do to possbile errors, try/catch needed.
             try
             {
+
                 bookingGridView.AutoGenerateColumns = true;
 
                 //Tries to get bookings from API.
+                txt_Status.Text = $"Fetching data from API";
                 _bookings = await _bookingController.getBookingsFromAPI(_brf);
 
                 //Displays the list of bookings in the table.
@@ -112,11 +118,17 @@ namespace WinFormsApp
                     }
 
                 }
+                txt_Status.Text = $"Fetching data complete";
             }
             catch (HttpRequestException e)
             {
                 //Pops up a message box if there is no connection to the API.
-                MessageBox.Show(e.Message, "No connection to API");
+                //MessageBox.Show(e.Message, "No connection to API");
+                if (!isCountdownRunning)
+                {
+                    StartCountdown();
+                }
+
             }
             catch (NoBookingException)
             {
@@ -212,7 +224,7 @@ namespace WinFormsApp
             }
             catch (Exception)
             {
-                MessageBox.Show("Stub ID: must be a number","Error");
+                MessageBox.Show("Stub ID: must be a number", "Error");
                 txt_StubID.Text = "";
             }
 
@@ -230,7 +242,7 @@ namespace WinFormsApp
             }
             catch (Exception)
             {
-                MessageBox.Show("Order ID: must be a number","Error");
+                MessageBox.Show("Order ID: must be a number", "Error");
                 txt_OrderID.Text = "";
             }
 
@@ -291,7 +303,8 @@ namespace WinFormsApp
                     break;
             }
             bookingGridView.DataSource = sortedData;
-            if (bookingGridView.Columns["Id"] != null) {
+            if (bookingGridView.Columns["Id"] != null)
+            {
                 bookingGridView.Columns.Remove("Id");
             }
         }
@@ -365,6 +378,32 @@ namespace WinFormsApp
             {
                 // User canceled the deletion
                 // You can add additional logic or simply do nothing
+            }
+        }
+        private void StartCountdown()
+        {
+            // Set up the timer
+            countdownDuration = 10;
+            timer = new System.Timers.Timer(1000); // 1 second interval
+            timer.Elapsed += OnTimedEvent;
+
+            // Start the timer
+            timer.Enabled = true;
+            isCountdownRunning = true;
+        }
+
+        private void OnTimedEvent(object sender, ElapsedEventArgs e)
+        {
+            countdownDuration--;
+
+            txt_Status.Text = $"Retrying in {countdownDuration}";
+
+            if (countdownDuration <= 0)
+            {
+                //Retry
+                isCountdownRunning = false;
+                timer.Stop();
+                getData();
             }
         }
     }
