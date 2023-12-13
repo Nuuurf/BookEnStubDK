@@ -38,7 +38,7 @@
                             <h5 class="mb-0">Booking oplysninger</h5>
                         </div>
                         <div class="card-body">
-                            <form asp-controller="Booking" asp-action="BookAppointment" method="post">
+                            <form asp-controller="Booking" asp-action="BookAppointment" method="post" id="bookingForm">
                                 <!-- Full Name -->
                                 <div class="mb-3">
                                     <label for="fullName" class="form-label">Fulde Navn</label>
@@ -140,6 +140,11 @@
                         event.preventDefault(); // Prevent form submission if no appointments are found
                     }
                 });
+            });
+
+            $('#bookingForm').on('submit', function (event) {
+                $('.btn-book-confirm').prop('disabled', true); // Disable button to prevent spam
+                $('.btn-book-confirm').text('Bekræfter booking...'); // Update text for user to know what is happening
             });
         </script>
 

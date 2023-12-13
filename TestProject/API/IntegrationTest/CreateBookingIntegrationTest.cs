@@ -13,14 +13,11 @@ using RestfulApi.DTOs;
 using RestfulApi.Models;
 using TestProject.API.Utilities;
 
-namespace TestProject.API.IntegrationTest
-{
-    public class CreateBookingIntegrationTest
-    {
+namespace TestProject.API.IntegrationTest {
+    public class CreateBookingIntegrationTest {
         private IDbConnection _connection;
 
-        private readonly BookingRequest _bookingRequest = new BookingRequest
-        {
+        private readonly BookingRequest _bookingRequest = new BookingRequest {
             Appointments = new List<DTONewBooking>
             {
                 new DTONewBooking
@@ -30,8 +27,7 @@ namespace TestProject.API.IntegrationTest
                     TimeEnd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 0, 0).AddDays(1) // One hour after TimeStart
                 }
             },
-            Customer = new DTOCustomer
-            {
+            Customer = new DTOCustomer {
                 FullName = "Banana Joe",
                 Email = "Joe@Banana.com",
                 Phone = "1234"
@@ -39,15 +35,13 @@ namespace TestProject.API.IntegrationTest
         };
 
         [SetUp]
-        public void SetUp()
-        {
+        public void SetUp() {
             _connection = DBConnection.Instance.GetOpenConnection();
         }
+
         [TearDown]
-        public void TearDown()
-        {
-            using (IDbConnection con = _connection)
-            {
+        public void TearDown() {
+            using (IDbConnection con = _connection) {
                 string script = "Delete from booking where notes = 'Delete me please'";
 
                 con.Execute(script);
@@ -55,9 +49,8 @@ namespace TestProject.API.IntegrationTest
             _connection.Close();
         }
 
-                [Test]
-        public async Task CreateBooking_AssociateWithCustomer_IntegrationTest()
-        {
+        [Test]
+        public async Task CreateBooking_AssociateWithCustomer_IntegrationTest() {
             // Arrange
             IDBCustomer _customer = new DBCustomer();
             IDBBooking _dBBooking = new DBBooking();
@@ -70,8 +63,7 @@ namespace TestProject.API.IntegrationTest
             IActionResult result = await resultTask;
 
             //Assert
-            if (result is ObjectResult objectResult)
-            {
+            if (result is ObjectResult objectResult) {
                 Assert.That(objectResult.StatusCode, Is.EqualTo(200));
             }
             Assert.IsInstanceOf<ObjectResult>(result);
