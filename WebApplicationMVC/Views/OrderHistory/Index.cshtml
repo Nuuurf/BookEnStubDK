@@ -1,5 +1,8 @@
 ﻿@model int?
 
+<!--Import JQuery-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,8 +22,14 @@
             <div class="form-group mb-3">
                 <input type="text" class="form-control" id="inputValue" name="inputValue" placeholder="Ex: 88 88 88 88" required>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
         </form>
     </div>
 </body>
 </html>
+
+<script>
+    $('#submitButton').on('click', function () {
+        localStorage.setItem("userPhone", $('#inputValue').val());
+    });
+</script>
