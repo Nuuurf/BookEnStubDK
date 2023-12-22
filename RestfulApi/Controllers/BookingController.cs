@@ -107,5 +107,29 @@ namespace RestfulApi.Controllers {
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
+        [HttpGet("{phoneNumber}")]
+        public async Task<IActionResult> GetBookingsByPhonenumber(string phoneNumber) {
+            if(phoneNumber != null) {
+                List<Booking> bookings = new List<Booking>();
+
+                try {
+                    bookings = await _bookingdata.GetBookingsByPhoneNumber(phoneNumber);
+
+                    return Ok(bookings);
+                }
+                //The result is empty
+                catch(EmptyResultException ex) {
+                    return UnprocessableEntity(ex.Message);
+                }
+                //Some other error has happened
+                catch(Exception ex) {
+                    return StatusCode(500, ex.Message);
+                }
+            }
+            else {
+                return BadRequest("No phone number was sent in request");
+            }
+        }
     }
 }

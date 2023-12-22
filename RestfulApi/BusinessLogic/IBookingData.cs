@@ -11,6 +11,8 @@ namespace RestfulApi.BusinessLogic {
 
         public Task<List<AvailableStubsForHour>> GetAvailableStubsForGivenTimeFrame(BookingRequestFilter req);
 
+        public Task<List<Booking>> GetBookingsByPhoneNumber(string phoneNumber);
+
         //Artifact from concurrencyTest, use later if wanted.
         //public System.Data.IsolationLevel TestInsertIsolationLevel(System.Data.IsolationLevel level);
 

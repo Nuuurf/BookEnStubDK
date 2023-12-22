@@ -194,5 +194,23 @@ namespace RestfulApi.BusinessLogic {
             }
             return selectedStubId;
         }
+
+        public async Task<List<Booking>> GetBookingsByPhoneNumber(string phoneNumber) {
+            List<Booking> bookings = new List<Booking>();
+
+            try {
+                bookings = await _dBBooking.GetBookingsByPhoneNumber(_connection, phoneNumber);
+                //Result is empty, meaning that the registed user has no bookings.
+                if(bookings.Count == 0) {
+                    throw new EmptyResultException("This user has no registered bookings. This might be caused by deletion of data");
+                }
+            }
+            //throw some other exception
+            catch {
+                throw;
+            }
+
+            return bookings;
+        }
     }
 }

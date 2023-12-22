@@ -123,6 +123,28 @@ public class DBBooking : IDBBooking {
         return bookingOrderId;
     }
 
+    public async Task<List<Booking>> GetBookingsByPhoneNumber(IDbConnection conn, string phoneNumber, IDbTransaction trans) {
+        //Script
+        const string script = "SELECT Booking.Id, Booking.Notes, booking.TimeStart, booking.TimeEnd " +
+        "FROM Booking " +
+        "INNER JOIN BookingOrder ON BookingOrder.id = booking.BookingOrderID " +
+        "INNER JOIN Customer ON Customer.Id = BookingOrder.customer_id_FK " +
+        "WHERE Customer.phone = @phone";
+
+        try {
+            //parameter for phonenumber
+            var parameter = new { phone = phoneNumber };
+            
+            var result = await conn.QueryAsync<Booking>(script, parameter, transaction: trans);
+
+            return result.ToList();
+        }
+        catch {
+            //handle exception in business logic
+            throw;
+        }
+    }
+
     public async Task<List<int>> GetBookedStubsForHour(IDbConnection conn, DateTime hour, IDbTransaction transaction = null, bool lockRows = false)
     {
         var hourStart = new DateTime(hour.Year, hour.Month, hour.Day, hour.Hour, 0, 0);

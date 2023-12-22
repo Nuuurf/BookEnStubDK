@@ -1,0 +1,68 @@
+﻿@model BookingHistoryItemContainer
+<!--Inport JQuery-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<h1>Booking historik</h1>
+
+<form asp-controller="OrderHistory" asp-action="Index" method="get">
+    <button type="submit" class="btn btn-primary">Tilbage</button>
+</form>
+
+<table class="table" id="BookingHistoryTable">
+    <thead>
+        <tr>
+            <th>
+                Booking Id
+            </th>
+            <th>
+                Noter
+            </th>
+            <th>
+                Start tidspunkt
+            </th>
+            <th>
+                Slut tidspunkt
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.BookingItems) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(i => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(i => item.Notes)
+                </td>
+                <td>
+                    @Html.DisplayFor(i => item.TimeStart)
+                </td>
+                <td>
+                    @Html.DisplayFor(i => item.TimeEnd)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        // function to update table content asynchronously //Very sensitive to ANYTHING
+        function updateTable() {
+            $.ajax({
+                url: '/OrderHistory/GetOrdersByPhone',
+                method: 'GET',
+                success: function (result) {
+                    // replace table content with retrieved content
+                    $('#BookingHistoryTable tbody').html(result);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+
+        // update every 10 seconds
+        setInterval(updateTable, 10000);
+    });
+</script>
