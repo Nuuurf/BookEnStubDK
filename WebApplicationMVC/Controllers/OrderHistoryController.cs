@@ -60,33 +60,28 @@ namespace WebApplicationMVC.Controllers {
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetOrdersByPhone(string phone) {
-            IActionResult result = null;
-
+        public async Task<IActionResult> UpdatePartialViewTable(string phone) {
+            //create uri
             string uri = "https://localhost:7021/Booking/" + phone;
 
             ApiService<List<BookingHistoryItem>> apiService = new ApiService<List<BookingHistoryItem>>();
-
-            List<BookingHistoryItem> bhi = new List<BookingHistoryItem>();
+            
+            BookingHistoryItemContainer bhc = new BookingHistoryItemContainer();
 
             try {
-                //Use api service to get generic object
-                bhi = await apiService.Get(uri);
+                //get list of booking history items
+                bhc.BookingItems = await apiService.Get(uri);
 
-                //sort
-                bhi.Sort((x, y) => y.TimeStart.CompareTo(x.TimeStart));
+                //Do a little sort, no sacrilege intended
+                bhc.BookingItems.Sort((x, y) => y.TimeStart.CompareTo(x.TimeStart));
 
-                //send json objects to frontend to be made into html
-                //result = Ok(bhi);
-
-                //send html to frontend
-                HTMLgenerator<BookingHistoryItem> htmlGen = new HTMLgenerator<BookingHistoryItem>();
-                return Content(htmlGen.GenerateTable(bhi), "text/html");
+                //return partial view with the items
+                return PartialView("PVBookingHistoryTable", bhc);
             }
-            catch {
-                result = StatusCode((int)apiService.ResponseCode);
+            catch (Exception ex) {
+                //if something goes wrong send 500 error
+                return StatusCode(500, ex.Message);
             }
-            return result;
         }
     }
 }

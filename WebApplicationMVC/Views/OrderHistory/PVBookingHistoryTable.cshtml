@@ -1,0 +1,38 @@
+﻿@model BookingHistoryItemContainer
+
+<table class="table" id="BookingHistoryTable">
+    <thead>
+        <tr>
+            <th>
+                Booking Id
+            </th>
+            <th>
+                Noter
+            </th>
+            <th>
+                Start tidspunkt
+            </th>
+            <th>
+                Slut tidspunkt
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.BookingItems) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(i => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(i => item.Notes)
+                </td>
+                <td>
+                    @Html.DisplayFor(i => item.TimeStart)
+                </td>
+                <td>
+                    @Html.DisplayFor(i => item.TimeEnd)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
