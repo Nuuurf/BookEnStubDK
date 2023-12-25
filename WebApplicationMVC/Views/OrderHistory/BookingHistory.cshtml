@@ -52,10 +52,13 @@
             $.ajax({
                 url: '/OrderHistory/GetOrdersByPhone',
                 method: 'GET',
+                datatype: 'json',
                 data: { phone: localStorage.getItem("userPhone")},
                 success: function (result) {
-                    // replace table content with retrieved content
+                    //Uses formattet html from backend
                     $('#BookingHistoryTable tbody').html(result);
+                    //Generates html on frontend (More complicated)
+                    //generateTable(result);
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
@@ -66,7 +69,34 @@
         //call method uppon document ready
         updateTable();
 
-        // update every 10 seconds
+
+        //update every 10 seconds
         setInterval(updateTable, 10000);
     });
+
+    //This function generates html to display.
+    //It has not styling or formatting.
+    function generateTable(jsonData) {
+        $('#BookingHistoryTable').empty();
+        
+        //create headers
+        const headers = Object.keys(jsonData[0]);
+        const headerRow = $('<tr></tr>');
+        headers.forEach(headerText => {
+            const th = $('<th></th>').text(headerText);
+            headerRow.append(th);
+        });
+        //append headers
+        $('#BookingHistoryTable').append(headerRow);
+
+        //populate table
+        jsonData.forEach(dataItem => {
+            const row = $('<tr></tr>');
+            Object.values(dataItem).forEach(value => {
+                const cell = $('<td></td>').text(value);
+                row.append(cell);
+            });
+            $('#BookingHistoryTable').append(row);
+        });
+    }
 </script>

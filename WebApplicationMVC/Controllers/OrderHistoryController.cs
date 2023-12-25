@@ -63,72 +63,29 @@ namespace WebApplicationMVC.Controllers {
         public async Task<IActionResult> GetOrdersByPhone(string phone) {
             IActionResult result = null;
 
-            using(HttpClient client = new HttpClient()) {
-                string uri = "https://localhost:7021/Booking/" + phone; //test value
+            string uri = "https://localhost:7021/Booking/" + phone;
 
-                try {
-                    HttpResponseMessage response = await client.GetAsync(uri);
+            ApiService<List<BookingHistoryItem>> apiService = new ApiService<List<BookingHistoryItem>>();
 
-                    if (response.IsSuccessStatusCode) {
-                        string responseData = await response.Content.ReadAsStringAsync();
+            List<BookingHistoryItem> bhi = new List<BookingHistoryItem>();
 
-                        List<BookingHistoryItem> items = JsonConvert.DeserializeObject<List<BookingHistoryItem>>(responseData);
+            try {
+                //Use api service to get generic object
+                bhi = await apiService.Get(uri);
 
-                        //sort items by date for better user experience
-                        items.Sort((x, y) => y.TimeStart.CompareTo(x.TimeStart));
+                //sort
+                bhi.Sort((x, y) => y.TimeStart.CompareTo(x.TimeStart));
 
-                        //Create a html table
-                        var table = new TableTag();
-                        table.AddClass("table table-boardered");
+                //send json objects to frontend to be made into html
+                //result = Ok(bhi);
 
-                        //add row headers to match the prexisting table format
-                        table.AddHeaderRow(row => {
-                            row.Header("Booking id");
-                            row.Header("Noter");
-                            row.Header("Start tidspunkt");
-                            row.Header("Slut tidspunkt");
-                        });
-
-                        //insert the data from the booking history items
-                        foreach(BookingHistoryItem item in items) {
-                            //mark rows with bookings that are older than current date with red.
-                            if (item.TimeEnd < DateTime.Now) {
-                                table.AddBodyRow(row => {
-                                    row.Cell(item.Id + "").Attr("class", "text-danger text-lg");
-                                    row.Cell(item.Notes).Attr("class", "text-danger text-lg");
-                                    row.Cell(item.TimeStart.ToString()).Attr("class", "text-danger text-lg");
-                                    row.Cell(item.TimeEnd.ToString()).Attr("class", "text-danger text-lg");
-                                });
-                            }
-                            else {
-                                table.AddBodyRow(row => {
-                                    row.Cell(item.Id + "");
-                                    row.Cell(item.Notes);
-                                    row.Cell(item.TimeStart.ToString());
-                                    row.Cell(item.TimeEnd.ToString());
-                                });
-                            }
-                            
-                        }
-                        
-                        //convert table object into html content that can be sent to page.
-                        result = Content(table.ToHtmlString(), "text/html");
-                    }
-                    else {
-                        //return the status code if it is not successful
-                        return StatusCode((int) response.StatusCode);
-                    }
-                }
-                catch (Exception ex) {
-                    //return status code 500 if some exception occures.
-                    return StatusCode(500, "Some internal server error has occured " + ex.Message);
-                }
+                //send html to frontend
+                HTMLgenerator<BookingHistoryItem> htmlGen = new HTMLgenerator<BookingHistoryItem>();
+                return Content(htmlGen.GenerateTable(bhi), "text/html");
             }
-
-            //test string
-            //string updatedHtml = "<tr><td>Booking 1</td><td>Details</td></tr><tr><td>Booking 2</td><td>Details</td></tr>";
-
-            //return Content(updatedHtml, "text/html"); // Return HTML content as a string
+            catch {
+                result = StatusCode((int)apiService.ResponseCode);
+            }
             return result;
         }
     }
