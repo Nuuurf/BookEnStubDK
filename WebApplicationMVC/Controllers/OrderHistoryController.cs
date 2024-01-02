@@ -83,7 +83,7 @@ namespace WebApplicationMVC.Controllers {
                 return Content(htmlGen.GenerateTable(bhi), "text/html");
             }
             catch {
-                result = StatusCode((int)apiService.ResponseCode);
+                result = StatusCode((int)ApiService.ResponseCode);
             }
             return result;
         }
