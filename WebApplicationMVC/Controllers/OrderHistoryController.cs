@@ -65,13 +65,12 @@ namespace WebApplicationMVC.Controllers {
 
             string uri = "https://localhost:7021/Booking/" + phone;
 
-            ApiService<List<BookingHistoryItem>> apiService = new ApiService<List<BookingHistoryItem>>();
 
             List<BookingHistoryItem> bhi = new List<BookingHistoryItem>();
 
             try {
                 //Use api service to get generic object
-                bhi = await apiService.Get(uri);
+                bhi = await ApiService.Get<List<BookingHistoryItem>>(uri);
 
                 //sort
                 bhi.Sort((x, y) => y.TimeStart.CompareTo(x.TimeStart));

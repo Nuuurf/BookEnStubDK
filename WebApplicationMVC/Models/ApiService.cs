@@ -2,15 +2,11 @@
 using Newtonsoft.Json;
 
 namespace WebApplicationMVC.Models {
-    public class ApiService<T> {
+    public static class ApiService {
 
-        public ApiService() {
-        
-        }
+        public static int ResponseCode { get; private set; }
 
-        public int ResponseCode { get; private set; }
-
-        public async Task<T> Get(String endpoint) {
+        public static async Task<T> Get<T>(String endpoint) {
 
             using(HttpClient client = new HttpClient()) {
 
@@ -29,7 +25,7 @@ namespace WebApplicationMVC.Models {
 
         }
 
-        public async Task<T> Post(String endpoint, T data) {
+        public static async Task<T> Post<T>(String endpoint, T data) {
 
             string dataAsString = "";
 
