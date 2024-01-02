@@ -56,9 +56,9 @@
                 data: { phone: localStorage.getItem("userPhone")},
                 success: function (result) {
                     //Uses formattet html from backend
-                    //$('#BookingHistoryTable tbody').html(result);
+                    $('#BookingHistoryTable tbody').html(result);
                     //Generates html on frontend (More complicated)
-                    generateTable(result);
+                    //generateTable(result);
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
